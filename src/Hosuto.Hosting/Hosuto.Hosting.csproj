@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <AssemblyName>Dbosoft.Hosuto.Hosting</AssemblyName>
+    <RootNamespace>Dbosoft.Hosuto</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hosuto.Abstractions\Hosuto.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Dbosoft.Hosuto.SimpleInjector</AssemblyName>
+    <RootNamespace>Dbosoft.Hosuto</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SimpleInjector" Version="5.0.3" />
+    <PackageReference Include="SimpleInjector.Integration.ServiceCollection" Version="5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hosuto.Abstractions\Hosuto.Abstractions.csproj" />
+    <ProjectReference Include="..\Hosuto.Hosting\Hosuto.Hosting.csproj" />
+  </ItemGroup>
+
+</Project>

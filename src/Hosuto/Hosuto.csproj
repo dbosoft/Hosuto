@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Dbosoft.Hosuto</AssemblyName>
+    <RootNamespace>Dbosoft.Hosuto</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hosuto.Abstractions\Hosuto.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>
