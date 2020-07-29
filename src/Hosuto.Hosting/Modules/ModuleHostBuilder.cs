@@ -82,10 +82,13 @@ namespace Dbosoft.Hosuto.Modules
             return UseServiceProviderFactory(factory);
         }
 
+#if NETSTANDARD2_1
+       
         IHostBuilder IHostBuilder.UseServiceProviderFactory<TContainerBuilder>(Func<HostBuilderContext, IServiceProviderFactory<TContainerBuilder>> factory)
         {
             return UseServiceProviderFactory(factory);
         }
+#endif
 
         IHostBuilder IHostBuilder.ConfigureContainer<TContainerBuilder>(Action<HostBuilderContext, TContainerBuilder> configureDelegate)
         {
@@ -154,7 +157,12 @@ namespace Dbosoft.Hosuto.Modules
             _hostingEnvironment = new HostingEnvironment()
             {
                 ApplicationName = _hostConfiguration[HostDefaults.ApplicationKey],
-                EnvironmentName = _hostConfiguration[HostDefaults.EnvironmentKey] ?? Environments.Production,
+                EnvironmentName = _hostConfiguration[HostDefaults.EnvironmentKey] ??
+#if NETSTANDARD2_1
+                                  Environments.Production,
+#else
+                                  EnvironmentName.Production,
+#endif
                 ContentRootPath = ResolveContentRootPath(_hostConfiguration[HostDefaults.ContentRootKey], AppContext.BaseDirectory)
             };
 
@@ -172,7 +180,12 @@ namespace Dbosoft.Hosuto.Modules
         {
             var frameworkServices = new ServiceCollection();
 
+#if NETSTANDARD2_0
+            frameworkServices.AddSingleton((IHostingEnvironment)_hostingEnvironment);
+#else
             frameworkServices.AddSingleton((IHostEnvironment)_hostingEnvironment);
+
+#endif
             frameworkServices.AddSingleton(_hostBuilderContext);
             _configureFrameworkActions.ForEach(c => c(_hostBuilderContext, frameworkServices));
 
@@ -186,7 +199,11 @@ namespace Dbosoft.Hosuto.Modules
         private IServiceProvider CreateServiceProvider()
         {
             var moduleServices = new ServiceCollection()
-                .AddSingleton((IHostEnvironment) _hostingEnvironment)
+#if NETSTANDARD2_0
+                .AddSingleton((IHostingEnvironment) _hostingEnvironment)
+#else
+                 .AddSingleton((IHostEnvironment) _hostingEnvironment)
+#endif
                 .AddSingleton(_hostBuilderContext.Configuration);
 
             foreach (var moduleType in _registeredModules.Keys)

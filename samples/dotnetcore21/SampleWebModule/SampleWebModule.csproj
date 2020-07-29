@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AssemblyName>Dbosoft.Hosuto.Samples.AspNetCore.WebModule</AssemblyName>
+    <RootNamespace>Dbosoft.Hosuto.Samples.AspNetCore.WebModule</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Hosuto.AspNetCore\Hosuto.AspNetCore.csproj" />
+  </ItemGroup>
+
+</Project>

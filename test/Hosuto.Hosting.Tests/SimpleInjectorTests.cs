@@ -22,7 +22,7 @@ namespace Hosuto.Hosting.Tests
             builder.UseSimpleInjector(container);
             builder.HostModule<SimpleInjectorModule>();
             builder.HostModule<SimpleInjectorWebModule>();
-            
+            builder.UseAspNetCoreWithDefaults((module, webBuilder) => { });
 
             builder.UseEnvironment(Environments.Development); 
             builder.Build().Start();

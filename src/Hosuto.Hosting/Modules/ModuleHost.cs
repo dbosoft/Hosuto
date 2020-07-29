@@ -1,4 +1,6 @@
-﻿using System;
+﻿
+
+using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -54,6 +56,7 @@ namespace Dbosoft.Hosuto.Modules
             var builder = new ModuleHostBuilder();
 
             builder.UseContentRoot(Directory.GetCurrentDirectory());
+#if NETSTANDARD2_1
             builder.ConfigureHostConfiguration(config =>
             {
                 config.AddEnvironmentVariables(prefix: "DOTNET_");
@@ -123,8 +126,10 @@ namespace Dbosoft.Hosuto.Modules
                     options.ValidateScopes = isDevelopment;
                     options.ValidateOnBuild = isDevelopment;
                 });
-
+#endif
             return builder;
+
+
         }
 
     }

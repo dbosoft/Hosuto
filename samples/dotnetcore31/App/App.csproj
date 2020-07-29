@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>Dbosoft.Hosuto.Samples.AspNetCore.App</AssemblyName>
+    <RootNamespace>Dbosoft.Hosuto.Samples.AspNetCore</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Hosuto.AspNetCore.Hosting\Hosuto.AspNetCore.Hosting.csproj" />
+    <ProjectReference Include="..\..\..\src\Hosuto.AspNetCore\Hosuto.AspNetCore.csproj" />
+    <ProjectReference Include="..\SampleWebModule\SampleWebModule.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <RunWorkingDirectory>$(MSBuildProjectDirectory)</RunWorkingDirectory>
+  </PropertyGroup>
+
+</Project>

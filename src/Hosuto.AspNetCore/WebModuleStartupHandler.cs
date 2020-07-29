@@ -37,9 +37,10 @@ namespace Hosuto.AspNetCore.Hosting
             var hostBuilderConfigurers = StartupContext.BuilderSettings.FrameworkServiceProvider
                 .GetServices<IWebModuleWebHostBuilderConfigurer>();
 
+            var moduleAssemblyName = StartupContext.Module.GetType().Assembly.GetName().Name;
 
 #if NETCOREAPP
-            
+
             var webHostBuilderInitializer = StartupContext.BuilderSettings.FrameworkServiceProvider
                 .GetService<IWebModuleWebHostBuilderInitializer>();
 
@@ -47,27 +48,48 @@ namespace Hosuto.AspNetCore.Hosting
                 throw new InvalidOperationException("AspNetCore runtime not configured.");
 
 
-            var builder = new HostBuilder();
+            var builder = CreateHostBuilder();
 
-            foreach (var configureAction in StartupContext.BuilderSettings.ConfigurationActions)
-            {
-                builder.ConfigureAppConfiguration(configureAction);
-            }
+            webHostBuilderInitializer.ConfigureWebHost(StartupContext.Module as IWebModule, builder,
+                new[]
+                    {
+                        new DelegateWebHostBuilderConfigurer((_, webHostBuilder) =>
+                        {
+                            webHostBuilder.ConfigureAppConfiguration(
+                                (ctx, b) => { ctx.HostingEnvironment.ApplicationName = moduleAssemblyName; });
+                        })
+                    }.Union(hostBuilderConfigurers)
+                    .Append(
+                        new DelegateWebHostBuilderConfigurer((_, webHostBuilder) =>
+                        {
+                            foreach (var configureServicesAction in StartupContext.BuilderSettings.ConfigureServicesActions)
+                            {
+                                webHostBuilder.ConfigureServices(srv => configureServicesAction(StartupContext.BuilderSettings.HostBuilderContext, srv));
+                            }
 
-            foreach (var configureServicesAction in StartupContext.BuilderSettings.ConfigureServicesActions)
-            {
-                builder.ConfigureServices(configureServicesAction);
-            }
+                            webHostBuilder.ConfigureServices(ConfigureServices);
+                            webHostBuilder.Configure(Configure);
+                        })));
 
-            builder.ConfigureServices(ConfigureServices);
-            
-            webHostBuilderInitializer.ConfigureWebHost(StartupContext.Module as IWebModule, builder, 
-                hostBuilderConfigurers.Append(new DelegateWebHostBuilderConfigurer((_, webHostBuilder)=> webHostBuilder.Configure(Configure))));
-            
             configureHostBuilderAction?.Invoke(builder);
             
             return builder.Build();
 #else
+
+            HostBuilderContext WebContextToHostBuilderContext(WebHostBuilderContext webContext)
+            {
+                return new HostBuilderContext(new Dictionary<object, object> { { "WebHostBuilderContext", webContext } })
+                {
+                    Configuration = webContext.Configuration,
+                    HostingEnvironment = new HostingEnvironment
+                    {
+                        ApplicationName = webContext.HostingEnvironment.ApplicationName,
+                        ContentRootFileProvider = webContext.HostingEnvironment.ContentRootFileProvider,
+                        ContentRootPath = webContext.HostingEnvironment.ContentRootPath,
+                        EnvironmentName = webContext.HostingEnvironment.EnvironmentName,
+                    }
+                };
+            }
 
             var webHostBuilderFactory = StartupContext.BuilderSettings.FrameworkServiceProvider
                 .GetService<IWebModuleWebHostBuilderFactory>();
@@ -77,6 +99,13 @@ namespace Hosuto.AspNetCore.Hosting
 
 
             var webHostBuilder = webHostBuilderFactory.CreateWebHost(StartupContext.Module as IWebModule);
+
+            webHostBuilder.UseConfiguration(StartupContext.BuilderSettings.HostBuilderContext.Configuration);
+            webHostBuilder.UseContentRoot(GetContentRoot());
+            webHostBuilder.ConfigureAppConfiguration((ctx, cfg) =>
+            {
+                ctx.HostingEnvironment.ApplicationName = moduleAssemblyName;
+            });
 
             foreach (var hostBuilderConfigurer in hostBuilderConfigurers)
             {
@@ -91,34 +120,19 @@ namespace Hosuto.AspNetCore.Hosting
 
             foreach (var configureServicesAction in StartupContext.BuilderSettings.ConfigureServicesActions)
             {
-                webHostBuilder.ConfigureServices(srv => configureServicesAction(StartupContext.BuilderSettings.HostBuilderContext, srv));
+                webHostBuilder.ConfigureServices(srv =>
+                    configureServicesAction(StartupContext.BuilderSettings.HostBuilderContext, srv));
             }
-            
+
             var webHost = webHostBuilder.ConfigureServices(ConfigureServices)
-                    .Configure(Configure)
-                    .Build();
+                .Configure(Configure)
+                .Build();
 
             return new WebHostWrapperHost(webHost);
 
 #endif
 
         }
-
-        private static HostBuilderContext WebContextToHostBuilderContext(WebHostBuilderContext webContext)
-        {
-            return new HostBuilderContext(new Dictionary<object, object>{ {"WebHostBuilderContext", webContext} })
-            {
-                Configuration =  webContext.Configuration, 
-                HostingEnvironment = new HostingEnvironment
-                {
-                    ApplicationName = webContext.HostingEnvironment.ApplicationName,
-                    ContentRootFileProvider = webContext.HostingEnvironment.ContentRootFileProvider,
-                    ContentRootPath = webContext.HostingEnvironment.ContentRootPath, 
-                    EnvironmentName = webContext.HostingEnvironment.EnvironmentName,
-                }
-            };
-        }
-
 
     }
 }

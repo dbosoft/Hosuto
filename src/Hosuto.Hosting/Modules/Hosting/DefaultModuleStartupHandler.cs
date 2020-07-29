@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -17,7 +19,8 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         public ModuleStartupContext<TModule> StartupContext { get; }
         protected virtual void ConfigureServices(IServiceCollection services)
         {
-            CallOptionalMethod(StartupContext.Module, "ConfigureServices", StartupContext.ServiceProvider, StartupContext.ServiceProvider, services);
+            var tempProvider = services.BuildServiceProvider();
+            CallOptionalMethod(StartupContext.Module, "ConfigureServices", StartupContext.ServiceProvider, tempProvider, services);
 
             var configurer = StartupContext.BuilderSettings.FrameworkServiceProvider.GetService<IServicesConfigurer<TModule>>();
             configurer?.ConfigureServices(StartupContext.Module, StartupContext.ServiceProvider, services);
@@ -72,28 +75,51 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 #endif
         }
 
-        public virtual IHost CreateHost(Action<IHostBuilder> configureHostBuilderAction)
+        protected virtual IHostBuilder CreateHostBuilder()
         {
             var builder = new HostBuilder();
-            
+
             builder.ConfigureHostConfiguration((configure) =>
             {
+                configure.Sources.Clear();
                 configure.AddConfiguration(StartupContext.BuilderSettings.HostBuilderContext.Configuration);
             });
 
-            
-            foreach (var moduleConfigurationAction in StartupContext.BuilderSettings.ConfigurationActions)
+            builder.UseContentRoot(GetContentRoot());
+
+            var moduleAssemblyName = StartupContext.Module.GetType().Assembly.GetName().Name;
+            builder.ConfigureAppConfiguration((ctx, cfg) =>
             {
-                builder.ConfigureAppConfiguration(moduleConfigurationAction);
+                ctx.HostingEnvironment.ApplicationName = moduleAssemblyName;
+            });
+
+            foreach (var configureAction in StartupContext.BuilderSettings.ConfigurationActions)
+            {
+                builder.ConfigureAppConfiguration(configureAction);
             }
+
+            return builder;
+        }
+
+        protected virtual string GetContentRoot()
+        {
+            return Path.GetFullPath(
+                Path.Combine(
+                    StartupContext.BuilderSettings.HostBuilderContext.HostingEnvironment
+                        .ContentRootPath, "..", StartupContext.Module.Name));
+
+        }
+
+        public virtual IHost CreateHost(Action<IHostBuilder> configureHostBuilderAction)
+        {
+            var builder = CreateHostBuilder();
 
             foreach (var configureServicesAction in StartupContext.BuilderSettings.ConfigureServicesActions)
             {
                 builder.ConfigureServices(configureServicesAction);
             }
-            
-            builder.ConfigureServices(ConfigureServices);
 
+            builder.ConfigureServices(ConfigureServices);
             configureHostBuilderAction?.Invoke(builder);
             var host = builder.Build();
 

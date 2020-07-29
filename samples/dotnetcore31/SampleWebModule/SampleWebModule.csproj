@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <RootNamespace>Dbosoft.Hosuto.Samples.AspNetCore</RootNamespace>
+    <AssemblyName>Dbosoft.Hosuto.Samples.AspNetCore.WebModule</AssemblyName>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+
+
+  <!--<ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>-->
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Hosuto.AspNetCore\Hosuto.AspNetCore.csproj" />
+  </ItemGroup>
+
+</Project>

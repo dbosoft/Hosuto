@@ -70,8 +70,8 @@ namespace Dbosoft.Hosuto.Modules
 
         public void Dispose()
         {
-            _startupContext.Dispose();
-            _host.Dispose();
+            _startupContext?.Dispose();
+            _host?.Dispose();
         }
     }
 }
