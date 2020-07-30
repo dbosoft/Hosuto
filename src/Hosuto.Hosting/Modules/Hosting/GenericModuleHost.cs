@@ -13,7 +13,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         private IHost _host;
         private readonly ModuleStartupContext<TModule> _startupContext;
         private bool _bootstrapRun;
-
+        
         public ModuleHost(TModule module,
             ModuleHostBuilderSettings builderSettings,
             Action<IHostBuilder> configureHostBuilderAction,
@@ -30,25 +30,8 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             if (_bootstrapRun) return;
             _bootstrapRun = true;
 
-            IModuleStartupHandler startupHandler = null;
-            var startupHandlerCandidates =
-                _startupContext.BuilderSettings.FrameworkServiceProvider.GetServices<IModuleStartupHandlerFactory>();
-
-
-            foreach (var handlerCandidate in startupHandlerCandidates)
-            {
-                startupHandler = handlerCandidate.CreateStartupHandler(_startupContext);
-                if (startupHandler != null)
-                    break;
-            }
-
-            // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
-            if (startupHandler == null)
-            {
-                startupHandler = new DefaultModuleStartupHandler<TModule>(_startupContext);
-            }
-
-            _host = startupHandler.CreateHost(_configureHostBuilderAction);
+            var hostFactory = _startupContext.BuilderSettings.FrameworkServiceProvider.GetRequiredService<IHostFactory>();
+            _host = hostFactory.CreateHost(_startupContext, _configureHostBuilderAction);
         }
 
         public Task StartAsync(CancellationToken cancellationToken = default)

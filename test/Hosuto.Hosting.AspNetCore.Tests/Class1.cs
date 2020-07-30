@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Hosuto.Simpleinjector.AspNetCore
+namespace Hosuto.Hosting.AspNetCore.Tests
 {
     public class Class1
     {

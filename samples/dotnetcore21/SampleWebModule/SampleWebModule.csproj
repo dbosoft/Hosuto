@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Hosuto.AspNetCore\Hosuto.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\src\Hosuto\Hosuto.csproj" />
     <ProjectReference Include="..\..\shared\Hosuto.Samples.Common\Hosuto.Samples.Common.csproj" />
   </ItemGroup>
 

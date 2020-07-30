@@ -1,4 +1,5 @@
 ﻿using System;
+using Dbosoft.Hosuto.Modules;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -8,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Dbosoft.Hosuto.Samples
 {
-    public class SampleWebModule : global::Dbosoft.Hosuto.Modules.WebModule
+    public class SampleWebModule : WebModule
     {
         public SampleWebModule(IConfiguration configuration)
         {
