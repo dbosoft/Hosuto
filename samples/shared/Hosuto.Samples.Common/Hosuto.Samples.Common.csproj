@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Dbosoft.Hosuto.Samples</RootNamespace>
+    <AssemblyName>Dbosoft.Hosuto.Samples.Common</AssemblyName>
+  </PropertyGroup>
+
+</Project>

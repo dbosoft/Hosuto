@@ -103,10 +103,16 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         protected virtual string GetContentRoot()
         {
-            return Path.GetFullPath(
-                Path.Combine(
-                    StartupContext.BuilderSettings.HostBuilderContext.HostingEnvironment
-                        .ContentRootPath, "..", StartupContext.Module.Name));
+            var pathCandidate = Path.Combine(
+                StartupContext.BuilderSettings.HostBuilderContext.HostingEnvironment
+                    .ContentRootPath, "..", StartupContext.Module.Name);
+
+            if (!Directory.Exists(pathCandidate))
+                return StartupContext.BuilderSettings.HostBuilderContext.HostingEnvironment
+                    .ContentRootPath;
+
+
+            return Path.GetFullPath(pathCandidate);
 
         }
 

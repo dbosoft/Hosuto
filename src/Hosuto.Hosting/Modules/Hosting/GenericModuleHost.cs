@@ -63,7 +63,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             _startupContext.Dispose();
         }
 
-        public IServiceProvider Services => _host.Services;
+        public IServiceProvider Services => _host?.Services;
 
         public Task WaitForShutdownAsync(CancellationToken cancellationToken = default) => _host.WaitForShutdownAsync(cancellationToken);
 

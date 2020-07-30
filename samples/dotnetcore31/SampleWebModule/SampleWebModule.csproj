@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-    <RootNamespace>Dbosoft.Hosuto.Samples.AspNetCore</RootNamespace>
-    <AssemblyName>Dbosoft.Hosuto.Samples.AspNetCore.WebModule</AssemblyName>
+    <RootNamespace>Dbosoft.Hosuto.Sample</RootNamespace>
+    <AssemblyName>Dbosoft.Hosuto.Samples.WebModule</AssemblyName>
     <OutputType>Library</OutputType>
   </PropertyGroup>
 
@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Hosuto.AspNetCore\Hosuto.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\shared\Hosuto.Samples.Common\Hosuto.Samples.Common.csproj" />
   </ItemGroup>
 
 </Project>

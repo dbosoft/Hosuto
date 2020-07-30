@@ -1,7 +1,9 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dbosoft.Hosuto.Modules;
+using Dbosoft.Hosuto.Samples;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
@@ -12,7 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Dbosoft.Hosuto.Samples.AspNetCore
+namespace Dbosoft.Hosuto.Sample
 {
     public class SampleWebModule : WebModule
     {
@@ -24,9 +26,10 @@ namespace Dbosoft.Hosuto.Samples.AspNetCore
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services, IHostEnvironment env)
+        public void ConfigureServices(IServiceProvider serviceProvider, IServiceCollection services)
         {
-            var webEnv = GetServiceFromCollection<IWebHostEnvironment>(services);
+
+            services.AddSingleton(serviceProvider.GetRequiredService<IMessageDispatcher>());
 
             services.AddMvc();
 

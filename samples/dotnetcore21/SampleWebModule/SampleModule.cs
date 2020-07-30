@@ -1,4 +1,4 @@
-﻿using Dbosoft.Hosuto.Modules;
+﻿using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dbosoft.Hosuto.Samples.AspNetCore.WebModule
+namespace Dbosoft.Hosuto.Samples
 {
     public class SampleWebModule : global::Dbosoft.Hosuto.Modules.WebModule
     {
@@ -18,8 +18,10 @@ namespace Dbosoft.Hosuto.Samples.AspNetCore.WebModule
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceProvider serviceProvider,IServiceCollection services)
         {
+            services.AddSingleton(serviceProvider.GetRequiredService<IMessageDispatcher>());
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
