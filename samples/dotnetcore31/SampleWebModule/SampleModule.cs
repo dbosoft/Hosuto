@@ -1,6 +1,4 @@
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Dbosoft.Hosuto.Modules;
@@ -8,17 +6,15 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace SampleWebModule
+namespace Dbosoft.Hosuto.Samples.AspNetCore
 {
-    public class SampleWebModule : IWebModule
+    public class SampleWebModule : WebModule
     {
         public SampleWebModule(IConfiguration configuration)
         {
@@ -65,8 +61,8 @@ namespace SampleWebModule
             });
         }
 
-        public string Name => "SampleWebModule";
-        public string Path => "/sample";
+        public override string Name => "SampleWebModule";
+        public override string Path => "/sample";
 
         private static T GetServiceFromCollection<T>(IServiceCollection services)
 

@@ -1,6 +1,4 @@
-﻿using Dbosoft.Hosuto.Modules.Hosting;
-
-namespace Dbosoft.Hosuto.Modules
+﻿namespace Dbosoft.Hosuto.Modules.Hosting
 {
     public class DefaultModuleStartupHandlerFactory : IModuleStartupHandlerFactory
     {

@@ -15,7 +15,12 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\Hosuto.Abstractions\Hosuto.Abstractions.csproj" />
+    <ProjectReference Include="..\Hosuto\Hosuto.csproj" />
     <ProjectReference Include="..\Hosuto.Hosting\Hosuto.Hosting.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Folder Include="Hosting\" />
   </ItemGroup>
 </Project>

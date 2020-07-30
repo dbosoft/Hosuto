@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using Dbosoft.Hosuto.Samples.AspNetCore.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SampleWebModule.Models;
 
-namespace SampleWebModule.Controllers
+namespace Dbosoft.Hosuto.Samples.AspNetCore
 {
     public class HomeController : Controller
     {

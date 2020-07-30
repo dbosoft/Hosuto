@@ -1,4 +1,4 @@
-﻿namespace Dbosoft.Hosuto.Modules
+﻿namespace Dbosoft.Hosuto.Modules.Hosting
 {
     public interface IModuleStartupHandlerFactory
     {

@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
-using Dbosoft.Hosuto.Modules;
+using Dbosoft.Hosuto.Modules.Hosting;
 using Dbosoft.Hosuto.Samples.AspNetCore.WebModule;
-using Hosuto.AspNetCore;
 using Microsoft.AspNetCore;
 using Microsoft.Extensions.Hosting;
 
-namespace App
+namespace Dbosoft.Hosuto.Samples.AspNetCore
 {
     class Program
     {
