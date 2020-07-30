@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <OutputType>Library</OutputType>
-    <AssemblyName>Dbosoft.Hosuto.Samples.AspNetCore.WebModule</AssemblyName>
-    <RootNamespace>Dbosoft.Hosuto.Samples.AspNetCore.WebModule</RootNamespace>
+    <AssemblyName>Dbosoft.Hosuto.Samples.WebModule</AssemblyName>
+    <RootNamespace>Dbosoft.Hosuto.Samples</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Hosuto.AspNetCore\Hosuto.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\shared\Hosuto.Samples.Common\Hosuto.Samples.Common.csproj" />
   </ItemGroup>
 
 </Project>

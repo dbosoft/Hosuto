@@ -12,7 +12,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         public ModuleCollectionHost(IEnumerable<IModuleHost> moduleHosts)
         {
-            _moduleHosts = moduleHosts;
+            _moduleHosts = moduleHosts.ToArray();
         }
 
         public void Bootstrap()

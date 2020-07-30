@@ -3,11 +3,13 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <AssemblyName>Dbosoft.Hosuto.Samples.AspNetCore.App</AssemblyName>
-    <RootNamespace>Dbosoft.Hosuto.Samples.AspNetCore</RootNamespace>
+    <AssemblyName>Dbosoft.Hosuto.Samples.App</AssemblyName>
+    <RootNamespace>Dbosoft.Hosuto.Samples</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\shared\Hosuto.Samples.Common\Hosuto.Samples.Common.csproj" />
+    <ProjectReference Include="..\..\shared\Hosuto.Samples.SimpleModule\Hosuto.Samples.SimpleModule.csproj" />
     <ProjectReference Include="..\SampleWebModule\SampleWebModule.csproj" />
     <ProjectReference Include="..\..\..\src\Hosuto.Hosting.AspNetCore\Hosuto.Hosting.AspNetCore.csproj" />
   </ItemGroup>
