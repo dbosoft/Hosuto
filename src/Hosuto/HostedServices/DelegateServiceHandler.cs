@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Dbosoft.Hosuto.Modules;
 
-namespace Dbosoft.Hosuto.Modules
+namespace Dbosoft.Hosuto.HostedServices
 {
     internal class DelegateServiceHandler : IHostedServiceHandler
     {

@@ -1,4 +1,5 @@
 using Dbosoft.Hosuto.Modules;
+using Dbosoft.Hosuto.Modules.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Xunit;

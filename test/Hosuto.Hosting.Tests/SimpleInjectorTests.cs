@@ -1,8 +1,8 @@
 using System;
 using System.Threading.Tasks;
+using Dbosoft.Hosuto.HostedServices;
 using Dbosoft.Hosuto.Modules;
-using Hosuto.AspNetCore;
-using Microsoft.AspNetCore;
+using Dbosoft.Hosuto.Modules.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,10 +49,10 @@ namespace Hosuto.Hosting.Tests
 
     }
 
-    public class SimpleInjectorWebModule : IWebModule
+    public class SimpleInjectorWebModule : WebModule
     {
-        public string Name => "I'm a module";
-        public string Path => "path";
+        public override string Name => "I'm a module";
+        public override string Path => "path";
 
         public SimpleInjectorWebModule(IHostEnvironment environment)
         {

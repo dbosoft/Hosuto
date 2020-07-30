@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Dbosoft.Hosuto.HostedServices;
+using Dbosoft.Hosuto.Modules;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Dbosoft.Hosuto.Modules
+namespace Dbosoft.Hosuto.HostedServices
 {
     public static class ServiceCollectionExtensions
     {

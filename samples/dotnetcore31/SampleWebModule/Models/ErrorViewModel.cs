@@ -1,6 +1,4 @@
-using System;
-
-namespace SampleWebModule.Models
+namespace Dbosoft.Hosuto.Samples.AspNetCore.Models
 {
     public class ErrorViewModel
     {

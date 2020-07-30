@@ -1,10 +1,9 @@
-﻿using Dbosoft.Hosuto.Modules;
-
-namespace Hosuto.AspNetCore.Hosting
+﻿namespace Dbosoft.Hosuto.Modules
 {
-    public abstract class WebModuleBase : ModuleBase
+    public abstract class WebModule : IModule
     {
         public abstract string Path { get; }
 
+        public abstract string Name { get; }
     }
 }

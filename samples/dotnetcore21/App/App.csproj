@@ -8,9 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Hosuto.AspNetCore.Hosting\Hosuto.AspNetCore.Hosting.csproj" />
-    <ProjectReference Include="..\..\..\src\Hosuto.AspNetCore\Hosuto.AspNetCore.csproj" />
     <ProjectReference Include="..\SampleWebModule\SampleWebModule.csproj" />
+    <ProjectReference Include="..\..\..\src\Hosuto.Hosting.AspNetCore\Hosuto.Hosting.AspNetCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

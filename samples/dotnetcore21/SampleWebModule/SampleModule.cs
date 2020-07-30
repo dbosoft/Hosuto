@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Dbosoft.Hosuto.Samples.AspNetCore.WebModule
 {
-    public class SampleWebModule : IWebModule
+    public class SampleWebModule : global::Dbosoft.Hosuto.Modules.WebModule
     {
         public SampleWebModule(IConfiguration configuration)
         {
@@ -56,7 +56,7 @@ namespace Dbosoft.Hosuto.Samples.AspNetCore.WebModule
             });
         }
 
-        public string Name => "SampleWebModule";
-        public string Path => "/sample";
+        public override string Name => "SampleWebModule";
+        public override string Path => "/sample";
     }
 }
