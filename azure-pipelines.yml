@@ -8,7 +8,7 @@ trigger:
 - develop
 
 pool:
-  name: 'default'
+  vmImage: windows-latest  
 
 steps:
 - script: dotnet restore
