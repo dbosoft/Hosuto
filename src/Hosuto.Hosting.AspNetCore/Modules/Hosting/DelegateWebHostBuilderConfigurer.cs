@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    class DelegateWebHostBuilderConfigurer : IWebModuleWebHostBuilderConfigurer
+    internal class DelegateWebHostBuilderConfigurer : IWebModuleWebHostBuilderConfigurer
     {
         private readonly Action<WebModule, IWebHostBuilder> _configureDelegate;
 

@@ -1,5 +1,4 @@
 ﻿using System;
-
 #if NETCOREAPP
 using System.Linq;
 #endif
@@ -16,30 +15,55 @@ using Microsoft.Extensions.Hosting.Internal;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
-    public class WebModuleStartupHandler<TModule> : DefaultModuleStartupHandler<TModule> where TModule : IModule
+    // ReSharper disable once ClassNeverInstantiated.Global
+    public class WebModuleHostFactory : IHostFactory
     {
+        private readonly IHostFactory _decoratedHostFactory;
 
-        public WebModuleStartupHandler(ModuleStartupContext<TModule> startupContext) : base(startupContext)
+        public WebModuleHostFactory(IHostFactory decoratedHostFactory)
         {
-            if (!(startupContext.Module is WebModule))
-                throw new InvalidOperationException(
-                    $"WebModuleStartupHandler requires a WebModule in {nameof(startupContext)}");
+            _decoratedHostFactory = decoratedHostFactory;
         }
 
-
-        protected virtual void Configure(IApplicationBuilder applicationBuilder)
+        public IHost CreateHost<TModule>(ModuleStartupContext<TModule> startupContext, Action<IHostBuilder> configureHostBuilderAction) where TModule : IModule
         {
-            CallOptionalMethod(StartupContext.Module, "Configure",
+            switch (startupContext.Module)
+            {
+               case WebModule _:
+                    {
+                        var factory = new WebModuleHostFactory<TModule>(startupContext);
+                        return factory.CreateHost(configureHostBuilderAction);
+                    }
+                    
+                default:
+                    return _decoratedHostFactory.CreateHost(startupContext, configureHostBuilderAction);
+            }
+        }
+    }
+
+    // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
+    public class WebModuleHostFactory<TModule> : DefaultHostFactory<TModule> where TModule : IModule
+    {
+        public WebModuleHostFactory(ModuleStartupContext<TModule> startupContext) : base(startupContext)
+        {
+        }
+
+        protected virtual void Configure(IApplicationBuilder app)
+        {
+            foreach (var configurer in StartupContext.BuilderSettings.FrameworkServiceProvider.GetServices<IConfigureAppStartupConfigurer<TModule>>())
+            {
+                configurer.Configure(StartupContext, app);
+            }
+
+            ModuleMethodInvoker.CallOptionalMethod(StartupContext.Module, "Configure",
                 StartupContext.ServiceProvider,
-                applicationBuilder.ApplicationServices,
-                applicationBuilder);
+                app.ApplicationServices,
+                app);
 
         }
 
         public override IHost CreateHost(Action<IHostBuilder> configureHostBuilderAction)
         {
-
             var hostBuilderConfigurers = StartupContext.BuilderSettings.FrameworkServiceProvider
                 .GetServices<IWebModuleWebHostBuilderConfigurer>();
 

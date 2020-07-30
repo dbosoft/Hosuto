@@ -8,11 +8,11 @@
 
   <ItemGroup>
     <PackageReference Include="SimpleInjector" Version="5.0.3" />
+    <PackageReference Include="SimpleInjector.Integration.GenericHost" Version="5.0.0" />
     <PackageReference Include="SimpleInjector.Integration.ServiceCollection" Version="5.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Hosuto.Abstractions\Hosuto.Abstractions.csproj" />
     <ProjectReference Include="..\Hosuto.Hosting\Hosuto.Hosting.csproj" />
   </ItemGroup>
 

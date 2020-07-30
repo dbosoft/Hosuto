@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
@@ -32,6 +34,17 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         private HostBuilderContext _hostBuilderContext;
         private HostingEnvironment _hostingEnvironment;
+        private Assembly _callingAssembly;
+
+        public ModuleHostBuilder()
+        {
+            _callingAssembly = Assembly.GetCallingAssembly();
+        }
+
+        public ModuleHostBuilder(Assembly callingAssembly)
+        {
+            _callingAssembly = callingAssembly;
+        }
 
         public IModuleHostBuilder HostModule<TModule>(Action<IHostBuilder> configureDelegate = null) where TModule : class, IModule
         {
@@ -106,14 +119,19 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             CreateHostingEnvironment();
             CreateHostBuilderContext();
 
+
             //build the services for configuration of Hosuto module system
             var frameworkServiceProvider = CreateFrameworkServiceProvider();
             var moduleHostFactory = frameworkServiceProvider.GetRequiredService<IModuleHostFactory>();
+            var outerServiceProvider = CreateServiceProvider();
 
-            return moduleHostFactory.CreateModuleHost(
-                _registeredModules, 
-                new ModuleHostBuilderSettings(_hostBuilderContext, _configureModulesConfigActions, _configureServicesActions, frameworkServiceProvider), 
-               CreateServiceProvider());
+            return new ModuleHost(
+                moduleHostFactory.CreateModuleHost(
+                    _registeredModules, 
+                    new ModuleHostBuilderSettings(_hostBuilderContext, _configureModulesConfigActions, _configureServicesActions, frameworkServiceProvider),
+                    outerServiceProvider), 
+                outerServiceProvider);
+
         }
 
         IHostBuilder IHostBuilder.ConfigureHostConfiguration(Action<IConfigurationBuilder> configureDelegate)
@@ -187,12 +205,15 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
 #endif
             frameworkServices.AddSingleton(_hostBuilderContext);
+            frameworkServices.AddTransient<IHostFactory,DefaultHostFactory>();
+
             _configureFrameworkActions.ForEach(c => c(_hostBuilderContext, frameworkServices));
 
             frameworkServices.TryAddSingleton<IModuleHostFactory, DefaultModuleHostFactory>();
             frameworkServices.TryAddSingleton(typeof(IModuleHost<>), typeof(ModuleHost<>));
 
-            return  frameworkServices.BuildServiceProvider(true);
+
+            return frameworkServices.BuildServiceProvider(true);
 
         }
 
@@ -243,5 +264,6 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         {
             return Build();
         }
+
     }
 }

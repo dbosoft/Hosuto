@@ -13,10 +13,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hosuto.Hosting", "src\Hosut
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hosuto.Hosting.Tests", "test\Hosuto.Hosting.Tests\Hosuto.Hosting.Tests.csproj", "{B0DF33E2-2F24-4C0F-9F5A-9EFD1D714FC4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hosuto.AspNetCore", "src\Hosuto.AspNetCore\Hosuto.AspNetCore.csproj", "{5946CED4-B974-4DA1-8111-AA334EBC978B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hosuto.Simpleinjector.AspNetCore", "src\Hosuto.Simpleinjector.AspNetCore\Hosuto.Simpleinjector.AspNetCore.csproj", "{714C91DB-A9C7-4133-967F-525BA389FCCA}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{0C4A607E-2CBA-4333-83AF-A509FDB38FDB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dotnetcore31", "dotnetcore31", "{1FDB2B4C-2A03-4B7F-BD25-311932729515}"
@@ -35,9 +31,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hosuto.Hosting.AspNetCore",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{F7CEA782-F709-477C-A7ED-8E2623338F7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hosuto.Samples.Common", "samples\shared\Hosuto.Samples.Common\Hosuto.Samples.Common.csproj", "{D4A5C193-51F1-4C10-BE03-C940090F245F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hosuto.Samples.Common", "samples\shared\Hosuto.Samples.Common\Hosuto.Samples.Common.csproj", "{D4A5C193-51F1-4C10-BE03-C940090F245F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hosuto.Samples.SimpleModule", "samples\shared\Hosuto.Samples.SimpleModule\Hosuto.Samples.SimpleModule.csproj", "{4F525B97-E934-4F9B-AB40-78CBF6B61269}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hosuto.Samples.SimpleModule", "samples\shared\Hosuto.Samples.SimpleModule\Hosuto.Samples.SimpleModule.csproj", "{4F525B97-E934-4F9B-AB40-78CBF6B61269}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hosuto.Testing.AspNetCore", "src\Hosuto.Testing.AspNetCore\Hosuto.Testing.AspNetCore.csproj", "{5101C6BF-94D4-4001-AA0B-AC863E6E79F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hosuto.Hosting.AspNetCore.Tests", "test\Hosuto.Hosting.AspNetCore.Tests\Hosuto.Hosting.AspNetCore.Tests.csproj", "{C650ED86-171D-4823-B334-F696FED6C471}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,14 +65,6 @@ Global
 		{B0DF33E2-2F24-4C0F-9F5A-9EFD1D714FC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0DF33E2-2F24-4C0F-9F5A-9EFD1D714FC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0DF33E2-2F24-4C0F-9F5A-9EFD1D714FC4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5946CED4-B974-4DA1-8111-AA334EBC978B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5946CED4-B974-4DA1-8111-AA334EBC978B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5946CED4-B974-4DA1-8111-AA334EBC978B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5946CED4-B974-4DA1-8111-AA334EBC978B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{714C91DB-A9C7-4133-967F-525BA389FCCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{714C91DB-A9C7-4133-967F-525BA389FCCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{714C91DB-A9C7-4133-967F-525BA389FCCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{714C91DB-A9C7-4133-967F-525BA389FCCA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{29C629D3-033F-4112-9F31-F0285D91FC71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{29C629D3-033F-4112-9F31-F0285D91FC71}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29C629D3-033F-4112-9F31-F0285D91FC71}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -101,6 +93,14 @@ Global
 		{4F525B97-E934-4F9B-AB40-78CBF6B61269}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F525B97-E934-4F9B-AB40-78CBF6B61269}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F525B97-E934-4F9B-AB40-78CBF6B61269}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5101C6BF-94D4-4001-AA0B-AC863E6E79F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5101C6BF-94D4-4001-AA0B-AC863E6E79F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5101C6BF-94D4-4001-AA0B-AC863E6E79F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5101C6BF-94D4-4001-AA0B-AC863E6E79F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C650ED86-171D-4823-B334-F696FED6C471}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C650ED86-171D-4823-B334-F696FED6C471}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C650ED86-171D-4823-B334-F696FED6C471}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C650ED86-171D-4823-B334-F696FED6C471}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

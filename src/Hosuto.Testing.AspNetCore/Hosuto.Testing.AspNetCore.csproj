@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.0;netstandard2.0</TargetFrameworks>
+    <AssemblyName>Dbosoft.Hosuto.Testing.AspNetCore</AssemblyName>
+    <RootNamespace>Dbosoft.Hosuto</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.0" />
+
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.1" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="2.1" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Folder Include="Modules\Testing\" />
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hosuto.Hosting.AspNetCore\Hosuto.Hosting.AspNetCore.csproj" />
+  </ItemGroup>
+
+</Project>

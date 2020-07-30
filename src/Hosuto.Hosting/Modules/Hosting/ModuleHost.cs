@@ -1,6 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -8,8 +11,17 @@ using Microsoft.Extensions.Logging.EventLog;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public static class ModuleHost
+    public class ModuleHost : IModuleHost
     {
+        private readonly IModuleHost _host;
+
+        public ModuleHost(IModuleHost host, IServiceProvider serviceProvider)
+        {
+            _host = host;
+            Services = serviceProvider;
+        }
+
+
 #if NETSTANDARD2_0
         /// <summary>
         /// Initializes a new instance of the <see cref="HostBuilder"/> class with pre-configured defaults.
@@ -92,7 +104,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         // ReSharper disable once MemberCanBePrivate.Global
         public static IModuleHostBuilder CreateDefaultBuilder(string[] args)
         {
-            var builder = new ModuleHostBuilder();
+            var builder = new ModuleHostBuilder(Assembly.GetCallingAssembly());
 
             builder.UseContentRoot(Directory.GetCurrentDirectory());
             builder.ConfigureHostConfiguration(config =>
@@ -172,5 +184,31 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         }
 
+        public void Dispose()
+        {
+            _host?.Dispose();
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken = new CancellationToken())
+        {
+            return _host.StartAsync(cancellationToken);
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken = new CancellationToken())
+        {
+            return _host.StopAsync(cancellationToken);
+        }
+
+        public IServiceProvider Services { get; }
+
+        public void Bootstrap()
+        {
+            _host.Bootstrap();
+        }
+
+        public Task WaitForShutdownAsync(CancellationToken cancellationToken = default)
+        {
+            return _host.WaitForShutdownAsync(cancellationToken);
+        }
     }
 }

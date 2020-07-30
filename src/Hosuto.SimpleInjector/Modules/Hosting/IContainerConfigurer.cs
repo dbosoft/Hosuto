@@ -5,6 +5,6 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 {
     public interface IContainerConfigurer<TModule> where TModule : IModule
     {
-        void ConfigureContainer(TModule module, IServiceProvider serviceProvider, Container container);
+        void ConfigureContainer(TModule module, Container container, IServiceProvider outerServiceProvider, IServiceProvider moduleServices);
     }
 }

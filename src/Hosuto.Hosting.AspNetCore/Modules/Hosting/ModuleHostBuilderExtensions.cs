@@ -42,7 +42,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         {
             builder.ConfigureFrameworkServices((ctx, services) =>
             {
-                services.AddTransient<IModuleStartupHandlerFactory, WebModuleStartupFactory>();
+                services.Decorate<IHostFactory, WebModuleHostFactory>();
                 services.TryAddTransient<IWebModuleWebHostBuilderInitializer, WebModuleWebHostBuilderInitializer>();
 
                 if(configure!=null)
@@ -60,7 +60,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
             builder.ConfigureFrameworkServices((ctx, services) =>
             {
-                services.AddTransient<IModuleStartupHandlerFactory, WebModuleStartupFactory>();
+                services.Decorate<IHostFactory, WebModuleHostFactory>();
                 services.TryAddTransient<IWebModuleWebHostBuilderFactory>(sp => new DelegateWebHostBuilderFactory(webHostBuilder));
                 
             });

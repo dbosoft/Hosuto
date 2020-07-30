@@ -1,10 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Dbosoft.Hosuto</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="SimpleInjector.Integration.AspNetCore" Version="5.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hosuto.Hosting.AspNetCore\Hosuto.Hosting.AspNetCore.csproj" />
     <ProjectReference Include="..\Hosuto.SimpleInjector\Hosuto.SimpleInjector.csproj" />
   </ItemGroup>
 
