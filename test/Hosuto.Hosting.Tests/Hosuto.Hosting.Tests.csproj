@@ -26,4 +26,8 @@
     <ProjectReference Include="..\..\src\Hosuto.Hosting\Hosuto.Hosting.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Integration\" />
+  </ItemGroup>
+
 </Project>
