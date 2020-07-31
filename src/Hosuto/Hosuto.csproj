@@ -6,6 +6,8 @@
     <RootNamespace>Dbosoft.Hosuto</RootNamespace>
   </PropertyGroup>
 
+  <Import Project="..\..\build\pack.props" />
+
   <ItemGroup>
     <PackageReference Include="GitVersionTask" Version="5.3.7">
       <PrivateAssets>all</PrivateAssets>

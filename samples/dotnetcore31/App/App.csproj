@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>Dbosoft.Hosuto.Samples.App</AssemblyName>
     <RootNamespace>Dbosoft.Hosuto.Sample</RootNamespace>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>

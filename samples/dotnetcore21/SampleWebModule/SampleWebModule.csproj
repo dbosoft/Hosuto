@@ -5,6 +5,8 @@
     <OutputType>Library</OutputType>
     <AssemblyName>Dbosoft.Hosuto.Samples.WebModule</AssemblyName>
     <RootNamespace>Dbosoft.Hosuto.Samples</RootNamespace>
+    <IsPackable>false</IsPackable>
+
   </PropertyGroup>
 
   <ItemGroup>

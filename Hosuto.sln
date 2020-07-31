@@ -37,7 +37,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hosuto.Samples.SimpleModule
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hosuto.Testing.AspNetCore", "src\Hosuto.Testing.AspNetCore\Hosuto.Testing.AspNetCore.csproj", "{5101C6BF-94D4-4001-AA0B-AC863E6E79F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hosuto.Hosting.AspNetCore.Tests", "test\Hosuto.Hosting.AspNetCore.Tests\Hosuto.Hosting.AspNetCore.Tests.csproj", "{C650ED86-171D-4823-B334-F696FED6C471}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hosuto.Hosting.AspNetCore.Tests", "test\Hosuto.Hosting.AspNetCore.Tests\Hosuto.Hosting.AspNetCore.Tests.csproj", "{C650ED86-171D-4823-B334-F696FED6C471}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{49CF90DB-545B-437A-ADA1-978AEE21A1E5}"
+	ProjectSection(SolutionItems) = preProject
+		build\pack.props = build\pack.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
