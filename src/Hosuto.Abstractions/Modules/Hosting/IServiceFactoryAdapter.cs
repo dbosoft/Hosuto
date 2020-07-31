@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    internal interface IServiceFactoryAdapter
+    public interface IServiceFactoryAdapter
     {
         object CreateBuilder(IServiceCollection services);
 

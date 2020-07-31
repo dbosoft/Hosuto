@@ -2,24 +2,23 @@
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public class ModuleStartupContext<TModule> : IDisposable where TModule : IModule
+    public class ModuleContext<TModule> : IModuleContext<TModule>, IModuleBootstrapContext<TModule> where TModule : IModule
     {
-
-        public ModuleStartupContext(TModule module, ModuleHostBuilderSettings builderSettings, IServiceProvider serviceProvider)
+        public ModuleContext(TModule module, IServiceProvider moduleServices, IServiceProvider serviceProvider, IServiceProvider frameworkServices)
         {
-            BuilderSettings = builderSettings;
-            ServiceProvider = serviceProvider;
+            Services = moduleServices;
+            ModuleHostServices = serviceProvider;
             Module = module;
+            Advanced = new AdvancedModuleContext(frameworkServices, null);
         }
 
         public TModule Module { get; }
-        public IServiceProvider ServiceProvider { get; }
-        public ModuleHostBuilderSettings BuilderSettings { get; }
-
+        public virtual IServiceProvider Services { get; }
+        public IAdvancedModuleContext Advanced { get; }
+        public IServiceProvider ModuleHostServices { get; }
 
         protected virtual void Dispose(bool disposing)
         {
-
         }
 
         public void Dispose()
@@ -28,4 +27,17 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             GC.SuppressFinalize(this);
         }
     }
+
+    public class AdvancedModuleContext : IAdvancedModuleContext
+    {
+        public AdvancedModuleContext(IServiceProvider frameworkServices, object rootContext)
+        {
+            FrameworkServices = frameworkServices;
+            RootContext = rootContext;
+        }
+
+        public IServiceProvider FrameworkServices { get; }
+        public object RootContext { get; }
+    }
+
 }

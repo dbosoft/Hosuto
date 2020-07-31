@@ -4,13 +4,13 @@ using SimpleInjector;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public class ServicesStartupConfigurer<TModule> : IServicesStartupConfigurer<TModule> where TModule: IModule
+    public class ServicesStartupConfigurer : IModuleServicesConfigurer
     {
-        public void ConfigureServices(ModuleStartupContext<TModule> startupContext, IServiceCollection services)
+        public void ConfigureServices(IModuleHostBuilderContext context, IServiceCollection services)
         {
-            if (startupContext is ContainerModuleStartupContext<TModule> context)
+            if (context.Advanced.RootContext is IContextWithContainer containerContext)
             {
-                services.AddSimpleInjector(context.Container);
+                services.AddSimpleInjector(containerContext.Container);
             }
         }
     }

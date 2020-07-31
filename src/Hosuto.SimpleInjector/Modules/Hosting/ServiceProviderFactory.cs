@@ -37,7 +37,17 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                 if (service.ImplementationInstance != null)
                     _container.Register(service.ServiceType, () => service.ImplementationInstance, lifestyle);
                 else
-                    _container.Register(service.ServiceType, service.ImplementationType, lifestyle);
+                {
+                    if(service.ImplementationType != null)
+                        _container.Register(service.ServiceType, service.ImplementationType, lifestyle);
+                    else
+                    {
+                        _container.Register(service.ServiceType, () => service.ImplementationFactory(_container), lifestyle);
+
+                    }
+
+                }
+                    
             }
 
             return _container;

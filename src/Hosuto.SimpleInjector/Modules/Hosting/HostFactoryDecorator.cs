@@ -1,4 +1,5 @@
 ﻿using System;
+using Dbosoft.Hosuto.Modules.Hosting.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SimpleInjector;
@@ -15,35 +16,34 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             _decoratedHostFactory = decoratedHostFactory;
         }
 
-        private void UseSimpleInjector<TModule>(ModuleStartupContext<TModule> startupContext, SimpleInjectorUseOptions options, IServiceProvider serviceProvider) where TModule: IModule
+        private void UseSimpleInjector<TModule>(IModuleContext<TModule> moduleContext, SimpleInjectorUseOptions options) where TModule: IModule
         {
-            ModuleMethodInvoker.CallOptionalMethod(startupContext.Module, "UseSimpleInjector", startupContext.ServiceProvider, serviceProvider, options);
+            ModuleMethodInvoker.CallOptionalMethod(moduleContext.ToBootstrapContext(), "UseSimpleInjector", moduleContext.Services, options);
         }
 
-        private void ConfigureContainer<TModule>(ModuleStartupContext<TModule> startupContext, IServiceProvider serviceProvider, Container container) where TModule : IModule
+        private void ConfigureContainer<TModule>(IModuleContext<TModule> moduleContext, Container container) where TModule : IModule
         {
-            foreach(var configurer in startupContext.BuilderSettings.FrameworkServiceProvider.GetServices<IContainerConfigurer<TModule>>())
+            foreach(var configurer in moduleContext.Advanced.FrameworkServices.GetServices<IContainerConfigurer<TModule>>())
             {
-                configurer.ConfigureContainer(startupContext.Module, container, startupContext.ServiceProvider,serviceProvider);
+                configurer.ConfigureContainer(moduleContext, container);
             }
 
-            ModuleMethodInvoker.CallOptionalMethod(startupContext.Module, "ConfigureContainer", startupContext.ServiceProvider, serviceProvider, container);
+            ModuleMethodInvoker.CallOptionalMethod(moduleContext.ToBootstrapContext(), "ConfigureContainer", moduleContext.Services, container);
         }
 
-        public IHost CreateHost<TModule>(ModuleStartupContext<TModule> startupContext, Action<IHostBuilder> configureHostBuilderAction) where TModule : IModule
+        public (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost<TModule>(IModuleBootstrapContext<TModule> bootstrapContext) where TModule : IModule
         {
-            var host = _decoratedHostFactory.CreateHost(startupContext, configureHostBuilderAction);
-
-            if (!(startupContext is ContainerModuleStartupContext<TModule> context)) return host;
-
+            var (host,moduleContext) = _decoratedHostFactory.CreateHost(bootstrapContext);
+            if (!(moduleContext is ModuleContextWithContainer<TModule> context)) return (host, moduleContext);
 
             var container = context.Container;
-            host.UseSimpleInjector(container, options => UseSimpleInjector(startupContext, options, host.Services));
-            ConfigureContainer(startupContext, host.Services, container);
+            host.UseSimpleInjector(container, options => UseSimpleInjector(moduleContext, options));
+            ConfigureContainer(moduleContext, container);
 
             container.Verify();
 
-            return host;
+            return (host, moduleContext);
         }
+
     }
 }

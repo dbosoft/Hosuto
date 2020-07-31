@@ -19,9 +19,8 @@ namespace Hosuto.Hosting.Tests
             builder.HostModule<SomeModule>();
             builder.UseEnvironment(environmentName);
             var host = builder.Build();
-            host.Bootstrap();
 
-            var module = host.Services.GetRequiredService<SomeModule>();
+            var module = host.ModuleHostServices.GetRequiredService<SomeModule>();
             Assert.Equal(environmentName, module.Environment);
         }
 
@@ -33,9 +32,7 @@ namespace Hosuto.Hosting.Tests
             builder.HostModule<OtherModule>();
 
             var host = builder.Build();
-            host.Bootstrap();
-
-            var module = host.Services.GetRequiredService<OtherModule>();
+            var module = host.ModuleHostServices.GetRequiredService<OtherModule>();
 
             Assert.NotNull(module.SomeModule);
         }

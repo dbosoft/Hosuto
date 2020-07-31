@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Dbosoft.Hosuto.Modules.Hosting.Internal;
 #if NETCOREAPP
 using System.Linq;
 #endif
@@ -7,11 +9,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
-#if NETSTANDARD
-using System.Collections.Generic;
 using Microsoft.Extensions.Hosting.Internal;
-#endif
+
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
@@ -25,18 +24,19 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             _decoratedHostFactory = decoratedHostFactory;
         }
 
-        public IHost CreateHost<TModule>(ModuleStartupContext<TModule> startupContext, Action<IHostBuilder> configureHostBuilderAction) where TModule : IModule
+
+        public (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost<TModule>(IModuleBootstrapContext<TModule> bootstrapContext) where TModule : IModule
         {
-            switch (startupContext.Module)
+            switch (bootstrapContext.Module)
             {
-               case WebModule _:
-                    {
-                        var factory = new WebModuleHostFactory<TModule>(startupContext);
-                        return factory.CreateHost(configureHostBuilderAction);
-                    }
-                    
+                case WebModule _:
+                {
+                    var factory = new WebModuleHostFactory<TModule>(bootstrapContext);
+                    return factory.CreateHost();
+                }
+
                 default:
-                    return _decoratedHostFactory.CreateHost(startupContext, configureHostBuilderAction);
+                    return _decoratedHostFactory.CreateHost(bootstrapContext);
             }
         }
     }
@@ -44,34 +44,33 @@ namespace Dbosoft.Hosuto.Modules.Hosting
     // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
     public class WebModuleHostFactory<TModule> : DefaultHostFactory<TModule> where TModule : IModule
     {
-        public WebModuleHostFactory(ModuleStartupContext<TModule> startupContext) : base(startupContext)
+        public WebModuleHostFactory(IModuleBootstrapContext<TModule> bootstrapContext) : base(bootstrapContext)
         {
         }
 
-        protected virtual void Configure(IApplicationBuilder app)
+        protected virtual void Configure(IModuleContext<TModule> moduleContext, IApplicationBuilder app)
         {
-            foreach (var configurer in StartupContext.BuilderSettings.FrameworkServiceProvider.GetServices<IConfigureAppStartupConfigurer<TModule>>())
+            foreach (var configurer in BootstrapContext.Advanced.FrameworkServices.GetServices<IConfigureAppConfigurer<TModule>>())
             {
-                configurer.Configure(StartupContext, app);
+                configurer.Configure(moduleContext, app);
             }
 
-            ModuleMethodInvoker.CallOptionalMethod(StartupContext.Module, "Configure",
-                StartupContext.ServiceProvider,
-                app.ApplicationServices,
-                app);
+            ModuleMethodInvoker.CallOptionalMethod(BootstrapContext, "Configure", app.ApplicationServices, app);
 
         }
 
-        public override IHost CreateHost(Action<IHostBuilder> configureHostBuilderAction)
+        public override (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost()
         {
-            var hostBuilderConfigurers = StartupContext.BuilderSettings.FrameworkServiceProvider
+            var hostBuilderConfigurers = BootstrapContext.Advanced.FrameworkServices
                 .GetServices<IWebModuleWebHostBuilderConfigurer>();
 
-            var moduleAssemblyName = StartupContext.Module.GetType().Assembly.GetName().Name;
+            var moduleAssemblyName = BootstrapContext.Module.GetType().Assembly.GetName().Name;
+            IModuleContext<TModule> moduleContext = null;
+
 
 #if NETCOREAPP
 
-            var webHostBuilderInitializer = StartupContext.BuilderSettings.FrameworkServiceProvider
+            var webHostBuilderInitializer = BootstrapContext.Advanced.FrameworkServices
                 .GetService<IWebModuleWebHostBuilderInitializer>();
 
             if (webHostBuilderInitializer == null)
@@ -79,8 +78,8 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
 
             var builder = CreateHostBuilder();
-
-            webHostBuilderInitializer.ConfigureWebHost(StartupContext.Module as WebModule, builder,
+            
+            webHostBuilderInitializer.ConfigureWebHost(BootstrapContext.Module as WebModule, builder,
                 new[]
                     {
                         new DelegateWebHostBuilderConfigurer((_, webHostBuilder) =>
@@ -92,76 +91,83 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                     .Append(
                         new DelegateWebHostBuilderConfigurer((_, webHostBuilder) =>
                         {
-                            foreach (var configureServicesAction in StartupContext.BuilderSettings.ConfigureServicesActions)
-                            {
-                                webHostBuilder.ConfigureServices(srv => configureServicesAction(StartupContext.BuilderSettings.HostBuilderContext, srv));
-                            }
+                            webHostBuilder.ConfigureServices((wctx, services)=> 
+                                ConfigureServices(WebContextToHostBuilderContext(wctx), services));
 
-                            webHostBuilder.ConfigureServices(ConfigureServices);
-                            webHostBuilder.Configure(Configure);
+                            webHostBuilder.Configure(app =>
+                            {
+                                // ReSharper disable once AccessToModifiedClosure
+                                Configure(moduleContext, app);
+                            });
                         })));
 
-            configureHostBuilderAction?.Invoke(builder);
-            
-            return builder.Build();
+            //configureHostBuilderAction?.Invoke(builder);
+
+            var host = builder.Build();
+            moduleContext = CreateModuleContext(host.Services);
+            return (host, moduleContext);
+
 #else
 
-            HostBuilderContext WebContextToHostBuilderContext(WebHostBuilderContext webContext)
-            {
-                return new HostBuilderContext(new Dictionary<object, object> { { "WebHostBuilderContext", webContext } })
-                {
-                    Configuration = webContext.Configuration,
-                    HostingEnvironment = new HostingEnvironment
-                    {
-                        ApplicationName = webContext.HostingEnvironment.ApplicationName,
-                        ContentRootFileProvider = webContext.HostingEnvironment.ContentRootFileProvider,
-                        ContentRootPath = webContext.HostingEnvironment.ContentRootPath,
-                        EnvironmentName = webContext.HostingEnvironment.EnvironmentName,
-                    }
-                };
-            }
-
-            var webHostBuilderFactory = StartupContext.BuilderSettings.FrameworkServiceProvider
+            var webHostBuilderFactory = BootstrapContext.Advanced.FrameworkServices
                 .GetService<IWebModuleWebHostBuilderFactory>();
 
             if (webHostBuilderFactory == null)
                 throw new InvalidOperationException("AspNetCore runtime not configured.");
 
 
-            var webHostBuilder = webHostBuilderFactory.CreateWebHost(StartupContext.Module as WebModule);
-
-            webHostBuilder.UseConfiguration(StartupContext.BuilderSettings.HostBuilderContext.Configuration);
+            var webHostBuilder = webHostBuilderFactory.CreateWebHost(BootstrapContext.Module as WebModule);
+            var hostBuilderContext = BootstrapContext.Advanced.FrameworkServices.GetRequiredService<HostBuilderContext>();
+            webHostBuilder.UseConfiguration(hostBuilderContext.Configuration);
             webHostBuilder.UseContentRoot(GetContentRoot());
-            webHostBuilder.ConfigureAppConfiguration((ctx, cfg) =>
+            webHostBuilder.ConfigureAppConfiguration((ctx, config) =>
             {
                 ctx.HostingEnvironment.ApplicationName = moduleAssemblyName;
+
+                foreach (var configurer in BootstrapContext.Advanced.FrameworkServices.GetServices<IModuleConfigurationConfigurer>())
+                {
+                    configurer.ConfigureModuleConfiguration(
+                        BootstrapContext.ToModuleHostBuilderContext(WebContextToHostBuilderContext(ctx)), config);
+                }
+
             });
 
             foreach (var hostBuilderConfigurer in hostBuilderConfigurers)
             {
-                hostBuilderConfigurer.ConfigureWebHost(StartupContext.Module as WebModule, webHostBuilder);
+                hostBuilderConfigurer.ConfigureWebHost(BootstrapContext.Module as WebModule, webHostBuilder);
             }
 
-            foreach (var configureAction in StartupContext.BuilderSettings.ConfigurationActions)
-            {
-                webHostBuilder.ConfigureAppConfiguration((webCtx, configure) =>
-                    configureAction(WebContextToHostBuilderContext(webCtx), configure));
-            }
+            var webHost = webHostBuilder.ConfigureServices((wctx, services) =>
+                    ConfigureServices(WebContextToHostBuilderContext(wctx), services))
+                .Configure(app =>
+                {
+                    // ReSharper disable once AccessToModifiedClosure
+                    Configure(moduleContext, app);
 
-            foreach (var configureServicesAction in StartupContext.BuilderSettings.ConfigureServicesActions)
-            {
-                webHostBuilder.ConfigureServices(srv =>
-                    configureServicesAction(StartupContext.BuilderSettings.HostBuilderContext, srv));
-            }
-
-            var webHost = webHostBuilder.ConfigureServices(ConfigureServices)
-                .Configure(Configure)
+                })
                 .Build();
 
-            return new WebHostWrapperHost(webHost);
+            moduleContext = CreateModuleContext(webHost.Services);
+
+            return (new WebHostWrapperHost(webHost), moduleContext);
 
 #endif
 
+        }
+
+        HostBuilderContext WebContextToHostBuilderContext(WebHostBuilderContext webContext)
+        {
+            return new HostBuilderContext(new Dictionary<object, object> { { "WebHostBuilderContext", webContext } })
+            {
+                Configuration = webContext.Configuration,
+                HostingEnvironment = new HostingEnvironment
+                {
+                    ApplicationName = webContext.HostingEnvironment.ApplicationName,
+                    ContentRootFileProvider = webContext.HostingEnvironment.ContentRootFileProvider,
+                    ContentRootPath = webContext.HostingEnvironment.ContentRootPath,
+                    EnvironmentName = webContext.HostingEnvironment.EnvironmentName,
+                }
+            };
         }
 
     }

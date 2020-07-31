@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Dbosoft.Hosuto.Modules.Hosting.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -9,32 +10,34 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 {
     public class DefaultHostFactory : IHostFactory
     {
-        public IHost CreateHost<TModule>(ModuleStartupContext<TModule> startupContext, Action<IHostBuilder> configureHostBuilderAction) where TModule : IModule
+        public (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost<TModule>(IModuleBootstrapContext<TModule> bootstrapContext) where TModule : IModule
         {
-            var factory = new DefaultHostFactory<TModule>(startupContext);
-            return factory.CreateHost(configureHostBuilderAction);
+            var factory = new DefaultHostFactory<TModule>(bootstrapContext);
+            return factory.CreateHost();
         }
+        
     }
 
     public class DefaultHostFactory<TModule> where TModule : IModule
     {
-        public DefaultHostFactory(ModuleStartupContext<TModule> startupContext)
+        public DefaultHostFactory(IModuleBootstrapContext<TModule> bootstrapContext)
         {
-            StartupContext = startupContext;
+            BootstrapContext = bootstrapContext;
         }
 
-        public ModuleStartupContext<TModule> StartupContext { get; }
-        protected virtual void ConfigureServices(IServiceCollection services)
+        public IModuleBootstrapContext<TModule> BootstrapContext { get; }
+
+        protected virtual void ConfigureServices(HostBuilderContext hostBuilderContext, IServiceCollection services)
         {
-            foreach (var configurer in StartupContext.BuilderSettings.FrameworkServiceProvider.GetServices<IServicesStartupConfigurer<TModule>>())
+            foreach (var configurer in BootstrapContext.Advanced.FrameworkServices.GetServices<IModuleServicesConfigurer>())
             {
-                configurer.ConfigureServices(StartupContext, services);
+                configurer.ConfigureServices(BootstrapContext.ToModuleHostBuilderContext(hostBuilderContext), services);
             }
 
             var tempProvider = services.BuildServiceProvider();
 
 
-            ModuleMethodInvoker.CallOptionalMethod(StartupContext.Module, "ConfigureServices", StartupContext.ServiceProvider, tempProvider, services);
+            ModuleMethodInvoker.CallOptionalMethod(BootstrapContext, "ConfigureServices", tempProvider, services);
 
         }
 
@@ -42,58 +45,61 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         protected virtual IHostBuilder CreateHostBuilder()
         {
             var builder = new HostBuilder();
+            var hostBuilderContext = BootstrapContext.Advanced.FrameworkServices.GetRequiredService<HostBuilderContext>();
 
             builder.ConfigureHostConfiguration((configure) =>
             {
                 configure.Sources.Clear();
-                configure.AddConfiguration(StartupContext.BuilderSettings.HostBuilderContext.Configuration);
+                configure.AddConfiguration(hostBuilderContext.Configuration);
             });
 
             builder.UseContentRoot(GetContentRoot());
 
-            var moduleAssemblyName = StartupContext.Module.GetType().Assembly.GetName().Name;
-            builder.ConfigureAppConfiguration((ctx, cfg) =>
+            var moduleAssemblyName = BootstrapContext.Module.GetType().Assembly.GetName().Name;
+
+            builder.ConfigureAppConfiguration((ctx, config) =>
             {
                 ctx.HostingEnvironment.ApplicationName = moduleAssemblyName;
-            });
 
-            foreach (var configureAction in StartupContext.BuilderSettings.ConfigurationActions)
-            {
-                builder.ConfigureAppConfiguration(configureAction);
-            }
+                foreach (var configurer in BootstrapContext.Advanced.FrameworkServices.GetServices<IModuleConfigurationConfigurer>())
+                {
+                    configurer.ConfigureModuleConfiguration(BootstrapContext.ToModuleHostBuilderContext(ctx), config);
+                }
+            });
 
             return builder;
         }
 
         protected virtual string GetContentRoot()
         {
-            var pathCandidate = Path.Combine(
-                StartupContext.BuilderSettings.HostBuilderContext.HostingEnvironment
-                    .ContentRootPath, "..", StartupContext.Module.Name);
+            var hostBuilderContext = BootstrapContext.Advanced.FrameworkServices.GetRequiredService<HostBuilderContext>();
+
+            var pathCandidate = Path.Combine(hostBuilderContext.HostingEnvironment
+                    .ContentRootPath, "..", BootstrapContext.Module.Name);
 
             if (!Directory.Exists(pathCandidate))
-                return StartupContext.BuilderSettings.HostBuilderContext.HostingEnvironment
-                    .ContentRootPath;
+                return hostBuilderContext.HostingEnvironment.ContentRootPath;
 
 
             return Path.GetFullPath(pathCandidate);
 
         }
 
-        public virtual IHost CreateHost(Action<IHostBuilder> configureHostBuilderAction)
+        protected virtual IModuleContext<TModule> CreateModuleContext(IServiceProvider services)
+        {
+            var factory = BootstrapContext.Advanced.FrameworkServices.GetRequiredService<IModuleContextFactory<TModule>>();
+            return factory.CreateModuleContext(BootstrapContext, services);
+        }
+
+        public virtual (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost()
         {
             var builder = CreateHostBuilder();
 
-            foreach (var configureServicesAction in StartupContext.BuilderSettings.ConfigureServicesActions)
-            {
-                builder.ConfigureServices(configureServicesAction);
-            }
-
             builder.ConfigureServices(ConfigureServices);
-            configureHostBuilderAction?.Invoke(builder);
             var host = builder.Build();
-
-            return host;
+            
+            
+            return (host, CreateModuleContext(host.Services));
         }
     }
 }

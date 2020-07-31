@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Builder;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public interface IConfigureAppStartupConfigurer<TModule> where TModule : IModule
+    public interface IConfigureAppConfigurer<TModule> where TModule : IModule
     {
-        void Configure(ModuleStartupContext<TModule> startupContext, IApplicationBuilder app);
+        void Configure(IModuleContext<TModule> context, IApplicationBuilder app);
     }
 }

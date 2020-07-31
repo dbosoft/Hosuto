@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Dbosoft.Hosuto.Modules.Hosting
+namespace Dbosoft.Hosuto.Modules.Hosting.Internal
 {
     public class ModuleCollectionHost : IModuleHost
     {
@@ -13,14 +13,6 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         public ModuleCollectionHost(IEnumerable<IModuleHost> moduleHosts)
         {
             _moduleHosts = moduleHosts.ToArray();
-        }
-
-        public void Bootstrap()
-        {
-            foreach (var moduleHost in _moduleHosts)
-            {
-                moduleHost.Bootstrap();
-            }
         }
 
         public async Task StartAsync(CancellationToken cancellationToken = default)
@@ -40,7 +32,9 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         }
 
         public IServiceProvider Services => _moduleHosts.FirstOrDefault()?.Services;
-            
+
+        public IServiceProvider ModuleHostServices => _moduleHosts?.FirstOrDefault()?.ModuleHostServices;
+
         public async Task WaitForShutdownAsync(CancellationToken cancellationToken = default)
         {
             foreach (var moduleHost in _moduleHosts)

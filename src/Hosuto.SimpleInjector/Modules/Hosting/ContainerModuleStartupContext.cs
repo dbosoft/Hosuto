@@ -4,19 +4,31 @@ using SimpleInjector.Lifestyles;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public class ContainerModuleStartupContext<TModule> : ModuleStartupContext<TModule> where TModule : IModule
+    internal class ModuleContextWithContainer<TModule> : ModuleContext<TModule>, IContextWithContainer where TModule : IModule
     {
-        public Container Container { get; } = new Container();
+        public Container Container { get; }
+        
 
-        public ContainerModuleStartupContext(TModule module, ModuleHostBuilderSettings builderSettings, IServiceProvider serviceProvider) : base(module, builderSettings, serviceProvider)
+        public ModuleContextWithContainer(Container container, TModule module, IServiceProvider moduleServices, IServiceProvider moduleHostServices, IServiceProvider frameworkServices) 
+            : base(module, moduleServices, moduleHostServices, frameworkServices)
         {
-            Container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+            Container = container;
         }
 
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
             Container?.Dispose();
+        }
+
+        public override IServiceProvider Services => Container;
+    }
+
+    internal interface IContextWithContainer
+    {
+        Container Container
+        {
+            get; 
         }
     }
 }

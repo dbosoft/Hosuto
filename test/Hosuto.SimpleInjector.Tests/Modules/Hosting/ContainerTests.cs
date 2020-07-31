@@ -1,32 +1,44 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Dbosoft.Hosuto.Modules;
 using Dbosoft.Hosuto.Modules.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Moq;
+using SimpleInjector;
 using Xunit;
 
-namespace Hosuto.Hosting.Tests.Modules.Hosting
+namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
 {
-    public class ServiceCollectionContainerTests
+    public class UseContainerTests
     {
         [Fact]
         public void Module_can_resolve_services_from_outer_container()
         {
-            var sc = new ServiceCollection();
+            var container = new Container();
             var serviceMock = new Mock<IService>();
             serviceMock.Setup(x=>x.CallMe()).Verifiable();
-            sc.AddSingleton(serviceMock.Object);
+            container.RegisterInstance(serviceMock.Object);
 
             var builder = ModuleHost.CreateDefaultBuilder();
-            builder.UseServiceCollection(sc);
+            builder.UseSimpleInjector(container);
             builder.HostModule<SomeModule>();
             var host = builder.Build();
 
             serviceMock.Verify(x=>x.CallMe());
 
+        }
+
+        [Fact]
+        public void Module_uses_SimpleInjector_as_inner_container()
+        {
+            var serviceMock = new Mock<IService>();
+            serviceMock.Setup(x => x.CallMe()).Verifiable();
+
+            var builder = ModuleHost.CreateDefaultBuilder();
+            builder.UseSimpleInjector();
+            builder.HostModule<SomeModule>();
+            var host = builder.Build();
+            var moduleHost = host.ModuleHostServices.GetRequiredService<IModuleHost<SomeModule>>();
+            Assert.IsType<Container>(moduleHost.ModuleContext.Services);
         }
 
         // ReSharper disable once MemberCanBePrivate.Global
@@ -42,9 +54,11 @@ namespace Hosuto.Hosting.Tests.Modules.Hosting
             public void ConfigureServices(IServiceProvider sp, IServiceCollection services)
             {
                 var service = sp.GetService<IService>();
-                service.CallMe();
+                service?.CallMe();
             }
 
         }
     }
+
+    
 }

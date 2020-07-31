@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Dbosoft.Hosuto.Modules.Hosting.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
@@ -23,10 +23,8 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         private readonly Dictionary<Type, Action<IHostBuilder>> _registeredModules = new Dictionary<Type, Action<IHostBuilder>>();
         private readonly List<Action<HostBuilderContext, IServiceCollection>> _configureFrameworkActions = new List<Action<HostBuilderContext, IServiceCollection>>();
-        private readonly List<Action<HostBuilderContext, IServiceCollection>> _configureServicesActions = new List<Action<HostBuilderContext, IServiceCollection>>();
-
         private readonly List<Action<IConfigurationBuilder>> _configureHostConfigActions = new List<Action<IConfigurationBuilder>>();
-        private readonly List<Action<HostBuilderContext, IConfigurationBuilder>> _configureModulesConfigActions = new List<Action<HostBuilderContext,IConfigurationBuilder>>();
+
         private IServiceFactoryAdapter _serviceProviderFactory = new ServiceFactoryAdapter<IServiceCollection>(new DefaultServiceProviderFactory());
 
         private bool _hostBuilt;
@@ -34,17 +32,6 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         private HostBuilderContext _hostBuilderContext;
         private HostingEnvironment _hostingEnvironment;
-        private Assembly _callingAssembly;
-
-        public ModuleHostBuilder()
-        {
-            _callingAssembly = Assembly.GetCallingAssembly();
-        }
-
-        public ModuleHostBuilder(Assembly callingAssembly)
-        {
-            _callingAssembly = callingAssembly;
-        }
 
         public IModuleHostBuilder HostModule<TModule>(Action<IHostBuilder> configureDelegate = null) where TModule : class, IModule
         {
@@ -62,27 +49,37 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             return this;
         }
 
-        public IModuleHostBuilder ConfigureAppConfiguration(Action<HostBuilderContext, IConfigurationBuilder> configureDelegate)
-        {
-            _configureModulesConfigActions.Add(configureDelegate ?? throw new ArgumentNullException(nameof(configureDelegate)));
-            return this;
-        }
-
         public IModuleHostBuilder ConfigureFrameworkServices(Action<HostBuilderContext, IServiceCollection> configureDelegate)
         {
             _configureFrameworkActions.Add(configureDelegate ?? throw new ArgumentNullException(nameof(configureDelegate)));
             return this;
         }
 
-        public IModuleHostBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configureDelegate)
+        public IModuleHostBuilder ConfigureAppConfiguration(Action<HostBuilderContext, IConfigurationBuilder> configureDelegate)
         {
-            _configureServicesActions.Add(configureDelegate ?? throw new ArgumentNullException(nameof(configureDelegate)));
+            ConfigureFrameworkServices((ctx, services) =>
+            {
+                services.AddTransient<IModuleConfigurationConfigurer>(sp =>
+                    new DelegateModuleHostBuilderConfigurationConfigurer(configureDelegate));
+            });
+
             return this;
         }
 
         IHostBuilder IHostBuilder.ConfigureAppConfiguration(Action<HostBuilderContext, IConfigurationBuilder> configureDelegate)
         {
             return ConfigureAppConfiguration(configureDelegate);
+        }
+
+        public IModuleHostBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configureDelegate)
+        {
+            ConfigureFrameworkServices((ctx, services) =>
+            {
+                services.AddTransient<IModuleServicesConfigurer>(sp =>
+                    new DelegateModuleServicesConfigurer(configureDelegate));
+            });
+
+            return this;
         }
 
         IHostBuilder IHostBuilder.ConfigureServices(Action<HostBuilderContext, IServiceCollection> configureDelegate)
@@ -121,16 +118,16 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
 
             //build the services for configuration of Hosuto module system
-            var frameworkServiceProvider = CreateFrameworkServiceProvider();
-            var moduleHostFactory = frameworkServiceProvider.GetRequiredService<IModuleHostFactory>();
-            var outerServiceProvider = CreateServiceProvider();
+            var frameworkServices = CreateFrameworkServiceProvider();
 
-            return new ModuleHost(
-                moduleHostFactory.CreateModuleHost(
-                    _registeredModules, 
-                    new ModuleHostBuilderSettings(_hostBuilderContext, _configureModulesConfigActions, _configureServicesActions, frameworkServiceProvider),
-                    outerServiceProvider), 
-                outerServiceProvider);
+            //create the service provider for the module host
+            var moduleHostServices = CreateServiceProvider(frameworkServices);
+
+            //bootstrap internal hosts (setup inner host and containers for modules)
+            BootstrapHosts(moduleHostServices, frameworkServices);
+            
+            //wrap the internal generic or collection module host in a ModulHost
+            return new ModuleHost(MergeInternalHosts(frameworkServices),moduleHostServices);
 
         }
 
@@ -208,16 +205,16 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             frameworkServices.AddTransient<IHostFactory,DefaultHostFactory>();
 
             _configureFrameworkActions.ForEach(c => c(_hostBuilderContext, frameworkServices));
-
-            frameworkServices.TryAddSingleton<IModuleHostFactory, DefaultModuleHostFactory>();
-            frameworkServices.TryAddSingleton(typeof(IModuleHost<>), typeof(ModuleHost<>));
+            
+            frameworkServices.TryAddSingleton(typeof(IInternalModuleHost<>), typeof(GenericModuleHost<>));
+            frameworkServices.TryAddTransient(typeof(IModuleContextFactory<>), typeof(DefaultModuleContextFactory<>));
 
 
             return frameworkServices.BuildServiceProvider(true);
 
         }
 
-        private IServiceProvider CreateServiceProvider()
+        private IServiceProvider CreateServiceProvider(IServiceProvider frameworkServices)
         {
             var moduleServices = new ServiceCollection()
 #if NETSTANDARD2_0
@@ -232,9 +229,50 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                 moduleServices.AddSingleton(moduleType);
             }
 
+            WireModuleHosts(moduleServices, frameworkServices);
+
+
             var containerBuilder = _serviceProviderFactory.CreateBuilder(moduleServices);
             return _serviceProviderFactory.CreateServiceProvider(containerBuilder);
 
+        }
+
+        private IInternalModuleHost GetModuleHost(Type moduleType, IServiceProvider frameworkServices) 
+        {
+            var hostType = typeof(IInternalModuleHost<>).MakeGenericType(moduleType);
+            var internalHost = frameworkServices.GetRequiredService(hostType) as IInternalModuleHost;
+            return internalHost;
+        }
+
+        private void BootstrapHosts(IServiceProvider moduleHostServices, IServiceProvider frameworkServices)
+        {
+            foreach (var module in _registeredModules)
+            {
+                GetModuleHost(module.Key, frameworkServices)?.Bootstrap(moduleHostServices);
+            }
+        }
+
+        private void WireModuleHosts(IServiceCollection moduleHostServices, IServiceProvider frameworkServices)
+        {
+            foreach (var module in _registeredModules)
+            {
+                var hostType = typeof(IInternalModuleHost<>).MakeGenericType(module.Key);
+                var serviceType = typeof(IModuleHost<>).MakeGenericType(module.Key);
+
+                var internalHost = frameworkServices.GetRequiredService(hostType);
+                moduleHostServices.AddSingleton(serviceType, sp => internalHost);
+            }
+        }
+
+        private IModuleHost MergeInternalHosts(IServiceProvider frameworkServices)
+        {
+            switch (_registeredModules.Count)
+            {
+                case 0: throw new InvalidOperationException("No modules have been registered in ModuleHost. Use HostModule<> method to add a module to the module host builder.");
+                case 1: return GetModuleHost(_registeredModules.First().Key, frameworkServices);
+                default: return new ModuleCollectionHost(_registeredModules.Select(
+                    m => GetModuleHost(m.Key, frameworkServices)));
+            }
         }
 
         private void CreateHostBuilderContext()

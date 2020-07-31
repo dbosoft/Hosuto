@@ -26,7 +26,11 @@ namespace Dbosoft.Hosuto.Sample
             builder.UseAspNetCoreWithDefaults((module, webBuilder) =>
             {
             });
-            return builder.RunConsoleAsync();
+            var host = builder.Build();
+            var test = host.ModuleHostServices.GetService<IMessageDispatcher>();
+            var module = host.ModuleHostServices.GetService<SampleWebModule>();
+            var moduleHost = host.ModuleHostServices.GetService<IModuleHost<SampleWebModule>>();
+            return host.RunAsync();
         }
     }
 }

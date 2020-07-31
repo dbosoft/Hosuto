@@ -15,10 +15,10 @@ namespace Dbosoft.Hosuto.Modules.Hosting
     {
         private readonly IModuleHost _host;
 
-        public ModuleHost(IModuleHost host, IServiceProvider serviceProvider)
+        public ModuleHost(IModuleHost host, IServiceProvider moduleHostServices)
         {
             _host = host;
-            Services = serviceProvider;
+            ModuleHostServices = moduleHostServices;
         }
 
 
@@ -104,8 +104,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         // ReSharper disable once MemberCanBePrivate.Global
         public static IModuleHostBuilder CreateDefaultBuilder(string[] args)
         {
-            var builder = new ModuleHostBuilder(Assembly.GetCallingAssembly());
-
+            var builder = new ModuleHostBuilder();
             builder.UseContentRoot(Directory.GetCurrentDirectory());
             builder.ConfigureHostConfiguration(config =>
             {
@@ -199,12 +198,9 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             return _host.StopAsync(cancellationToken);
         }
 
-        public IServiceProvider Services { get; }
+        public IServiceProvider Services => _host?.Services;
 
-        public void Bootstrap()
-        {
-            _host.Bootstrap();
-        }
+        public IServiceProvider ModuleHostServices { get; }
 
         public Task WaitForShutdownAsync(CancellationToken cancellationToken = default)
         {
