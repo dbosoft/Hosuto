@@ -19,23 +19,26 @@ steps:
     versionSpec: '5.x'
 
 - task: DotNetCoreCLI@2
-  displayName: Build
+  displayName: dotnet build
   inputs:
     command: build
     projects: '**/*.csproj'
     arguments: '--configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
+  displayName: dotnet test
   inputs:
     command: test
     projects: '**/*Tests/*.csproj'
     arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
 
 - task: DotNetCoreCLI@2
+  displayName: dotnet publish
   inputs:
     command: publish
     arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
 
 - task: PublishBuildArtifacts@1
+  displayName: publish artifacts
   inputs:
     ArtifactName: drop
