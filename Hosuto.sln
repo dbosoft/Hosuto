@@ -41,7 +41,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hosuto.Hosting.AspNetCore.T
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{49CF90DB-545B-437A-ADA1-978AEE21A1E5}"
 	ProjectSection(SolutionItems) = preProject
-		gitversion.yaml = gitversion.yaml
+		gitversion.yml = gitversion.yml
 		build\pack.props = build\pack.props
 	EndProjectSection
 EndProject
