@@ -35,7 +35,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         {
             builder.HostModule<TModule>(hostConfigureAction);
             configureAction?.Invoke(builder);
-            return builder.Build().Run();
+            return builder.Build().RunAsync();
 
         }
     }

@@ -4,6 +4,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Dbosoft.Hosuto.Samples.SimpleModule</AssemblyName>
     <RootNamespace>Dbosoft.Hosuto.Samples</RootNamespace>
+    <IsPackable>false</IsPackable>
+
   </PropertyGroup>
 
   <ItemGroup>

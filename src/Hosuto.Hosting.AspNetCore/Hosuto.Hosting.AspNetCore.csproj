@@ -6,6 +6,9 @@
     <RootNamespace>Dbosoft.Hosuto</RootNamespace>
   </PropertyGroup>
 
+  <Import Project="..\..\build\pack.props" />
+
+
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>

@@ -6,6 +6,9 @@
     <RootNamespace>Dbosoft.Hosuto</RootNamespace>
   </PropertyGroup>
 
+  <Import Project="..\..\build\pack.props" />
+
+
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.0" />
@@ -23,6 +26,14 @@
   <ItemGroup>
     <Folder Include="Modules\Testing\" />
     <Folder Include="Properties\" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="GitVersionTask" Version="5.3.7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 

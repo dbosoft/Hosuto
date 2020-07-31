@@ -6,6 +6,8 @@
     <RootNamespace>Dbosoft.Hosuto</RootNamespace>
   </PropertyGroup>
 
+  <Import Project="..\..\build\pack.props" />
+
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="[2.1,3.0]" />
   </ItemGroup>
