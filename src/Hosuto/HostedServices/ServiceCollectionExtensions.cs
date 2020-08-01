@@ -22,8 +22,7 @@ namespace Dbosoft.Hosuto.HostedServices
             this IServiceCollection services, 
             Func<IServiceProvider, CancellationToken, Task> handlerDelegate)
         {
-            return services.AddSingleton<IHostedService>(sp =>
-                new HandlerHostService<DelegateServiceHandler>(sp,new DelegateServiceHandler(handlerDelegate)));
+            return services.AddSingleton<IHostedService>(sp => new DelegateHandlerHostService(sp, handlerDelegate));
         }
 
     }

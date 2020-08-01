@@ -6,6 +6,6 @@ namespace Dbosoft.Hosuto.HostedServices
 {
     public interface IHostedServiceHandler
     {
-        Task Execute(IServiceProvider serviceProvider, CancellationToken stoppingToken);
+        Task Execute(CancellationToken stoppingToken);
     }
 }

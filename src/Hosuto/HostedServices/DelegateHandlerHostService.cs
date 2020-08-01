@@ -7,13 +7,15 @@ using Microsoft.Extensions.Hosting;
 
 namespace Dbosoft.Hosuto.HostedServices
 {
-    internal class HandlerHostService<TServiceHandler> : BackgroundService where TServiceHandler : class, IHostedServiceHandler
+    internal class DelegateHandlerHostService : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly Func<IServiceProvider, CancellationToken, Task> _handlerDelegate;
 
-        public HandlerHostService(IServiceProvider serviceProvider)
+        public DelegateHandlerHostService(IServiceProvider serviceProvider, Func<IServiceProvider, CancellationToken, Task> handlerDelegate)
         {
             _serviceProvider = serviceProvider;
+            _handlerDelegate = handlerDelegate;
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -21,8 +23,7 @@ namespace Dbosoft.Hosuto.HostedServices
             var services = _serviceProvider.AsModuleServices();
             using (var scope = services.CreateScope())
             {
-                var serviceHandler = scope.ServiceProvider.GetRequiredService<TServiceHandler>();
-                return serviceHandler.Execute(stoppingToken);
+                return _handlerDelegate(scope.ServiceProvider, stoppingToken);
             }
         }
     }

@@ -12,7 +12,7 @@ namespace Dbosoft.Hosuto.Samples
         {
             services.AddSingleton(serviceProvider.GetRequiredService<IMessageDispatcher>());
 
-            services.AddModuleHandler((sp, cancelToken) =>
+            services.AddHostedHandler((sp, cancelToken) =>
             {
                 var dispatcher = sp.GetRequiredService<IMessageDispatcher>();
                 dispatcher.RegisterRecipient(this);
