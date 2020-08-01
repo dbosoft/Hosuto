@@ -15,7 +15,7 @@ namespace Dbosoft.Hosuto.HostedServices
             where TServiceHandler : class, IHostedServiceHandler
         {
             services.AddSingleton<TServiceHandler>();
-            return services.AddSingleton<IHostedService,HandlerHostService<TServiceHandler>>();
+            return services.AddHostedService<HandlerHostService<TServiceHandler>>();
         }
 
         public static IServiceCollection AddHostedHandler(

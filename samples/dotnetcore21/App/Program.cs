@@ -20,7 +20,7 @@ namespace Dbosoft.Hosuto.Samples
             builder.UseEnvironment(EnvironmentName.Development);
 
             //here we add a ServiceCollection to build a DI container that is available for all modules. 
-                        
+
             //var sc = new ServiceCollection();
             //sc.AddSingleton<IMessageDispatcher, MessageDispatcher>();
             //builder.UseServiceCollection(sc);

@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
-using System.Text;
 using Dbosoft.Hosuto.Modules.Hosting;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -146,7 +143,10 @@ namespace Dbosoft.Hosuto.Modules.Testing
             }
 
             var hostBuilder = CreateModuleHostBuilder();
-            hostBuilder.HostModule<TModule>();
+            hostBuilder.HostModule<TModule>(sp =>
+            {
+                _server = (TestServer)sp.GetRequiredService<IServer>();
+            });
 #if NETSTANDARD
             hostBuilder.UseAspNetCore(CreateWebHostBuilder, (_, webHostBuilder) =>
 #else         
@@ -160,7 +160,7 @@ namespace Dbosoft.Hosuto.Modules.Testing
 #endif
             });
             _host = CreateHost(hostBuilder);
-            _server = (TestServer)_host.Services.GetRequiredService<IServer>();
+            
 
         }
 

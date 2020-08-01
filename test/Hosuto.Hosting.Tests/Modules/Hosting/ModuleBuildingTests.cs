@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Xunit;
 
-namespace Hosuto.Hosting.Tests
+namespace Hosuto.Hosting.Tests.Modules.Hosting
 {
     public class ModuleBuildingTests
     {
@@ -42,7 +42,9 @@ namespace Hosuto.Hosting.Tests
             public string Name => "I'm a module";
             public string Environment { get; private set; }
 
+#pragma warning disable 618
             public void ConfigureServices(IServiceCollection services, IHostingEnvironment environment)
+#pragma warning restore 618
             {
                 Environment = environment.EnvironmentName;
             }

@@ -26,6 +26,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         {
             var container = new Container();
             container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+            container.Options.ResolveUnregisteredConcreteTypes = false;
             container.Register<IServiceScopeFactory, SimpleInjectorScopeFactory>();
             return new ModuleContextWithContainer<TModule>(container, module, null, moduleHostServices, frameworkServices);
         }

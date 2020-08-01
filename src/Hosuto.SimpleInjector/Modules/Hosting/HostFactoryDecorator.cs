@@ -39,6 +39,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             var container = context.Container;
             host.UseSimpleInjector(container, options => UseSimpleInjector(moduleContext, options));
             ConfigureContainer(moduleContext, container);
+            container.RegisterInstance((IServiceProvider) container);
 
             container.Verify();
 
