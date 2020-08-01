@@ -13,7 +13,9 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             _bootstrapContext = bootstrapContext;
             HostBuilderContext = hostBuilderContext 
                                  ?? bootstrapContext.Advanced.FrameworkServices.GetRequiredService<HostBuilderContext>();
-            Advanced = new AdvancedModuleContext(_bootstrapContext.Advanced.FrameworkServices, _bootstrapContext);
+            Advanced = new AdvancedModuleContext(_bootstrapContext.Advanced.FrameworkServices,
+                bootstrapContext.Advanced.HostServices,
+                _bootstrapContext);
         }
 
         public TModule Module => _bootstrapContext.Module;

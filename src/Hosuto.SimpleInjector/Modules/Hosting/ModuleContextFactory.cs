@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 using SimpleInjector;
 using SimpleInjector.Lifestyles;
 
@@ -25,6 +26,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         {
             var container = new Container();
             container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+            container.Register<IServiceScopeFactory, SimpleInjectorScopeFactory>();
             return new ModuleContextWithContainer<TModule>(container, module, null, moduleHostServices, frameworkServices);
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SimpleInjector;
+using SimpleInjector.Lifestyles;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
@@ -9,7 +10,16 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         public static IModuleHostBuilder UseSimpleInjector(this IModuleHostBuilder hostBuilder,
             Container container, bool enableModuleContainer = true) 
         {
-            hostBuilder.UseServiceProviderFactory(new ServiceProviderFactory(container));
+            if (container.Options.DefaultScopedLifestyle == null)
+            {
+                container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+            }
+
+            hostBuilder.ConfigureFrameworkServices((ctx, services) =>
+            {
+                services.AddSingleton(container);
+                services.AddTransient<IModuleHostServiceProviderFactory, ServiceProviderFactory>();
+            });
 
             return !enableModuleContainer 
                 ? hostBuilder 

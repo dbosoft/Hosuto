@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Dbosoft.Hosuto.Modules
@@ -9,9 +10,9 @@ namespace Dbosoft.Hosuto.Modules
     {
         private readonly THostedService _innerService;
 
-        public ModuleHostedService(THostedService hostedService)
+        public ModuleHostedService(IServiceProvider serviceProvider)
         {
-            _innerService = hostedService;
+            _innerService = serviceProvider.AsModuleServices().GetRequiredService<THostedService>();
         }
 
         public Task StartAsync(CancellationToken cancellationToken)

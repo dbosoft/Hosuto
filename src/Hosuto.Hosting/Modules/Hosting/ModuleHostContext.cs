@@ -9,12 +9,14 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             Services = moduleServices;
             ModuleHostServices = serviceProvider;
             Module = module;
-            Advanced = new AdvancedModuleContext(frameworkServices, null);
+            Advanced = new AdvancedModuleContext(frameworkServices, moduleServices, null);
         }
 
         public TModule Module { get; }
         public virtual IServiceProvider Services { get; }
         public IAdvancedModuleContext Advanced { get; }
+        object IModuleContext.Module => Module;
+
         public IServiceProvider ModuleHostServices { get; }
 
         protected virtual void Dispose(bool disposing)
@@ -30,13 +32,15 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
     public class AdvancedModuleContext : IAdvancedModuleContext
     {
-        public AdvancedModuleContext(IServiceProvider frameworkServices, object rootContext)
+        public AdvancedModuleContext(IServiceProvider frameworkServices, IServiceProvider hostServices, object rootContext)
         {
             FrameworkServices = frameworkServices;
+            HostServices = hostServices;
             RootContext = rootContext;
         }
 
         public IServiceProvider FrameworkServices { get; }
+        public IServiceProvider HostServices { get; }
         public object RootContext { get; }
     }
 

@@ -1,61 +1,35 @@
 ﻿using System;
+using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleInjector;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    internal class ServiceProviderFactory : IServiceProviderFactory<Container>
+    internal class ServiceProviderFactory : IModuleHostServiceProviderFactory
     {
         private readonly Container _container;
 
         public ServiceProviderFactory(Container container)
         {
-            _container = container;
+            _container = container ?? throw new ArgumentNullException(nameof(container));
         }
 
-        public Container CreateBuilder(IServiceCollection services)
+        public object ConfigureServices(IServiceCollection services)
         {
-            foreach (var service in services)
-            {
-                Lifestyle lifestyle;
-
-                switch (service.Lifetime)
-                {
-                    case ServiceLifetime.Singleton:
-                        lifestyle = Lifestyle.Singleton;
-                        break;
-                    case ServiceLifetime.Scoped:
-                        lifestyle = Lifestyle.Scoped;
-                        break;
-                    case ServiceLifetime.Transient:
-                        lifestyle = Lifestyle.Transient;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-                if (service.ImplementationInstance != null)
-                    _container.Register(service.ServiceType, () => service.ImplementationInstance, lifestyle);
-                else
-                {
-                    if(service.ImplementationType != null)
-                        _container.Register(service.ServiceType, service.ImplementationType, lifestyle);
-                    else
-                    {
-                        _container.Register(service.ServiceType, () => service.ImplementationFactory(_container), lifestyle);
-
-                    }
-
-                }
-                    
-            }
-
+            services.AddSimpleInjector(_container);
             return _container;
         }
 
-        public IServiceProvider CreateServiceProvider(Container containerBuilder)
+        public IServiceProvider ReplaceServiceProvider(object state, IServiceProvider services)
         {
+            if (state == null) throw new ArgumentNullException(nameof(state));
+            if (services == null) throw new ArgumentNullException(nameof(services));
+
+            Debug.Assert(ReferenceEquals(state, _container));
+            services.UseSimpleInjector(_container);
+
             return _container;
         }
     }
+    
 }

@@ -10,10 +10,10 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 {
     public class DefaultHostFactory : IHostFactory
     {
-        public (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost<TModule>(IModuleBootstrapContext<TModule> bootstrapContext) where TModule : IModule
+        public (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost<TModule>(IModuleBootstrapContext<TModule> bootstrapContext, Action<IHostBuilder> configure) where TModule : IModule
         {
             var factory = new DefaultHostFactory<TModule>(bootstrapContext);
-            return factory.CreateHost();
+            return factory.CreateHost(configure);
         }
         
     }
@@ -91,11 +91,12 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             return factory.CreateModuleContext(BootstrapContext, services);
         }
 
-        public virtual (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost()
+        public virtual (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost(Action<IHostBuilder> configure)
         {
             var builder = CreateHostBuilder();
 
             builder.ConfigureServices(ConfigureServices);
+            configure?.Invoke(builder);
             var host = builder.Build();
             
             

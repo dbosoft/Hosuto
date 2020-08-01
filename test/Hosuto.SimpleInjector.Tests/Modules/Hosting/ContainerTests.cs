@@ -14,14 +14,17 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
         public void Module_can_resolve_services_from_outer_container()
         {
             var container = new Container();
-            var serviceMock = new Mock<IService>();
-            serviceMock.Setup(x=>x.CallMe()).Verifiable();
-            container.RegisterInstance(serviceMock.Object);
-
             var builder = ModuleHost.CreateDefaultBuilder();
             builder.UseSimpleInjector(container);
+
+            var serviceMock = new Mock<IService>();
+            serviceMock.Setup(x => x.CallMe()).Verifiable();
+            container.RegisterInstance(serviceMock.Object);
+
+
             builder.HostModule<SomeModule>();
             var host = builder.Build();
+            var moduleHost = host.Services.GetRequiredService<IModuleHost<SomeModule>>();
 
             serviceMock.Verify(x=>x.CallMe());
 
@@ -37,7 +40,7 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
             builder.UseSimpleInjector();
             builder.HostModule<SomeModule>();
             var host = builder.Build();
-            var moduleHost = host.ModuleHostServices.GetRequiredService<IModuleHost<SomeModule>>();
+            var moduleHost = host.Services.GetRequiredService<IModuleHost<SomeModule>>();
             Assert.IsType<Container>(moduleHost.ModuleContext.Services);
         }
 

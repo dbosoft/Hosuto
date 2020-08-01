@@ -1,4 +1,7 @@
-﻿using Dbosoft.Hosuto.HostedServices;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Dbosoft.Hosuto.HostedServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -10,6 +13,7 @@ namespace Dbosoft.Hosuto.Modules
             this IServiceCollection services)
             where THostedService : class, IHostedService
         {
+            services.AddSingleton<THostedService>();
             return services.AddSingleton<IHostedService, ModuleHostedService<THostedService>>();
         }
 
@@ -17,9 +21,16 @@ namespace Dbosoft.Hosuto.Modules
             this IServiceCollection services)
             where TModuleHandler : class, IHostedServiceHandler
         {
-            return services.AddSingleton<IHostedService, ModuleHostedHandler<TModuleHandler>>();
+            return services.AddSingleton<IHostedService, ModuleHandlerHostService<TModuleHandler>>();
         }
 
+        public static IServiceCollection AddModuleHandler(
+            this IServiceCollection services,
+            Func<IServiceProvider, CancellationToken, Task> handlerDelegate)
+        {
+            return services.AddSingleton<IHostedService>(sp =>
+                new ModuleHandlerHostService<DelegateServiceHandler>(sp, new DelegateServiceHandler(handlerDelegate)));
+        }
 
     }
 }

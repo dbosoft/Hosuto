@@ -1,9 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -11,16 +8,8 @@ using Microsoft.Extensions.Logging.EventLog;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public class ModuleHost : IModuleHost
+    public static class ModuleHost
     {
-        private readonly IModuleHost _host;
-
-        public ModuleHost(IModuleHost host, IServiceProvider moduleHostServices)
-        {
-            _host = host;
-            ModuleHostServices = moduleHostServices;
-        }
-
 
 #if NETSTANDARD2_0
         /// <summary>
@@ -105,6 +94,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         public static IModuleHostBuilder CreateDefaultBuilder(string[] args)
         {
             var builder = new ModuleHostBuilder();
+            
             builder.UseContentRoot(Directory.GetCurrentDirectory());
             builder.ConfigureHostConfiguration(config =>
             {
@@ -182,29 +172,6 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
 
         }
-
-        public void Dispose()
-        {
-            _host?.Dispose();
-        }
-
-        public Task StartAsync(CancellationToken cancellationToken = new CancellationToken())
-        {
-            return _host.StartAsync(cancellationToken);
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken = new CancellationToken())
-        {
-            return _host.StopAsync(cancellationToken);
-        }
-
-        public IServiceProvider Services => _host?.Services;
-
-        public IServiceProvider ModuleHostServices { get; }
-
-        public Task WaitForShutdownAsync(CancellationToken cancellationToken = default)
-        {
-            return _host.WaitForShutdownAsync(cancellationToken);
-        }
+        
     }
 }

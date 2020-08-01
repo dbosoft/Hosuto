@@ -8,9 +8,9 @@ namespace Dbosoft.Hosuto.Modules.Hosting
     public interface IModuleHostBuilder: IHostBuilder
     {
 
-        IModuleHostBuilder HostModule<TModule>(Action<IHostBuilder> configure = null) where TModule : class, IModule;
-        new IModuleHost Build(); 
-        
+        IModuleHostBuilder HostModule<TModule>(Action<IServiceProvider> bootstrap = null) where TModule : class, IModule;
+        IModuleHostBuilder HostModule<TModule>(Action<IHostBuilder> configure, Action<IServiceProvider> bootstrap = null) where TModule : class, IModule;
+
         /// <summary>
         /// Set up the configuration for the builder itself. This will be used to initialize the <see cref="IHostEnvironment"/>
         /// for use later in the build process. This can be called multiple times and the results will be additive.

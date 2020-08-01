@@ -1,51 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using Dbosoft.Hosuto.Modules.Hosting.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Hosting.Internal;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
     public class ModuleHostBuilder : IModuleHostBuilder
     {
 
-        /// <summary>
-        /// A central location for sharing state between components during the host building process.
-        /// </summary>
-        public IDictionary<object, object> Properties { get; } = new Dictionary<object, object>();
+        public IDictionary<object, object> Properties => _innerBuilder.Properties;
 
-        private readonly Dictionary<Type, Action<IHostBuilder>> _registeredModules = new Dictionary<Type, Action<IHostBuilder>>();
+        private readonly Dictionary<Type, ModuleHostBootstrapActions> _registeredModules = new Dictionary<Type, ModuleHostBootstrapActions>();
         private readonly List<Action<HostBuilderContext, IServiceCollection>> _configureFrameworkActions = new List<Action<HostBuilderContext, IServiceCollection>>();
-        private readonly List<Action<IConfigurationBuilder>> _configureHostConfigActions = new List<Action<IConfigurationBuilder>>();
-
-        private IServiceFactoryAdapter _serviceProviderFactory = new ServiceFactoryAdapter<IServiceCollection>(new DefaultServiceProviderFactory());
-
         private bool _hostBuilt;
-        private IConfiguration _hostConfiguration;
-
-        private HostBuilderContext _hostBuilderContext;
-        private HostingEnvironment _hostingEnvironment;
-
-        public IModuleHostBuilder HostModule<TModule>(Action<IHostBuilder> configureDelegate = null) where TModule : class, IModule
+        private readonly IHostBuilder _innerBuilder = new HostBuilder();
+        
+        public IModuleHostBuilder HostModule<TModule>(Action<IServiceProvider> bootstrap = null) where TModule : class, IModule
         {
-            if(_registeredModules.ContainsKey(typeof(TModule)))
+            CheckIfModuleAlreadyRegistered<TModule>();
+            _registeredModules.Add(typeof(TModule), new ModuleHostBootstrapActions { Bootstrap = bootstrap});
+            return this;
+        }
+
+        public IModuleHostBuilder HostModule<TModule>(Action<IHostBuilder> configure, Action<IServiceProvider> bootstrap = null) where TModule : class, IModule
+        {
+            CheckIfModuleAlreadyRegistered<TModule>();
+            _registeredModules.Add(typeof(TModule), new ModuleHostBootstrapActions { ConfigureBuilder = configure, Bootstrap = bootstrap });
+            return this;
+        }
+
+        private void CheckIfModuleAlreadyRegistered<TModule>() where TModule : IModule
+        {
+            if (_registeredModules.ContainsKey(typeof(TModule)))
                 throw new InvalidOperationException($"Module of type {typeof(TModule)} is already used.");
 
-            _registeredModules.Add(typeof(TModule), configureDelegate);
-            return this;
         }
 
         public IModuleHostBuilder ConfigureHostConfiguration(
             Action<IConfigurationBuilder> configureDelegate)
         {
-            _configureHostConfigActions.Add(configureDelegate ?? throw new ArgumentNullException(nameof(configureDelegate)));
+            _innerBuilder.ConfigureHostConfiguration(configureDelegate);
             return this;
         }
 
@@ -105,30 +102,62 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             return ConfigureContainer(configureDelegate);
         }
 
-        public IModuleHost Build()
+        public IHost Build()
         {
             if (_hostBuilt)
                 throw new InvalidOperationException("Build can only be called once.");
 
             _hostBuilt = true;
 
-            BuildHostConfiguration();
-            CreateHostingEnvironment();
-            CreateHostBuilderContext();
+            AddModuleContextAccessor();
 
+            IServiceProvider frameworkServices = null;
+            object moduleHostServicesFactoryState = null;
+            var host = _innerBuilder.ConfigureServices((ctx, services) =>
+            {
+                frameworkServices = CreateFrameworkServiceProvider(ctx);
 
-            //build the services for configuration of Hosuto module system
-            var frameworkServices = CreateFrameworkServiceProvider();
+                var moduleHostServicesFactory = frameworkServices.GetService<IModuleHostServiceProviderFactory>();
+                moduleHostServicesFactoryState = moduleHostServicesFactory?.ConfigureServices(services);
 
-            //create the service provider for the module host
-            var moduleHostServices = CreateServiceProvider(frameworkServices);
+                foreach (var moduleType in _registeredModules.Keys)
+                {
+                    services.AddSingleton(moduleType);
+                }
+
+                RegisterModulesAndHosts(services, frameworkServices);
+                
+            }).Build();
+
+            var moduleHostServiceProvider = host.Services;
+
+            if (moduleHostServicesFactoryState != null)
+            {
+                var moduleHostServicesFactory = frameworkServices.GetService<IModuleHostServiceProviderFactory>();
+                moduleHostServiceProvider =
+                    moduleHostServicesFactory.ReplaceServiceProvider(moduleHostServicesFactoryState,
+                        moduleHostServiceProvider);
+            }
+
 
             //bootstrap internal hosts (setup inner host and containers for modules)
-            BootstrapHosts(moduleHostServices, frameworkServices);
-            
-            //wrap the internal generic or collection module host in a ModulHost
-            return new ModuleHost(MergeInternalHosts(frameworkServices),moduleHostServices);
+            BootstrapModuleHosts(moduleHostServiceProvider, frameworkServices);
 
+            return host;
+        }
+
+        private void RegisterModulesAndHosts(IServiceCollection services, IServiceProvider frameworkServices)
+        {
+            foreach (var module in _registeredModules)
+            {
+                var internalHostType = typeof(Internal.IModuleHost<>).MakeGenericType(module.Key);
+                var serviceType = typeof(IModuleHost<>).MakeGenericType(module.Key);
+                var hostedServiceType = typeof(ModuleHostService<>).MakeGenericType(module.Key);
+                
+                var internalHost = frameworkServices.GetRequiredService(internalHostType);
+                services.AddSingleton(serviceType, sp => internalHost);
+                services.AddTransient(typeof(IHostedService), hostedServiceType);
+            }
         }
 
         IHostBuilder IHostBuilder.ConfigureHostConfiguration(Action<IConfigurationBuilder> configureDelegate)
@@ -144,10 +173,11 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         /// <returns>The same instance of the <see cref="IHostBuilder"/> for chaining.</returns>
         public IModuleHostBuilder UseServiceProviderFactory<TContainerBuilder>(IServiceProviderFactory<TContainerBuilder> factory)
         {
-            _serviceProviderFactory = new ServiceFactoryAdapter<TContainerBuilder>(factory ?? throw new ArgumentNullException(nameof(factory)));
+            _innerBuilder.UseServiceProviderFactory(factory);
             return this;
         }
 
+#if NETSTANDARD2_1
         /// <summary>
         /// Overrides the factory used to create the service provider.
         /// </summary>
@@ -156,57 +186,21 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         /// <returns>The same instance of the <see cref="IHostBuilder"/> for chaining.</returns>
         public IModuleHostBuilder UseServiceProviderFactory<TContainerBuilder>(Func<HostBuilderContext, IServiceProviderFactory<TContainerBuilder>> factory)
         {
-            _serviceProviderFactory = new ServiceFactoryAdapter<TContainerBuilder>(() => _hostBuilderContext, factory ?? throw new ArgumentNullException(nameof(factory)));
+            _innerBuilder.UseServiceProviderFactory(factory);
             return this;
         }
-
-        private void BuildHostConfiguration()
-        {
-            var configurationBuilder = new ConfigurationBuilder().AddInMemoryCollection();
-            _configureHostConfigActions.ForEach(c=>c(configurationBuilder));
-            _hostConfiguration = configurationBuilder.Build();
-        }
-
-        private void CreateHostingEnvironment()
-        {
-            _hostingEnvironment = new HostingEnvironment()
-            {
-                ApplicationName = _hostConfiguration[HostDefaults.ApplicationKey],
-                EnvironmentName = _hostConfiguration[HostDefaults.EnvironmentKey] ??
-#if NETSTANDARD2_1
-                                  Environments.Production,
-#else
-                                  EnvironmentName.Production,
 #endif
-                ContentRootPath = ResolveContentRootPath(_hostConfiguration[HostDefaults.ContentRootKey], AppContext.BaseDirectory)
-            };
-
-            if (string.IsNullOrEmpty(_hostingEnvironment.ApplicationName))
-            {
-                var hostingEnvironment = _hostingEnvironment;
-                var entryAssembly = Assembly.GetEntryAssembly();
-                hostingEnvironment.ApplicationName = entryAssembly?.GetName().Name;
-            }
-
-            _hostingEnvironment.ContentRootFileProvider = new PhysicalFileProvider(_hostingEnvironment.ContentRootPath);
-        }
-
-        private IServiceProvider CreateFrameworkServiceProvider()
+        private IServiceProvider CreateFrameworkServiceProvider(HostBuilderContext ctx)
         {
             var frameworkServices = new ServiceCollection();
 
-#if NETSTANDARD2_0
-            frameworkServices.AddSingleton((IHostingEnvironment)_hostingEnvironment);
-#else
-            frameworkServices.AddSingleton((IHostEnvironment)_hostingEnvironment);
-
-#endif
-            frameworkServices.AddSingleton(_hostBuilderContext);
+            frameworkServices.AddSingleton(ctx.HostingEnvironment);
             frameworkServices.AddTransient<IHostFactory,DefaultHostFactory>();
+            frameworkServices.AddSingleton(ctx);
 
-            _configureFrameworkActions.ForEach(c => c(_hostBuilderContext, frameworkServices));
+            _configureFrameworkActions.ForEach(c => c(ctx, frameworkServices));
             
-            frameworkServices.TryAddSingleton(typeof(IInternalModuleHost<>), typeof(GenericModuleHost<>));
+            frameworkServices.TryAddSingleton(typeof(Internal.IModuleHost<>), typeof(ModuleHost<>));
             frameworkServices.TryAddTransient(typeof(IModuleContextFactory<>), typeof(DefaultModuleContextFactory<>));
 
 
@@ -214,94 +208,36 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         }
 
-        private IServiceProvider CreateServiceProvider(IServiceProvider frameworkServices)
+        private void AddModuleContextAccessor()
         {
-            var moduleServices = new ServiceCollection()
-#if NETSTANDARD2_0
-                .AddSingleton((IHostingEnvironment) _hostingEnvironment)
-#else
-                 .AddSingleton((IHostEnvironment) _hostingEnvironment)
-#endif
-                .AddSingleton(_hostBuilderContext.Configuration);
-
-            foreach (var moduleType in _registeredModules.Keys)
+            ConfigureServices((ctx, services) =>
             {
-                moduleServices.AddSingleton(moduleType);
-            }
-
-            WireModuleHosts(moduleServices, frameworkServices);
-
-
-            var containerBuilder = _serviceProviderFactory.CreateBuilder(moduleServices);
-            return _serviceProviderFactory.CreateServiceProvider(containerBuilder);
-
+                services.AddSingleton<IModuleContextAccessor, ModuleContextAccessor>();
+            });
+        }
+        
+        public IModuleHostBuilder ConfigureContainer<TContainerBuilder>(Action<HostBuilderContext, TContainerBuilder> configureDelegate)
+        {
+            _innerBuilder.ConfigureContainer(configureDelegate);
+            return this;
         }
 
-        private IInternalModuleHost GetModuleHost(Type moduleType, IServiceProvider frameworkServices) 
+
+        private static IModuleHost GetModuleHost(Type moduleType, IServiceProvider frameworkServices)
         {
-            var hostType = typeof(IInternalModuleHost<>).MakeGenericType(moduleType);
-            var internalHost = frameworkServices.GetRequiredService(hostType) as IInternalModuleHost;
+            var hostType = typeof(Internal.IModuleHost<>).MakeGenericType(moduleType);
+            var internalHost = frameworkServices.GetRequiredService(hostType) as IModuleHost;
             return internalHost;
         }
 
-        private void BootstrapHosts(IServiceProvider moduleHostServices, IServiceProvider frameworkServices)
+        private void BootstrapModuleHosts(IServiceProvider moduleHostServices, IServiceProvider frameworkServices)
         {
             foreach (var module in _registeredModules)
             {
-                GetModuleHost(module.Key, frameworkServices)?.Bootstrap(moduleHostServices);
+                GetModuleHost(module.Key, frameworkServices)?.Bootstrap(moduleHostServices, module.Value);
             }
         }
 
-        private void WireModuleHosts(IServiceCollection moduleHostServices, IServiceProvider frameworkServices)
-        {
-            foreach (var module in _registeredModules)
-            {
-                var hostType = typeof(IInternalModuleHost<>).MakeGenericType(module.Key);
-                var serviceType = typeof(IModuleHost<>).MakeGenericType(module.Key);
-
-                var internalHost = frameworkServices.GetRequiredService(hostType);
-                moduleHostServices.AddSingleton(serviceType, sp => internalHost);
-            }
-        }
-
-        private IModuleHost MergeInternalHosts(IServiceProvider frameworkServices)
-        {
-            switch (_registeredModules.Count)
-            {
-                case 0: throw new InvalidOperationException("No modules have been registered in ModuleHost. Use HostModule<> method to add a module to the module host builder.");
-                case 1: return GetModuleHost(_registeredModules.First().Key, frameworkServices);
-                default: return new ModuleCollectionHost(_registeredModules.Select(
-                    m => GetModuleHost(m.Key, frameworkServices)));
-            }
-        }
-
-        private void CreateHostBuilderContext()
-        {
-            _hostBuilderContext = new HostBuilderContext(Properties)
-            {
-                HostingEnvironment = _hostingEnvironment,
-                Configuration = _hostConfiguration
-            };
-        }
-
-
-        private static string ResolveContentRootPath(string contentRootPath, string basePath)
-        {
-            if (string.IsNullOrEmpty(contentRootPath))
-                return basePath;
-            return Path.IsPathRooted(contentRootPath) ? contentRootPath : Path.Combine(Path.GetFullPath(basePath), contentRootPath);
-        }
-
-
-        public IModuleHostBuilder ConfigureContainer<TContainerBuilder>(Action<HostBuilderContext, TContainerBuilder> configureDelegate)
-        {
-            throw new NotImplementedException();
-        }
-
-        IHost IHostBuilder.Build()
-        {
-            return Build();
-        }
 
     }
 }

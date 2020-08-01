@@ -21,16 +21,16 @@ namespace Dbosoft.Hosuto.Sample
             sc.AddSingleton<IMessageDispatcher, MessageDispatcher>();
             builder.UseServiceCollection(sc);
 
-            builder.HostModule<SimpleModule>();
             builder.HostModule<SampleWebModule>();
             builder.UseAspNetCoreWithDefaults((module, webBuilder) =>
             {
             });
             var host = builder.Build();
-            var test = host.ModuleHostServices.GetService<IMessageDispatcher>();
-            var module = host.ModuleHostServices.GetService<SampleWebModule>();
-            var moduleHost = host.ModuleHostServices.GetService<IModuleHost<SampleWebModule>>();
+            var test = host.Services.GetService<IMessageDispatcher>();
+            var module = host.Services.GetService<SampleWebModule>();
+            var moduleHost = host.Services.GetService<IModuleHost<SampleWebModule>>();
             return host.RunAsync();
+
         }
     }
 }

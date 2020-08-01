@@ -25,18 +25,18 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         }
 
 
-        public (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost<TModule>(IModuleBootstrapContext<TModule> bootstrapContext) where TModule : IModule
+        public (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost<TModule>(IModuleBootstrapContext<TModule> bootstrapContext, Action<IHostBuilder> configure) where TModule : IModule
         {
             switch (bootstrapContext.Module)
             {
                 case WebModule _:
                 {
                     var factory = new WebModuleHostFactory<TModule>(bootstrapContext);
-                    return factory.CreateHost();
+                    return factory.CreateHost(configure);
                 }
 
                 default:
-                    return _decoratedHostFactory.CreateHost(bootstrapContext);
+                    return _decoratedHostFactory.CreateHost(bootstrapContext, configure);
             }
         }
     }
@@ -59,7 +59,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         }
 
-        public override (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost()
+        public override (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost(Action<IHostBuilder> configure)
         {
             var hostBuilderConfigurers = BootstrapContext.Advanced.FrameworkServices
                 .GetServices<IWebModuleWebHostBuilderConfigurer>();
@@ -101,13 +101,15 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                             });
                         })));
 
-            //configureHostBuilderAction?.Invoke(builder);
+            configure?.Invoke(builder);
 
             var host = builder.Build();
             moduleContext = CreateModuleContext(host.Services);
             return (host, moduleContext);
 
 #else
+            if(configure!=null)
+                throw new InvalidOperationException("The configure delegate is not supported for ASPNETCORE < 3.0. You should configure the webHostBuilder instead.");
 
             var webHostBuilderFactory = BootstrapContext.Advanced.FrameworkServices
                 .GetService<IWebModuleWebHostBuilderFactory>();

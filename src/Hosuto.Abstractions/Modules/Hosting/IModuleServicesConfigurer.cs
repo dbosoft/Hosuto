@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
@@ -8,6 +7,4 @@ namespace Dbosoft.Hosuto.Modules.Hosting
     {
         void ConfigureServices(IModuleHostBuilderContext context, IServiceCollection services);
     }
-
-
 }

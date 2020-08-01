@@ -11,13 +11,15 @@ namespace Dbosoft.Hosuto.Samples
         public void ConfigureServices(IServiceProvider serviceProvider, IServiceCollection services)
         {
             services.AddSingleton(serviceProvider.GetRequiredService<IMessageDispatcher>());
-            services.AddHostedHandler((sp, cancelToken) =>
+
+            services.AddModuleHandler((sp, cancelToken) =>
             {
                 var dispatcher = sp.GetRequiredService<IMessageDispatcher>();
                 dispatcher.RegisterRecipient(this);
                 return Task.CompletedTask;
             });
         }
+
 
 
         public string Name => "simple";

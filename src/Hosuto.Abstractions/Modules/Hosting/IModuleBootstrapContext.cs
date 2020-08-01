@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.Extensions.Hosting;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
@@ -9,17 +8,5 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         IServiceProvider ModuleHostServices { get; }
 
         IAdvancedModuleContext Advanced { get;  }
-    }
-
-
-    public interface IModuleHostBuilderContext
-    {
-        IModule Module { get; }
-        IServiceProvider ModuleHostServices { get; }
-
-        HostBuilderContext HostBuilderContext { get; }
-
-        IAdvancedModuleContext Advanced { get; }
-
     }
 }

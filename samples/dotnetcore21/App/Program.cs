@@ -1,8 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Dbosoft.Hosuto.Modules.Hosting;
 using Microsoft.AspNetCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SimpleInjector;
 
 namespace Dbosoft.Hosuto.Samples
 {
@@ -18,9 +20,14 @@ namespace Dbosoft.Hosuto.Samples
             builder.UseEnvironment(EnvironmentName.Development);
 
             //here we add a ServiceCollection to build a DI container that is available for all modules. 
-            var sc = new ServiceCollection();
-            sc.AddSingleton<IMessageDispatcher, MessageDispatcher>();
-            builder.UseServiceCollection(sc);
+                        
+            //var sc = new ServiceCollection();
+            //sc.AddSingleton<IMessageDispatcher, MessageDispatcher>();
+            //builder.UseServiceCollection(sc);
+
+            var container = new Container();
+            builder.UseSimpleInjector(container);
+            container.RegisterSingleton<IMessageDispatcher, MessageDispatcher>();
 
             builder.HostModule<SimpleModule>();
             builder.HostModule<SampleWebModule>();
@@ -29,9 +36,10 @@ namespace Dbosoft.Hosuto.Samples
             builder.UseAspNetCore(() => WebHost.CreateDefaultBuilder(args), (module, webBuilder) =>
             {
             });
-            var host = builder.Build();
 
-            return host.RunAsync();
+            return builder.RunConsoleAsync();
+            // Host will use its default ShutdownTimeout if none is specified.
+
         }
     }
 }
