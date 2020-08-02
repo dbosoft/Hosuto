@@ -8,9 +8,10 @@ namespace Dbosoft.Hosuto.Modules.Hosting
     {
         public void ConfigureServices(IModuleHostBuilderContext context, IServiceCollection services)
         {
-            if (context.Advanced.RootContext is IContextWithContainer containerContext)
+            if (context.Advanced.RootContext is ISimpleInjectorModuleContext containerContext)
             {
                 services.AddSimpleInjector(containerContext.Container);
+
             }
         }
     }

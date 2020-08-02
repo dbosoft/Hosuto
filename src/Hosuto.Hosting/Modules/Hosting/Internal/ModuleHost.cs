@@ -20,7 +20,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting.Internal
             _frameworkServices = frameworkServices;
         }
 
-        public virtual void Bootstrap(IServiceProvider moduleHostServices, ModuleHostBootstrapActions bootstrapActions)
+        public virtual void Bootstrap(IServiceProvider moduleHostServices, ModuleHostingOptions options)
         {
             if (_bootstrapRun) return;
             _bootstrapRun = true;
@@ -30,12 +30,15 @@ namespace Dbosoft.Hosuto.Modules.Hosting.Internal
             var context = contextFactory.CreateModuleBootstrapContext(module, moduleHostServices, _frameworkServices);
             
             var hostFactory = _frameworkServices.GetRequiredService<IHostFactory>();
-            (_host, ModuleContext) = hostFactory.CreateHost(context, bootstrapActions.ConfigureBuilder);
+            (_host, ModuleContext) = hostFactory.CreateHost(context, options);
 
             if (ModuleContext.Advanced.HostServices.GetService<IModuleContextAccessor>() is ModuleContextAccessor contextAccessor) 
                 contextAccessor.Context = ModuleContext;
+            
+            if(!options.ConfigureContextCalled)
+                options.ConfigureContextAction?.Invoke(ModuleContext);
 
-            bootstrapActions.Bootstrap?.Invoke(_host.Services);
+            options.BootstrapAction?.Invoke(_host.Services);
         }
 
         public Task StartAsync(CancellationToken cancellationToken = default)

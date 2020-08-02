@@ -31,15 +31,18 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             ModuleMethodInvoker.CallOptionalMethod(moduleContext.ToBootstrapContext(), "ConfigureContainer", moduleContext.Services, container);
         }
 
-        public (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost<TModule>(IModuleBootstrapContext<TModule> bootstrapContext, Action<IHostBuilder> configure) where TModule : IModule
+        public (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost<TModule>(IModuleBootstrapContext<TModule> bootstrapContext, ModuleHostingOptions options) where TModule : IModule
         {
-            var (host,moduleContext) = _decoratedHostFactory.CreateHost(bootstrapContext, configure);
+            var (host,moduleContext) = _decoratedHostFactory.CreateHost(bootstrapContext, options);
             if (!(moduleContext is ModuleContextWithContainer<TModule> context)) return (host, moduleContext);
 
             var container = context.Container;
-            host.UseSimpleInjector(container, options => UseSimpleInjector(moduleContext, options));
+            host.UseSimpleInjector(container, o => UseSimpleInjector(moduleContext, o));
             ConfigureContainer(moduleContext, container);
             container.RegisterInstance((IServiceProvider) container);
+
+            options.ConfigureContextCalled = true;
+            options.ConfigureContextAction?.Invoke(moduleContext);
 
             container.Verify();
 

@@ -13,30 +13,27 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         public IDictionary<object, object> Properties => _innerBuilder.Properties;
 
-        private readonly Dictionary<Type, ModuleHostBootstrapActions> _registeredModules = new Dictionary<Type, ModuleHostBootstrapActions>();
+        private readonly Dictionary<Type, ModuleHostingOptions> _registeredModules = new Dictionary<Type, ModuleHostingOptions>();
         private readonly List<Action<HostBuilderContext, IServiceCollection>> _configureFrameworkActions = new List<Action<HostBuilderContext, IServiceCollection>>();
         private bool _hostBuilt;
         private readonly IHostBuilder _innerBuilder = new HostBuilder();
         
-        public IModuleHostBuilder HostModule<TModule>(Action<IServiceProvider> bootstrap = null) where TModule : class, IModule
+        public IModuleHostBuilder HostModule<TModule>(Action<IModuleHostingOptions> options = null) where TModule : class, IModule
         {
-            CheckIfModuleAlreadyRegistered<TModule>();
-            _registeredModules.Add(typeof(TModule), new ModuleHostBootstrapActions { Bootstrap = bootstrap});
+            HostModule(typeof(TModule), options);
             return this;
         }
 
-        public IModuleHostBuilder HostModule<TModule>(Action<IHostBuilder> configure, Action<IServiceProvider> bootstrap = null) where TModule : class, IModule
+        public IModuleHostBuilder HostModule(Type moduleType, Action<IModuleHostingOptions> options = null)
         {
-            CheckIfModuleAlreadyRegistered<TModule>();
-            _registeredModules.Add(typeof(TModule), new ModuleHostBootstrapActions { ConfigureBuilder = configure, Bootstrap = bootstrap });
+            if (_registeredModules.ContainsKey(moduleType))
+                throw new InvalidOperationException($"Module of type {moduleType} is already used.");
+
+            var hostingOptions = new ModuleHostingOptions();
+            options?.Invoke(hostingOptions);
+
+            _registeredModules.Add(moduleType, hostingOptions);
             return this;
-        }
-
-        private void CheckIfModuleAlreadyRegistered<TModule>() where TModule : IModule
-        {
-            if (_registeredModules.ContainsKey(typeof(TModule)))
-                throw new InvalidOperationException($"Module of type {typeof(TModule)} is already used.");
-
         }
 
         public IModuleHostBuilder ConfigureHostConfiguration(

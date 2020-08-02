@@ -11,7 +11,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         public IModuleContext<TModule> CreateModuleContext(IModuleBootstrapContext<TModule> bootstrapContext, IServiceProvider moduleServices)
         {
-            if(!(bootstrapContext is IContextWithContainer containerContext))
+            if(!(bootstrapContext is ISimpleInjectorModuleContext containerContext))
                 throw new InvalidOperationException($"{nameof(bootstrapContext)} contains no SimpleInjector container. This is not expected here. Actual type: {bootstrapContext.GetType()}");
 
             return new ModuleContextWithContainer<TModule>(containerContext.Container,

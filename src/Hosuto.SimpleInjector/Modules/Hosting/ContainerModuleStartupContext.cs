@@ -4,7 +4,7 @@ using SimpleInjector.Lifestyles;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    internal class ModuleContextWithContainer<TModule> : ModuleContext<TModule>, IContextWithContainer where TModule : IModule
+    internal class ModuleContextWithContainer<TModule> : ModuleContext<TModule>, ISimpleInjectorModuleContext where TModule : IModule
     {
         public Container Container { get; }
         
@@ -22,13 +22,5 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         }
 
         public override IServiceProvider Services => Container;
-    }
-
-    internal interface IContextWithContainer
-    {
-        Container Container
-        {
-            get; 
-        }
     }
 }

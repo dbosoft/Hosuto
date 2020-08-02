@@ -8,8 +8,8 @@ namespace Dbosoft.Hosuto.Modules.Hosting
     public interface IModuleHostBuilder: IHostBuilder
     {
 
-        IModuleHostBuilder HostModule<TModule>(Action<IServiceProvider> bootstrap = null) where TModule : class, IModule;
-        IModuleHostBuilder HostModule<TModule>(Action<IHostBuilder> configure, Action<IServiceProvider> bootstrap = null) where TModule : class, IModule;
+        IModuleHostBuilder HostModule<TModule>(Action<IModuleHostingOptions> options = null) where TModule : class, IModule;
+        IModuleHostBuilder HostModule(Type moduleType, Action<IModuleHostingOptions> options = null);
 
         /// <summary>
         /// Set up the configuration for the builder itself. This will be used to initialize the <see cref="IHostEnvironment"/>

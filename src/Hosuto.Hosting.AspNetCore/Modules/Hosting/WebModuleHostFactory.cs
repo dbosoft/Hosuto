@@ -25,18 +25,18 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         }
 
 
-        public (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost<TModule>(IModuleBootstrapContext<TModule> bootstrapContext, Action<IHostBuilder> configure) where TModule : IModule
+        public (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost<TModule>(IModuleBootstrapContext<TModule> bootstrapContext, ModuleHostingOptions options) where TModule : IModule
         {
             switch (bootstrapContext.Module)
             {
                 case WebModule _:
                 {
                     var factory = new WebModuleHostFactory<TModule>(bootstrapContext);
-                    return factory.CreateHost(configure);
+                    return factory.CreateHost(options);
                 }
 
                 default:
-                    return _decoratedHostFactory.CreateHost(bootstrapContext, configure);
+                    return _decoratedHostFactory.CreateHost(bootstrapContext, options);
             }
         }
     }
@@ -59,7 +59,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         }
 
-        public override (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost(Action<IHostBuilder> configure)
+        public override (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost(ModuleHostingOptions options)
         {
             var hostBuilderConfigurers = BootstrapContext.Advanced.FrameworkServices
                 .GetServices<IWebModuleWebHostBuilderConfigurer>();
@@ -101,15 +101,15 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                             });
                         })));
 
-            configure?.Invoke(builder);
+            options.ConfigureBuilderAction?.Invoke(builder);
 
             var host = builder.Build();
             moduleContext = CreateModuleContext(host.Services);
             return (host, moduleContext);
 
 #else
-            if(configure!=null)
-                throw new InvalidOperationException("The configure delegate is not supported for ASPNETCORE < 3.0. You should configure the webHostBuilder instead.");
+            if(options.ConfigureBuilderAction != null)
+                throw new InvalidOperationException("The configure method with IHostBuilder is not supported for ASPNETCORE < 3.0. You should configure the webHostBuilder instead.");
 
             var webHostBuilderFactory = BootstrapContext.Advanced.FrameworkServices
                 .GetService<IWebModuleWebHostBuilderFactory>();

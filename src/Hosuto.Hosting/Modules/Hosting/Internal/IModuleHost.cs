@@ -5,7 +5,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting.Internal
 {
     public interface IModuleHost : IHost
     {
-        void Bootstrap(IServiceProvider moduleHostServices, ModuleHostBootstrapActions bootstrapActions);
+        void Bootstrap(IServiceProvider moduleHostServices, ModuleHostingOptions options);
 
     }
 

@@ -18,27 +18,18 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
 
         public static Task RunModule<TModule>(this IModuleHostBuilder hostBuilder,
-            Action<IHostBuilder> hostConfigureAction = null) where TModule : class, IModule
+            Action<IModuleHostingOptions> options = null ) where TModule : class, IModule
         {
-            return RunModule<TModule>(hostBuilder, null, hostConfigureAction);
+            return RunModule(hostBuilder, typeof(TModule), options);
         }
 
 
-        public static Task RunModule<TModule>(this IModuleHostBuilder hostBuilder, 
-            Action<IModuleHostBuilder> configureAction) where TModule : class, IModule
+        public static Task RunModule(this IModuleHostBuilder hostBuilder, 
+            Type moduleType,
+            Action<IModuleHostingOptions> options = null)
         {
-            return RunModule<TModule>(hostBuilder, configureAction, null);
-
-        }
-
-        public static Task RunModule<TModule>(this IModuleHostBuilder builder,
-            Action<IModuleHostBuilder> configureAction,
-            Action<IHostBuilder> hostConfigureAction) where TModule : class, IModule
-        {
-            builder.HostModule<TModule>(hostConfigureAction);
-            configureAction?.Invoke(builder);
-            return builder.Build().RunAsync();
-
+            hostBuilder.HostModule(moduleType,options);
+            return hostBuilder.Build().RunAsync();
         }
 
 

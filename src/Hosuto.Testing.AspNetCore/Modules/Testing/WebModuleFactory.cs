@@ -128,12 +128,35 @@ namespace Dbosoft.Hosuto.Modules.Testing
                 {
                     _configuration(builder);
                     configuration(builder);
+                },
+                ConfigureModule);
+
+            _derivedFactories.Add(factory);
+
+            return factory;
+        }
+
+        public WebModuleFactory<TModule> WithModuleConfiguration(Action<IModuleHostingOptions> options)
+        {
+            var factory = new DelegatedWebApplicationFactory(
+                ClientOptions,
+                CreateServer,
+                CreateHost,
+                CreateModuleHostBuilder,
+                GetTestAssemblies,
+                ConfigureClient,
+                ConfigureWebHost,
+                o =>
+                {
+                    ConfigureModule(o);
+                    options(o);
                 });
 
             _derivedFactories.Add(factory);
 
             return factory;
         }
+
 
         private void EnsureServer()
         {
@@ -143,9 +166,14 @@ namespace Dbosoft.Hosuto.Modules.Testing
             }
 
             var hostBuilder = CreateModuleHostBuilder();
-            hostBuilder.HostModule<TModule>(sp =>
+            hostBuilder.HostModule<TModule>(options =>
             {
-                _server = (TestServer)sp.GetRequiredService<IServer>();
+                options.Configure(sp =>
+                {
+                    _server = (TestServer) sp.GetRequiredService<IServer>();
+                });
+
+                ConfigureModule(options);
             });
 #if NETSTANDARD
             hostBuilder.UseAspNetCore(CreateWebHostBuilder, (_, webHostBuilder) =>
@@ -155,9 +183,12 @@ namespace Dbosoft.Hosuto.Modules.Testing
             {
                 SetContentRoot(webHostBuilder);
                 _configuration(webHostBuilder);
-#if !NETSTANDARD
-                webHostBuilder.UseTestServer();
-#endif
+
+                webHostBuilder.ConfigureServices(services =>
+                {
+                    services.AddSingleton<IServer, TestServer>();
+                });
+
             });
             _host = CreateHost(hostBuilder);
             
@@ -348,6 +379,14 @@ namespace Dbosoft.Hosuto.Modules.Testing
         }
 
         /// <summary>
+        /// Gives a fixture an opportunity to configure the module.
+        /// </summary>
+        /// <param name="builder">The <see cref="IWebHostBuilder"/> for the application.</param>
+        protected virtual void ConfigureModule(IModuleHostingOptions options)
+        {
+        }
+
+        /// <summary>
         /// Gives a fixture an opportunity to configure the application before it gets built.
         /// </summary>
         /// <param name="builder">The <see cref="IWebHostBuilder"/> for the application.</param>
@@ -485,6 +524,7 @@ namespace Dbosoft.Hosuto.Modules.Testing
             private readonly Func<IModuleHostBuilder> _createModuleHostBuilder;
             private readonly Func<IEnumerable<Assembly>> _getTestAssemblies;
             private readonly Action<HttpClient> _configureClient;
+            private readonly Action<IModuleHostingOptions> _configureModule;
 
             public DelegatedWebApplicationFactory(
                 WebModuleFactoryClientOptions options,
@@ -493,7 +533,8 @@ namespace Dbosoft.Hosuto.Modules.Testing
                 Func<IModuleHostBuilder> createModuleHostBuilder,
                 Func<IEnumerable<Assembly>> getTestAssemblies,
                 Action<HttpClient> configureClient,
-                Action<IWebHostBuilder> configureWebHost)
+                Action<IWebHostBuilder> configureWebHost,
+                Action<IModuleHostingOptions> configureModule)
             {
                 ClientOptions = new WebModuleFactoryClientOptions(options);
                 _createServer = createServer;
@@ -502,6 +543,7 @@ namespace Dbosoft.Hosuto.Modules.Testing
                 _getTestAssemblies = getTestAssemblies;
                 _configureClient = configureClient;
                 _configuration = configureWebHost;
+                _configureModule = configureModule;
             }
 
             protected override TestServer CreateServer(IWebHostBuilder builder) => _createServer(builder);
@@ -514,6 +556,8 @@ namespace Dbosoft.Hosuto.Modules.Testing
 
             protected override void ConfigureWebHost(IWebHostBuilder builder) => _configuration(builder);
 
+            protected override void ConfigureModule(IModuleHostingOptions options) => _configureModule(options);
+            
             protected override void ConfigureClient(HttpClient client) => _configureClient(client);
 
             internal override WebModuleFactory<TModule> WithWebHostBuilderCore(Action<IWebHostBuilder> configuration)
@@ -529,7 +573,8 @@ namespace Dbosoft.Hosuto.Modules.Testing
                     {
                         _configuration(builder);
                         configuration(builder);
-                    });
+                    },
+                    _configureModule);
             }
         }
     }
