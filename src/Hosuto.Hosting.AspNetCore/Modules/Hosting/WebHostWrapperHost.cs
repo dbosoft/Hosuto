@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if NETSTANDARD
+
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
@@ -6,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
+
     internal class WebHostWrapperHost : IHost
     {
         public WebHostWrapperHost(IWebHost webHost)
@@ -23,4 +26,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         public IServiceProvider Services => WebHost.Services;
     }
+
 }
+
+#endif

@@ -139,15 +139,16 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                 hostBuilderConfigurer.ConfigureWebHost(BootstrapContext.Module as WebModule, webHostBuilder);
             }
 
-            var webHost = webHostBuilder.ConfigureServices((wctx, services) =>
+            webHostBuilder.ConfigureServices((wctx, services) =>
                     ConfigureServices(WebContextToHostBuilderContext(wctx), services))
                 .Configure(app =>
                 {
                     // ReSharper disable once AccessToModifiedClosure
                     Configure(moduleContext, app);
 
-                })
-                .Build();
+                });
+
+            var webHost = options.BuildWebHost(webHostBuilder);
 
             moduleContext = CreateModuleContext(webHost.Services);
 

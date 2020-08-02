@@ -168,26 +168,32 @@ namespace Dbosoft.Hosuto.Modules.Testing
             var hostBuilder = CreateModuleHostBuilder();
             hostBuilder.HostModule<TModule>(options =>
             {
+#if NETSTANDARD
+                options.BuildWebHostCallback(webHostBuilder =>
+                {
+                    _server = new TestServer(webHostBuilder);
+                    return _server.Host;
+                });
+#else
                 options.Configure(sp =>
                 {
                     _server = (TestServer) sp.GetRequiredService<IServer>();
                 });
-
+#endif
                 ConfigureModule(options);
             });
 #if NETSTANDARD
             hostBuilder.UseAspNetCore(CreateWebHostBuilder, (_, webHostBuilder) =>
-#else         
+#else
             hostBuilder.UseAspNetCore((_,webHostBuilder)=>
 #endif
             {
                 SetContentRoot(webHostBuilder);
                 _configuration(webHostBuilder);
 
-                webHostBuilder.ConfigureServices(services =>
-                {
-                    services.AddSingleton<IServer, TestServer>();
-                });
+#if !NETSTANDARD
+                webHostBuilder.UseTestServer();
+#endif
 
             });
             _host = CreateHost(hostBuilder);

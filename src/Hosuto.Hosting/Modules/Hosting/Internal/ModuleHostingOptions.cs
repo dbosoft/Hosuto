@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Hosting;
 
 namespace Dbosoft.Hosuto.Modules.Hosting.Internal
@@ -11,6 +12,8 @@ namespace Dbosoft.Hosuto.Modules.Hosting.Internal
         public Action<IModuleContext> ConfigureContextAction { get; private set; }
 
         public bool ConfigureContextCalled { get; set; }
+
+        public IDictionary<string, object> Properties { get; } = new Dictionary<string, object>();
 
         public IModuleHostingOptions Configure(Action<IServiceProvider> configureAction)
         {

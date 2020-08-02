@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Hosting;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
     public interface IModuleHostingOptions
     {
+        IDictionary<string,object> Properties { get; }
         IModuleHostingOptions Configure(Action<IServiceProvider> configureAction);
         IModuleHostingOptions Configure(Action<IHostBuilder> configureAction);
 
