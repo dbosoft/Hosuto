@@ -1,15 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using Dbosoft.Hosuto.Modules.Hosting.Internal;
-#if NETCOREAPP
 using System.Linq;
+using Dbosoft.Hosuto.Modules.Hosting.Internal;
+#if !NETCOREAPP
+using Microsoft.AspNetCore.Hosting.Internal;
+using System.Collections.Generic;
+using HostingEnvironment = Microsoft.Extensions.Hosting.Internal.HostingEnvironment;
 #endif
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Hosting.Internal;
 
 
 namespace Dbosoft.Hosuto.Modules.Hosting
@@ -56,9 +57,8 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             }
 
             ModuleMethodInvoker.CallOptionalMethod(BootstrapContext, "Configure", app.ApplicationServices, app);
-
         }
-
+        
         public override (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost(ModuleHostingOptions options)
         {
             var hostBuilderConfigurers = BootstrapContext.Advanced.FrameworkServices
@@ -78,7 +78,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
 
             var builder = CreateHostBuilder();
-            
+
             webHostBuilderInitializer.ConfigureWebHost(BootstrapContext.Module as WebModule, builder,
                 new[]
                     {
@@ -91,9 +91,6 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                     .Append(
                         new DelegateWebHostBuilderConfigurer((_, webHostBuilder) =>
                         {
-                            webHostBuilder.ConfigureServices((wctx, services)=> 
-                                ConfigureServices(WebContextToHostBuilderContext(wctx), services));
-
                             webHostBuilder.Configure(app =>
                             {
                                 // ReSharper disable once AccessToModifiedClosure
@@ -139,9 +136,17 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                 hostBuilderConfigurer.ConfigureWebHost(BootstrapContext.Module as WebModule, webHostBuilder);
             }
 
-            webHostBuilder.ConfigureServices((wctx, services) =>
-                    ConfigureServices(WebContextToHostBuilderContext(wctx), services))
-                .Configure(app =>
+            webHostBuilder.ConfigureServices((webContext, services) =>
+            {
+                Action<IServiceCollection> configureMethod = (s) =>
+                    ConfigureServices(WebContextToHostBuilderContext(webContext), s);
+
+                configureMethod = BuildConfigureServicesFilterPipeline(configureMethod);
+                configureMethod(services);
+
+            });
+
+            webHostBuilder.Configure(app =>
                 {
                     // ReSharper disable once AccessToModifiedClosure
                     Configure(moduleContext, app);
@@ -158,7 +163,8 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         }
 
-        HostBuilderContext WebContextToHostBuilderContext(WebHostBuilderContext webContext)
+#if NETSTANDARD
+        private static HostBuilderContext WebContextToHostBuilderContext(WebHostBuilderContext webContext)
         {
             return new HostBuilderContext(new Dictionary<object, object> { { "WebHostBuilderContext", webContext } })
             {
@@ -172,6 +178,30 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                 }
             };
         }
+        
+        private static Action<IServiceCollection> BuildConfigureServicesFilterPipeline(Action<IServiceCollection> configureServices)
+        {
+            return (services =>
+            {
+                var serviceProvider = services.BuildServiceProvider(true);
+#pragma warning disable CS0612 // Type or member is obsolete
+            var filters = serviceProvider.GetRequiredService<IEnumerable<IStartupConfigureServicesFilter>>().Reverse().ToArray();
+#pragma warning restore CS0612 // Type or member is obsolete
 
+            if (filters.Length == 0)
+            {
+                configureServices(services);
+                return;
+            }
+
+            var pipeline = filters.Aggregate(configureServices,
+                (current, t) => t.ConfigureServices(current));
+
+            pipeline(services);
+
+            });
+
+        }
+#endif
     }
 }

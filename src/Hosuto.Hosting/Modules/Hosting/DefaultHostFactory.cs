@@ -35,8 +35,8 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             }
 
             var tempProvider = services.BuildServiceProvider();
-
-
+            
+            
             ModuleMethodInvoker.CallOptionalMethod(BootstrapContext, "ConfigureServices", tempProvider, services);
 
         }
@@ -67,6 +67,8 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                 }
             });
 
+            builder.ConfigureServices(ConfigureServices);
+
             return builder;
         }
 
@@ -95,7 +97,6 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         {
             var builder = CreateHostBuilder();
 
-            builder.ConfigureServices(ConfigureServices);
             options.ConfigureBuilderAction?.Invoke(builder);
             var host = builder.Build();
 
