@@ -1,11 +1,8 @@
 using System.Threading.Tasks;
-using Dbosoft.Hosuto.Modules;
 using Dbosoft.Hosuto.Modules.Testing;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Xunit;
 
 namespace Hosuto.Hosting.AspNetCore.Tests
@@ -30,34 +27,24 @@ namespace Hosuto.Hosting.AspNetCore.Tests
 
             Assert.Equal("Ok", result);
         }
-    }
 
-    public class SomeWebModule : WebModule
-    {
-        public override string Name => "I'm a module";
-        public override string Path => "path";
-
-
-        public void ConfigureServices(IServiceCollection services)
+        [Fact]
+        public async Task ConfigureTestServices_is_called_after_module_setup()
         {
-            services.AddRouting();
+            var someServiceMoq = new Mock<ISomeService>();
+
+            var result = await _factory.WithWebHostBuilder(b =>
+                {
+                    b.UseSolutionRelativeContentRoot("");
+                    b.ConfigureTestServices(services =>
+                    {
+                        services.AddTransient(sp => someServiceMoq.Object);
+                    });
+                })
+                .CreateClient().GetStringAsync("/");
+
+            someServiceMoq.Verify(x => x.CallMe());
+            
         }
-
-        public void Configure(IApplicationBuilder app)
-        {
-#if NETCOREAPP2_1
-            app.UseRouter(route =>
-#else
-            app.UseRouting();
-            app.UseEndpoints(route =>
-#endif
-            {
-                route.MapGet("/", context => context.Response.WriteAsync("Ok"));
-            });
-
-        }
-
     }
-
-
 }
