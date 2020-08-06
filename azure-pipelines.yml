@@ -19,6 +19,11 @@ steps:
     versionSpec: '5.x'
 
 - task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    restoreArguments: '--disable-parallel'
+
+- task: DotNetCoreCLI@2
   displayName: dotnet build
   inputs:
     command: build
