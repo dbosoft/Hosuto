@@ -1,13 +1,13 @@
 # Hosuto
-Advanced application hosting for .NET Generic Host and Asp.Net Core.
+Advanced application hosting with .NET Generic Host and Asp.Net Core.
 
 
 ## Description
 
 Hosuto contains currently the following features to extend .NET Generic Host: 
 
-- **modules**: The hosuto module system allows you to setup multiple independed hosts within a single application. Modules can share configuration and a DI container for global settings and interaction. The module system supports both .NET Generic host and Asp.Net Core 2.1 and higher. 
-- **HostedServices from delegates**: With Hosuto you can add HostedServices from delegates to the Generic Host. 
+- **Modules**: The hosuto module system allows you to setup multiple independed hosts within a single application. Modules can share configuration and a DI container for global settings and interaction. The module system supports both .NET Generic host and Asp.Net Core 2.1 and higher. 
+- **Hosted Services extensions**: Husuto contains extensions methods to simplify the use of hosted services in Generic Hosts and Asp.Net Core Hosts. 
 
 ## Platforms & Prerequisites
 
@@ -77,6 +77,19 @@ The module has now to be added to the modules host builder:
 
   ```
 
+### Hosted Services extensions
+
+Hosuto adds a extension method AddHostedHandler (for IServiceCollection) to register a handler that will executed as hosted service. A handler is created from the hosts DI container and contains one method Execute to run the handler. 
+Another overload of AddHostedHandler also allows to use a Func<IServiceProvider, CancellationToken, Task> delegate to set the handler code. 
+
+```csharp
+            services.AddHostedHandler((sp, cancelToken) =>
+            {
+                var dispatcher = sp.GetRequiredService<IMessageDispatcher>();
+                dispatcher.RegisterRecipient(this);
+                return Task.CompletedTask;
+            });
+  ```
 
 ## Versioning
 
