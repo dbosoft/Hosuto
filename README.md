@@ -24,7 +24,7 @@ Take a look at the [Using](#using) section learning how to configure and use Hos
 ### Modules
 
 With Hosuto modules you can create isolated parts of your application that will all run in their own host but share global settings and a DI container. 
-As each module has it's own service provider you can register different services in each module. For example if you host a server component in one module you could configure another module to be a client of the same component. If you now distribute the application you can choose to run each module in it's own application or to run the modules in the same application. 
+As each module has it's own service provider you can register different services in each module. For example if you host a server component in one module you could configure another module to host a client of the same component. If you now distribute the application you can choose to run each module in it's own application or to run the modules in the same application. 
 
 To use modules first create a modules host in your applications main method. This host replaces the default .Net Generic Host. 
 
@@ -36,7 +36,7 @@ Add a reference to the nuget package [Dbosoft.Hosuto.Hosting](https://www.nuget.
 
             var builder = ModulesHost.CreateDefaultBuilder(args);
             
-            // you can configure a module host builder like a host builder.
+            // you can configure a modules host builder like a host builder.
             // All configurations set with ConfigureHostConfiguration will be shared between all modules.
             builder.UseEnvironment(EnvironmentName.Development);
             return builder.RunConsoleAsync();
