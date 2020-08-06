@@ -80,13 +80,13 @@ The module has now to be added to the modules host builder:
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/dbosoft/YaNco/tags). 
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/dbosoft/Hosuto/tags). 
 
 ## Authors
 
 * **Frank Wagner** - *Initial work* - [fw2568](https://github.com/fw2568)
 
-See also the list of [contributors](https://github.com/Dbosoft/YaNco/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/Dbosoft/Hosuto/contributors) who participated in this project.
 
 
 ## License
