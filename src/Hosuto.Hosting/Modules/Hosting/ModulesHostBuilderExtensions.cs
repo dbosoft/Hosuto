@@ -9,7 +9,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 {
     public static class ModuleHostBuilderExtensions
     {
-        public static IModuleHostBuilder UseServiceCollection(this IModuleHostBuilder hostBuilder,
+        public static IModulesHostBuilder UseServiceCollection(this IModulesHostBuilder hostBuilder,
             IServiceCollection services)
         {
             hostBuilder.UseServiceProviderFactory(new ServiceCollectionServiceProviderFactory(services));
@@ -17,14 +17,14 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         }
 
 
-        public static Task RunModule<TModule>(this IModuleHostBuilder hostBuilder,
+        public static Task RunModule<TModule>(this IModulesHostBuilder hostBuilder,
             Action<IModuleHostingOptions> options = null ) where TModule : class, IModule
         {
             return RunModule(hostBuilder, typeof(TModule), options);
         }
 
 
-        public static Task RunModule(this IModuleHostBuilder hostBuilder, 
+        public static Task RunModule(this IModulesHostBuilder hostBuilder, 
             Type moduleType,
             Action<IModuleHostingOptions> options = null)
         {
@@ -42,9 +42,9 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         /// <param name="configureDelegate">The delegate for configuring the <see cref="IConfigurationBuilder"/> that will be used
         /// to construct the <see cref="IConfiguration"/> for the application.</param>
         /// <returns>The same instance of the <see cref="IHostBuilder"/> for chaining.</returns>
-        static IModuleHostBuilder ConfigureModuleConfiguration(
-            this IModuleHostBuilder hostBuilder,
-            Action<IModuleHostBuilderContext, IConfigurationBuilder> configureDelegate)
+        static IModulesHostBuilder ConfigureModuleConfiguration(
+            this IModulesHostBuilder hostBuilder,
+            Action<IModulesHostBuilderContext, IConfigurationBuilder> configureDelegate)
         {
             hostBuilder.ConfigureFrameworkServices((ctx, services) =>
             {
@@ -62,9 +62,9 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         /// <param name="configureDelegate">The delegate for configuring the <see cref="IServiceCollection"/> that will be used
         /// to construct the <see cref="IServiceProvider"/>.</param>
         /// <returns>The same instance of the <see cref="IHostBuilder"/> for chaining.</returns>
-        public static IModuleHostBuilder ConfigureServices(
-            this IModuleHostBuilder hostBuilder,
-            Action<IModuleHostBuilderContext, IServiceCollection> configureDelegate)
+        public static IModulesHostBuilder ConfigureServices(
+            this IModulesHostBuilder hostBuilder,
+            Action<IModulesHostBuilderContext, IServiceCollection> configureDelegate)
         {
             hostBuilder.ConfigureFrameworkServices((ctx, services) =>
             {

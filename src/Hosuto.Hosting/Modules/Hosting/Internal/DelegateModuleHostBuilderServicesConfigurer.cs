@@ -6,9 +6,9 @@ namespace Dbosoft.Hosuto.Modules.Hosting.Internal
 {
     public class DelegateModuleServicesConfigurer : IModuleServicesConfigurer
     {
-        private readonly Action<IModuleHostBuilderContext, IServiceCollection> _configureDelegate;
+        private readonly Action<IModulesHostBuilderContext, IServiceCollection> _configureDelegate;
 
-        public DelegateModuleServicesConfigurer(Action<IModuleHostBuilderContext, IServiceCollection> configureDelegate)
+        public DelegateModuleServicesConfigurer(Action<IModulesHostBuilderContext, IServiceCollection> configureDelegate)
         {
             _configureDelegate = configureDelegate;
         }
@@ -18,7 +18,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting.Internal
             _configureDelegate = (ctx, config) => configureDelegate(ctx.HostBuilderContext, config);
         }
 
-        public void ConfigureServices(IModuleHostBuilderContext context, IServiceCollection services) =>
+        public void ConfigureServices(IModulesHostBuilderContext context, IServiceCollection services) =>
             _configureDelegate(context, services);
     }
 }

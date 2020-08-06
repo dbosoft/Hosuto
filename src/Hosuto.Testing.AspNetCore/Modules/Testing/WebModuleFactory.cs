@@ -348,9 +348,9 @@ namespace Dbosoft.Hosuto.Modules.Testing
         /// array as arguments.
         /// </remarks>
         /// <returns>A <see cref="IHostBuilder"/> instance.</returns>
-        protected virtual IModuleHostBuilder CreateModuleHostBuilder()
+        protected virtual IModulesHostBuilder CreateModuleHostBuilder()
         {
-            var hostBuilder = new ModuleHostBuilder();
+            var hostBuilder = new ModulesHostBuilder();
 
 #if NETSTANDARD
             hostBuilder.UseEnvironment(EnvironmentName.Development);
@@ -527,7 +527,7 @@ namespace Dbosoft.Hosuto.Modules.Testing
         {
             private readonly Func<IWebHostBuilder, TestServer> _createServer;
             private readonly Func<IHostBuilder, IHost> _createHost;
-            private readonly Func<IModuleHostBuilder> _createModuleHostBuilder;
+            private readonly Func<IModulesHostBuilder> _createModuleHostBuilder;
             private readonly Func<IEnumerable<Assembly>> _getTestAssemblies;
             private readonly Action<HttpClient> _configureClient;
             private readonly Action<IModuleHostingOptions> _configureModule;
@@ -536,7 +536,7 @@ namespace Dbosoft.Hosuto.Modules.Testing
                 WebModuleFactoryClientOptions options,
                 Func<IWebHostBuilder, TestServer> createServer,
                 Func<IHostBuilder, IHost> createHost,
-                Func<IModuleHostBuilder> createModuleHostBuilder,
+                Func<IModulesHostBuilder> createModuleHostBuilder,
                 Func<IEnumerable<Assembly>> getTestAssemblies,
                 Action<HttpClient> configureClient,
                 Action<IWebHostBuilder> configureWebHost,
@@ -556,7 +556,7 @@ namespace Dbosoft.Hosuto.Modules.Testing
 
             protected override IHost CreateHost(IHostBuilder builder) => _createHost(builder);
 
-            protected override IModuleHostBuilder CreateModuleHostBuilder() => _createModuleHostBuilder();
+            protected override IModulesHostBuilder CreateModuleHostBuilder() => _createModuleHostBuilder();
 
             protected override IEnumerable<Assembly> GetTestAssemblies() => _getTestAssemblies();
 

@@ -15,7 +15,7 @@ namespace Hosuto.Hosting.Tests.Modules.Hosting
         [InlineData("Production")]
         public void Build_module_has_environment_of_host(string environmentName)
         {
-            var builder = ModuleHost.CreateDefaultBuilder();
+            var builder = ModulesHost.CreateDefaultBuilder();
             builder.HostModule<SomeModule>();
             builder.UseEnvironment(environmentName);
             var host = builder.Build();
@@ -27,7 +27,7 @@ namespace Hosuto.Hosting.Tests.Modules.Hosting
         [Fact]
         public void Multiple_modules_can_be_bootstrapped_and_see_each_other()
         {
-            var builder = ModuleHost.CreateDefaultBuilder();
+            var builder = ModulesHost.CreateDefaultBuilder();
             builder.HostModule<SomeModule>();
             builder.HostModule<OtherModule>();
 

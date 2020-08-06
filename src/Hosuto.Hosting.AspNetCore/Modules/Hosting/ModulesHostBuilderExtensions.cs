@@ -4,11 +4,11 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public static class ModuleHostBuilderExtensions
+    public static class ModulesHostBuilderExtensions
     {
 #if NETCOREAPP
 
-        public static IModuleHostBuilder ConfigureWebHostDefaults(this IModuleHostBuilder builder, Action<Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure)
+        public static IModulesHostBuilder ConfigureWebHostDefaults(this IModulesHostBuilder builder, Action<Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure)
         {
             return builder.UseAspNetCoreWithDefaults((module, webHostBuilder) =>
             {
@@ -16,7 +16,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             });
         }
 
-        public static IModuleHostBuilder ConfigureWebHost(this IModuleHostBuilder builder, Action<Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure)
+        public static IModulesHostBuilder ConfigureWebHost(this IModulesHostBuilder builder, Action<Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure)
         {
             return builder.UseAspNetCore((module, webHostBuilder) =>
             {
@@ -25,7 +25,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         }
 
 
-        public static IModuleHostBuilder UseAspNetCoreWithDefaults(this IModuleHostBuilder builder, Action<WebModule, Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure = null)
+        public static IModulesHostBuilder UseAspNetCoreWithDefaults(this IModulesHostBuilder builder, Action<WebModule, Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure = null)
         {
             builder.ConfigureFrameworkServices((ctx, services) =>
             {
@@ -37,7 +37,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             return UseAspNetCore(builder, configure);
         }
 
-        public static IModuleHostBuilder UseAspNetCore(this IModuleHostBuilder builder,
+        public static IModulesHostBuilder UseAspNetCore(this IModulesHostBuilder builder,
             Action<WebModule, Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure = null)
         {
             builder.ConfigureFrameworkServices((ctx, services) =>
@@ -54,7 +54,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         }
 
 #else
-        public static IModuleHostBuilder UseAspNetCore(this IModuleHostBuilder builder, Func<Microsoft.AspNetCore.Hosting.IWebHostBuilder> webHostBuilder, Action<WebModule, Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure = null)
+        public static IModulesHostBuilder UseAspNetCore(this IModulesHostBuilder builder, Func<Microsoft.AspNetCore.Hosting.IWebHostBuilder> webHostBuilder, Action<WebModule, Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure = null)
         {
             if (webHostBuilder == null) throw new ArgumentNullException(nameof(webHostBuilder));
 
@@ -68,7 +68,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             return ConfigureAspNetCore(builder,configure);
         }
 
-        public static IModuleHostBuilder ConfigureAspNetCore(this IModuleHostBuilder builder, Action<WebModule, Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure)
+        public static IModulesHostBuilder ConfigureAspNetCore(this IModulesHostBuilder builder, Action<WebModule, Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure)
         {
             if (configure == null) throw new ArgumentNullException(nameof(configure));
 

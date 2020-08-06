@@ -10,7 +10,7 @@ namespace Dbosoft.Hosuto.Sample
     {
         static Task Main(string[] args)
         {
-            var builder = ModuleHost.CreateDefaultBuilder(args);
+            var builder = ModulesHost.CreateDefaultBuilder(args);
 
             // you can configure a module host builder like a host builder.
             // All configurations set with ConfigureHostConfiguration will be shared between all modules.

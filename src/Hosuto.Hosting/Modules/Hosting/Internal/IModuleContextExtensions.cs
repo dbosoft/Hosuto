@@ -14,17 +14,17 @@ namespace Dbosoft.Hosuto.Modules.Hosting.Internal
 
         }
 
-        public static IModuleHostBuilderContext ToModuleHostBuilderContext<TModule>(
+        public static IModulesHostBuilderContext ToModuleHostBuilderContext<TModule>(
             this IModuleContext<TModule> moduleContext, HostBuilderContext hostBuilderContext = null) where TModule : IModule
         {
-            return new ModuleHostBuilderContext<TModule>(hostBuilderContext,moduleContext.ToBootstrapContext());
+            return new ModulesHostBuilderContext<TModule>(hostBuilderContext,moduleContext.ToBootstrapContext());
 
         }
 
-        public static IModuleHostBuilderContext ToModuleHostBuilderContext<TModule>(
+        public static IModulesHostBuilderContext ToModuleHostBuilderContext<TModule>(
             this IModuleBootstrapContext<TModule> bootstrapContext, HostBuilderContext hostBuilderContext = null) where TModule : IModule
         {
-            return new ModuleHostBuilderContext<TModule>(hostBuilderContext, bootstrapContext);
+            return new ModulesHostBuilderContext<TModule>(hostBuilderContext, bootstrapContext);
 
         }
     }

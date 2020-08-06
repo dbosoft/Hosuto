@@ -4,10 +4,10 @@ using SimpleInjector.Lifestyles;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public static class ModuleHostBuilderExtensions
+    public static class ModulesHostBuilderExtensions
     {
         // ReSharper disable once UnusedMethodReturnValue.Global
-        public static IModuleHostBuilder UseSimpleInjector(this IModuleHostBuilder hostBuilder,
+        public static IModulesHostBuilder UseSimpleInjector(this IModulesHostBuilder hostBuilder,
             Container container, bool enableModuleContainer = true) 
         {
             if (container.Options.DefaultScopedLifestyle == null)
@@ -27,7 +27,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         }
 
-        public static IModuleHostBuilder UseSimpleInjector(this IModuleHostBuilder hostBuilder)
+        public static IModulesHostBuilder UseSimpleInjector(this IModulesHostBuilder hostBuilder)
         {
             hostBuilder.ConfigureFrameworkServices((ctx, services) =>
             {
