@@ -6,7 +6,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 {
     public class ServicesStartupConfigurer : IModuleServicesConfigurer
     {
-        public void ConfigureServices(IModuleHostBuilderContext context, IServiceCollection services)
+        public void ConfigureServices(IModulesHostBuilderContext context, IServiceCollection services)
         {
             if (context.Advanced.RootContext is ISimpleInjectorModuleContext containerContext)
             {

@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging.EventLog;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public static class ModuleHost
+    public static class ModulesHost
     {
 
 #if NETSTANDARD2_0
@@ -24,7 +24,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         ///     <item><description>load app <see cref="IHostingEnvironment.EnvironmentName"/> from User Secrets when <see cref="IHostingEnvironment"/> is 'Development' using the entry assembly</description></item>
         ///     <item><description>load app <see cref="IHostingEnvironment.EnvironmentName"/> from environment variables</description></item>
         ///     <item><description>configure the <see cref="IHostingEnvironment"/> to log to the console, debug, and event source output</description></item>
-        ///     <item><description>enables scope validation on the dependency injection container when <see cref="IModuleHostBuilder"/> is 'Development'</description></item>
+        ///     <item><description>enables scope validation on the dependency injection container when <see cref="IModulesHostBuilder"/> is 'Development'</description></item>
         ///   </list>
         /// </remarks>
         /// <returns>The initialized <see cref="ILoggerFactory"/>.</returns>
@@ -41,12 +41,12 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         ///     <item><description>load app <see cref="IHostEnvironment.EnvironmentName"/> from User Secrets when <see cref="IHostEnvironment"/> is 'Development' using the entry assembly</description></item>
         ///     <item><description>load app <see cref="IHostEnvironment.EnvironmentName"/> from environment variables</description></item>
         ///     <item><description>configure the <see cref="IHostEnvironment"/> to log to the console, debug, and event source output</description></item>
-        ///     <item><description>enables scope validation on the dependency injection container when <see cref="IModuleHostBuilder"/> is 'Development'</description></item>
+        ///     <item><description>enables scope validation on the dependency injection container when <see cref="IModulesHostBuilder"/> is 'Development'</description></item>
         ///   </list>
         /// </remarks>
         /// <returns>The initialized <see cref="ILoggerFactory"/>.</returns>
 #endif
-        public static IModuleHostBuilder CreateDefaultBuilder() =>
+        public static IModulesHostBuilder CreateDefaultBuilder() =>
             CreateDefaultBuilder(args: null);
 
 #if NETSTANDARD2_0
@@ -91,9 +91,9 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         /// <returns>The initialized <see cref="IHostBuilder"/>.</returns>
 #endif
         // ReSharper disable once MemberCanBePrivate.Global
-        public static IModuleHostBuilder CreateDefaultBuilder(string[] args)
+        public static IModulesHostBuilder CreateDefaultBuilder(string[] args)
         {
-            var builder = new ModuleHostBuilder();
+            var builder = new ModulesHostBuilder();
             
             builder.UseContentRoot(Directory.GetCurrentDirectory());
             builder.ConfigureHostConfiguration(config =>

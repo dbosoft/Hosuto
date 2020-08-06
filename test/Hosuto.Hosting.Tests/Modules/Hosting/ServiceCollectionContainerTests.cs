@@ -20,7 +20,7 @@ namespace Hosuto.Hosting.Tests.Modules.Hosting
             serviceMock.Setup(x=>x.CallMe()).Verifiable();
             sc.AddSingleton(serviceMock.Object);
 
-            var builder = ModuleHost.CreateDefaultBuilder();
+            var builder = ModulesHost.CreateDefaultBuilder();
             builder.UseServiceCollection(sc);
             builder.HostModule<SomeModule>();
             var host = builder.Build();

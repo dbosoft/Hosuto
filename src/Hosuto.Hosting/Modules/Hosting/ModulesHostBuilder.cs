@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public class ModuleHostBuilder : IModuleHostBuilder
+    public class ModulesHostBuilder : IModulesHostBuilder
     {
 
         public IDictionary<object, object> Properties => _innerBuilder.Properties;
@@ -18,13 +18,13 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         private bool _hostBuilt;
         private readonly IHostBuilder _innerBuilder = new HostBuilder();
         
-        public IModuleHostBuilder HostModule<TModule>(Action<IModuleHostingOptions> options = null) where TModule : class, IModule
+        public IModulesHostBuilder HostModule<TModule>(Action<IModuleHostingOptions> options = null) where TModule : class, IModule
         {
             HostModule(typeof(TModule), options);
             return this;
         }
 
-        public IModuleHostBuilder HostModule(Type moduleType, Action<IModuleHostingOptions> options = null)
+        public IModulesHostBuilder HostModule(Type moduleType, Action<IModuleHostingOptions> options = null)
         {
             if (_registeredModules.ContainsKey(moduleType))
                 throw new InvalidOperationException($"Module of type {moduleType} is already used.");
@@ -36,20 +36,20 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             return this;
         }
 
-        public IModuleHostBuilder ConfigureHostConfiguration(
+        public IModulesHostBuilder ConfigureHostConfiguration(
             Action<IConfigurationBuilder> configureDelegate)
         {
             _innerBuilder.ConfigureHostConfiguration(configureDelegate);
             return this;
         }
 
-        public IModuleHostBuilder ConfigureFrameworkServices(Action<HostBuilderContext, IServiceCollection> configureDelegate)
+        public IModulesHostBuilder ConfigureFrameworkServices(Action<HostBuilderContext, IServiceCollection> configureDelegate)
         {
             _configureFrameworkActions.Add(configureDelegate ?? throw new ArgumentNullException(nameof(configureDelegate)));
             return this;
         }
 
-        public IModuleHostBuilder ConfigureAppConfiguration(Action<HostBuilderContext, IConfigurationBuilder> configureDelegate)
+        public IModulesHostBuilder ConfigureAppConfiguration(Action<HostBuilderContext, IConfigurationBuilder> configureDelegate)
         {
             ConfigureFrameworkServices((ctx, services) =>
             {
@@ -65,7 +65,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             return ConfigureAppConfiguration(configureDelegate);
         }
 
-        public IModuleHostBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configureDelegate)
+        public IModulesHostBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configureDelegate)
         {
             ConfigureFrameworkServices((ctx, services) =>
             {
@@ -149,7 +149,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             {
                 var internalHostType = typeof(Internal.IModuleHost<>).MakeGenericType(module.Key);
                 var serviceType = typeof(IModuleHost<>).MakeGenericType(module.Key);
-                var hostedServiceType = typeof(ModuleHostService<>).MakeGenericType(module.Key);
+                var hostedServiceType = typeof(ModulesHostService<>).MakeGenericType(module.Key);
                 
                 var internalHost = frameworkServices.GetRequiredService(internalHostType);
                 services.AddSingleton(serviceType, sp => internalHost);
@@ -168,7 +168,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         /// <typeparam name="TContainerBuilder">The type of the builder to create.</typeparam>
         /// <param name="factory">A factory used for creating service providers.</param>
         /// <returns>The same instance of the <see cref="IHostBuilder"/> for chaining.</returns>
-        public IModuleHostBuilder UseServiceProviderFactory<TContainerBuilder>(IServiceProviderFactory<TContainerBuilder> factory)
+        public IModulesHostBuilder UseServiceProviderFactory<TContainerBuilder>(IServiceProviderFactory<TContainerBuilder> factory)
         {
             _innerBuilder.UseServiceProviderFactory(factory);
             return this;
@@ -181,7 +181,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         /// <param name="factory">A factory used for creating service providers.</param>
         /// <typeparam name="TContainerBuilder">The type of the builder to create.</typeparam>
         /// <returns>The same instance of the <see cref="IHostBuilder"/> for chaining.</returns>
-        public IModuleHostBuilder UseServiceProviderFactory<TContainerBuilder>(Func<HostBuilderContext, IServiceProviderFactory<TContainerBuilder>> factory)
+        public IModulesHostBuilder UseServiceProviderFactory<TContainerBuilder>(Func<HostBuilderContext, IServiceProviderFactory<TContainerBuilder>> factory)
         {
             _innerBuilder.UseServiceProviderFactory(factory);
             return this;
@@ -213,7 +213,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             });
         }
         
-        public IModuleHostBuilder ConfigureContainer<TContainerBuilder>(Action<HostBuilderContext, TContainerBuilder> configureDelegate)
+        public IModulesHostBuilder ConfigureContainer<TContainerBuilder>(Action<HostBuilderContext, TContainerBuilder> configureDelegate)
         {
             _innerBuilder.ConfigureContainer(configureDelegate);
             return this;

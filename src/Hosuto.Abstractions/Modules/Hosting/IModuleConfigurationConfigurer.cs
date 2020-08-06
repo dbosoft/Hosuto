@@ -5,7 +5,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 {
     public interface IModuleConfigurationConfigurer
     {
-        void ConfigureModuleConfiguration(IModuleHostBuilderContext context, IConfigurationBuilder configuration);
+        void ConfigureModuleConfiguration(IModulesHostBuilderContext context, IConfigurationBuilder configuration);
     }
 
 

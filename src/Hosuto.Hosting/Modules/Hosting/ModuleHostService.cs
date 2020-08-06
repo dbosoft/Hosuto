@@ -4,11 +4,11 @@ using Microsoft.Extensions.Hosting;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public class ModuleHostService<TModule> : IHostedService where TModule : IModule
+    public class ModulesHostService<TModule> : IHostedService where TModule : IModule
     {
         private readonly IModuleHost<TModule> _moduleHost;
 
-        public ModuleHostService(IModuleHost<TModule> moduleHost)
+        public ModulesHostService(IModuleHost<TModule> moduleHost)
         {
             _moduleHost = moduleHost;
         }
