@@ -2,13 +2,14 @@
 using Dbosoft.Hosuto.Modules;
 using Dbosoft.Hosuto.Modules.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Moq;
 using SimpleInjector;
 using Xunit;
 
 namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
 {
-    public class UseContainerTests
+    public class InnerContainerTests
     {
         [Fact]
         public void Module_uses_SimpleInjector_as_inner_container()
@@ -22,30 +23,19 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
             host.Dispose();
         }
 
-        [Fact]
-        public void ConfigureContainer_extensions_are_called()
-        {
-            var configureMock = new Mock<IContainerConfigurer<SomeModule>>();
-            configureMock.Setup(x => 
-                x.ConfigureContainer(It.IsAny<IModuleContext<SomeModule>>(), It.IsAny<Container>())
-            ).Verifiable();
 
-            var builder = ModulesHost.CreateDefaultBuilder();
-            builder.UseSimpleInjector();
-            builder.HostModule<SomeModule>();
-            builder.ConfigureFrameworkServices((ctx, services) => services.AddTransient(sp=>configureMock.Object));
-            builder.Build().Dispose();
-
-            configureMock.Verify();
-
-
-        }
 
         public class SomeModule : IModule
         {
             public string Name => "I'm a module";
-            
+
+
+            public virtual void ConfigureContainer(Container container, IHostingEnvironment env)
+            {
+
+            }
         }
+
     }
 
     

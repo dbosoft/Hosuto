@@ -117,9 +117,14 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                 var moduleHostServicesFactory = frameworkServices.GetService<IModuleHostServiceProviderFactory>();
                 moduleHostServicesFactoryState = moduleHostServicesFactory?.ConfigureServices(services);
 
-                foreach (var moduleType in _registeredModules.Keys)
+                foreach (var module in _registeredModules)
                 {
-                    services.AddSingleton(moduleType);
+                    
+                    if(module.Value.ModuleFactory==null)
+                        services.AddSingleton(module.Key);
+                    else
+                        services.AddSingleton(module.Key, module.Value.ModuleFactory);
+
                 }
 
                 RegisterModulesAndHosts(services, frameworkServices);
