@@ -138,18 +138,16 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
             webHostBuilder.ConfigureServices((webContext, services) =>
             {
+                var tempServiceProvider = services.BuildServiceProvider();
+
                 Action<IServiceCollection> configureMethod = (s) =>
                 {
-                    using (var tempServiceProvider = services.BuildServiceProvider())
-                    {
-                        ConfigureServices(WebContextToHostBuilderContext(webContext), s, tempServiceProvider);
-                    }
-                        
+                    ConfigureServices(WebContextToHostBuilderContext(webContext), s, tempServiceProvider);
+
                 };
 
-                configureMethod = BuildConfigureServicesFilterPipeline(configureMethod);
+                configureMethod = BuildConfigureServicesFilterPipeline(tempServiceProvider, configureMethod);
                 configureMethod(services);
-
             });
 
             webHostBuilder.Configure(app =>
@@ -185,11 +183,10 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             };
         }
         
-        private static Action<IServiceCollection> BuildConfigureServicesFilterPipeline(Action<IServiceCollection> configureServices)
+        private static Action<IServiceCollection> BuildConfigureServicesFilterPipeline(IServiceProvider serviceProvider,  Action<IServiceCollection> configureServices)
         {
             return (services =>
             {
-                var serviceProvider = services.BuildServiceProvider(true);
 #pragma warning disable CS0612 // Type or member is obsolete
             var filters = serviceProvider.GetRequiredService<IEnumerable<IStartupConfigureServicesFilter>>().Reverse().ToArray();
 #pragma warning restore CS0612 // Type or member is obsolete
