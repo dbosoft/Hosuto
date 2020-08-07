@@ -6,8 +6,8 @@ Advanced application hosting with .NET Generic Host and Asp.Net Core.
 
 Hosuto contains currently the following features to extend .NET Generic Host: 
 
-- **Modules**: The hosuto module system allows you to setup multiple independed hosts within a single application. Modules can share configuration and a DI container for global settings and interaction. The module system supports both .NET Generic host and Asp.Net Core 2.1 and higher. 
-- **Hosted Services extensions**: Husuto contains extensions methods to simplify the use of hosted services in Generic Hosts and Asp.Net Core Hosts. 
+- **Modules**: The Hosuto module system allows you to setup multiple independed hosts within a single application. Modules can share configuration and a DI container for global settings and interaction. The module system supports both .NET Generic host and Asp.Net Core 2.1 and higher. 
+- **Hosted Services extensions**: Hosuto contains extensions methods to simplify the use of hosted services in Generic Hosts and Asp.Net Core Hosts. 
 
 ## Platforms & Prerequisites
 
@@ -17,79 +17,10 @@ Hosuto supports .NET Standard 2.0 or higher and Asp.Net Core >= 2.1 and <= 3.1.
 ## Getting started
 
 The easiest way to get started is by installing [the available NuGet package](https://www.nuget.org/packages/Dbosoft.Hosuto). 
-Take a look at the [Using](#using) section learning how to configure and use Hosuto.
+Take a look at the [Getting started](https://github.com/dbosoft/Hosuto/wiki/Getting-Started) wiki page learning how to configure and use Hosuto.
 
-## Using
+To see a full example see the [sample](https://github.com/dbosoft/Hosuto/tree/master/samples) folder of the repository. 
 
-### Modules
-
-With Hosuto modules you can create isolated parts of your application that will all run in their own host but share global settings and a DI container. 
-As each module has it's own service provider you can register different services in each module. For example if you host a server component in one module you could configure another module to host a client of the same component. If you now distribute the application you can choose to run each module in it's own application or to run the modules in the same application. 
-
-To use modules first create a modules host in your applications main method. This host replaces the default .Net Generic Host. 
-
-Add a reference to the nuget package [Dbosoft.Hosuto.Hosting](https://www.nuget.org/packages/Dbosoft.Hosuto.Hosting) and build the modules host from a ModulesHostBuilder: 
-
-```csharp
-        static Task Main(string[] args)
-        {
-
-            var builder = ModulesHost.CreateDefaultBuilder(args);
-            
-            // you can configure a modules host builder like a host builder.
-            // All configurations set with ConfigureHostConfiguration will be shared between all modules.
-            builder.UseEnvironment(EnvironmentName.Development);
-            return builder.RunConsoleAsync();
-
-        }
-
-  ```
-
-Then you can define your modules. A module is typical placed in a sperated assembly but this is not required. 
-Modules only have to implement the IModule interface but have a convention based setup logic like the Startup class for Asp.Net Core. 
-
-```csharp
-    public class SimpleModule : IModule
-    {
-        public void ConfigureServices(
-            IServiceCollection services)
-        {
-
-            [...]
-  ```
-
-The configure service method will configure the DI container of the module host. Todo something useful you will typical have to register at least one HostedServices here. 
-
-The module has now to be added to the modules host builder: 
-
-```csharp
-        static Task Main(string[] args)
-        {
-
-            var builder = ModulesHost.CreateDefaultBuilder(args);
-            
-            [...]
-            
-            builder.HostModule<SomeModule>();
-            return builder.RunConsoleAsync();
-
-        }
-
-  ```
-
-### Hosted Services extensions
-
-Hosuto adds a extension method AddHostedHandler (for IServiceCollection) to register a handler that will executed as hosted service. A handler is created from the hosts DI container and contains one method Execute to run the handler. 
-Another overload of AddHostedHandler also allows to use a Func<IServiceProvider, CancellationToken, Task> delegate to set the handler code. 
-
-```csharp
-            services.AddHostedHandler((sp, cancelToken) =>
-            {
-                var dispatcher = sp.GetRequiredService<IMessageDispatcher>();
-                dispatcher.RegisterRecipient(this);
-                return Task.CompletedTask;
-            });
-  ```
 
 ## Versioning
 
