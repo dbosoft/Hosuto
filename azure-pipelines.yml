@@ -28,14 +28,16 @@ steps:
   inputs:
     command: build
     projects: '**/*.csproj'
-    arguments: '--configuration $(buildConfiguration) --disable-parallel'
+    arguments: '--configuration $(buildConfiguration)'
+    restoreArguments: '--disable-parallel'
 
 - task: DotNetCoreCLI@2
   displayName: dotnet test
   inputs:
     command: test
     projects: '**/*Tests/*.csproj'
-    arguments: '--configuration $(buildConfiguration) --collect "Code coverage" --disable-parallel'
+    arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
+    restoreArguments: '--disable-parallel'
 
 - task: DotNetCoreCLI@2
   displayName: dotnet pack
