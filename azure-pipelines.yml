@@ -35,7 +35,7 @@ steps:
   inputs:
     command: test
     projects: '**/*Tests/*.csproj'
-    arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
+    arguments: '--configuration $(buildConfiguration) --collect "Code coverage" --disable-parallel'
 
 - task: DotNetCoreCLI@2
   displayName: dotnet pack
