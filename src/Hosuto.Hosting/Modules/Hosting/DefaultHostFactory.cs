@@ -27,17 +27,14 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         public IModuleBootstrapContext<TModule> BootstrapContext { get; }
 
-        protected virtual void ConfigureServices(HostBuilderContext hostBuilderContext, IServiceCollection services)
+        protected virtual void ConfigureServices(HostBuilderContext hostBuilderContext, IServiceCollection services, IServiceProvider serviceProvider)
         {
             foreach (var configurer in BootstrapContext.Advanced.FrameworkServices.GetServices<IModuleServicesConfigurer>())
             {
                 configurer.ConfigureServices(BootstrapContext.ToModuleHostBuilderContext(hostBuilderContext), services);
             }
-
-            var tempProvider = services.BuildServiceProvider();
             
-            
-            ModuleMethodInvoker.CallOptionalMethod(BootstrapContext, "ConfigureServices", tempProvider, services);
+            ModuleMethodInvoker.CallOptionalMethod(BootstrapContext, "ConfigureServices", serviceProvider, services);
 
         }
 
@@ -67,7 +64,15 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                 }
             });
 
-            builder.ConfigureServices(ConfigureServices);
+            
+            builder.ConfigureServices((ctx, services) =>
+            {
+                // ReSharper disable once ConvertToUsingDeclaration
+                using(var tempServiceProvider = services.BuildServiceProvider())
+                {
+                    ConfigureServices(ctx, services, tempServiceProvider);
+                }
+            });
 
             return builder;
         }

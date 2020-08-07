@@ -139,7 +139,13 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             webHostBuilder.ConfigureServices((webContext, services) =>
             {
                 Action<IServiceCollection> configureMethod = (s) =>
-                    ConfigureServices(WebContextToHostBuilderContext(webContext), s);
+                {
+                    using (var tempServiceProvider = services.BuildServiceProvider())
+                    {
+                        ConfigureServices(WebContextToHostBuilderContext(webContext), s, tempServiceProvider);
+                    }
+                        
+                };
 
                 configureMethod = BuildConfigureServicesFilterPipeline(configureMethod);
                 configureMethod(services);
