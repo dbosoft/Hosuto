@@ -18,7 +18,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         private void UseSimpleInjector<TModule>(IModuleContext<TModule> moduleContext, SimpleInjectorUseOptions options) where TModule: IModule
         {
-            ModuleMethodInvoker.CallOptionalMethod(moduleContext.ToBootstrapContext(), "UseSimpleInjector", moduleContext.Services, options);
+            ModuleMethodInvoker.CallOptionalMethod(moduleContext.ToBootstrapContext(), "UseSimpleInjector", moduleContext.Advanced.HostServices, options);
         }
 
         private void ConfigureContainer<TModule>(IModuleContext<TModule> moduleContext, Container container) where TModule : IModule
@@ -28,7 +28,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                 configurer.ConfigureContainer(moduleContext, container);
             }
 
-            ModuleMethodInvoker.CallOptionalMethod(moduleContext.ToBootstrapContext(), "ConfigureContainer", moduleContext.Services, container);
+            ModuleMethodInvoker.CallOptionalMethod(moduleContext.ToBootstrapContext(), "ConfigureContainer", moduleContext.Advanced.HostServices, container);
         }
 
         public (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost<TModule>(IModuleBootstrapContext<TModule> bootstrapContext, ModuleHostingOptions options) where TModule : IModule
