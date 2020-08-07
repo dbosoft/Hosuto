@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
 {
-    public class UseContainerTests
+    public class OuterContainerTests
     {
         [Fact]
         public void Module_can_resolve_services_from_outer_container()
@@ -28,20 +28,6 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
 
             serviceMock.Verify(x=>x.CallMe());
 
-        }
-
-        [Fact]
-        public void Module_uses_SimpleInjector_as_inner_container()
-        {
-            var serviceMock = new Mock<IService>();
-            serviceMock.Setup(x => x.CallMe()).Verifiable();
-
-            var builder = ModulesHost.CreateDefaultBuilder();
-            builder.UseSimpleInjector();
-            builder.HostModule<SomeModule>();
-            var host = builder.Build();
-            var moduleHost = host.Services.GetRequiredService<IModuleHost<SomeModule>>();
-            Assert.IsType<Container>(moduleHost.ModuleContext.Services);
         }
 
         // ReSharper disable once MemberCanBePrivate.Global
