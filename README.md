@@ -1,6 +1,5 @@
 # Hosuto
-Advanced application hosting with .NET Generic Host and Asp.Net Core.
-
+Advanced application hosting with .NET Generic Host and Asp.Net Core
 
 ## Description
 
