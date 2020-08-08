@@ -4,6 +4,7 @@ using Dbosoft.Hosuto.Modules.Hosting.Internal;
 #if !NETCOREAPP
 using Microsoft.AspNetCore.Hosting.Internal;
 using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 using HostingEnvironment = Microsoft.Extensions.Hosting.Internal.HostingEnvironment;
 #endif
 
@@ -51,18 +52,20 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         protected virtual void Configure(IModuleContext<TModule> moduleContext, IApplicationBuilder app)
         {
-            foreach (var configurer in BootstrapContext.Advanced.FrameworkServices.GetServices<IConfigureAppConfigurer<TModule>>())
-            {
-                configurer.Configure(moduleContext, app);
-            }
+            Filters.BuildFilterPipeline(
+                BootstrapContext.Advanced.FrameworkServices.GetServices<IWebModuleConfigureFilter>(),
+                (ctx, appBuilder) =>
+                {
+                    ModuleMethodInvoker.CallOptionalMethod(BootstrapContext, "Configure", appBuilder.ApplicationServices, appBuilder);
 
-            ModuleMethodInvoker.CallOptionalMethod(BootstrapContext, "Configure", app.ApplicationServices, app);
+                })(moduleContext, app);
+
         }
         
         public override (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost(ModuleHostingOptions options)
         {
-            var hostBuilderConfigurers = BootstrapContext.Advanced.FrameworkServices
-                .GetServices<IWebModuleWebHostBuilderConfigurer>();
+            var webHostBuilderFilters = BootstrapContext.Advanced.FrameworkServices
+                .GetServices<IWebModuleWebHostBuilderFilter>();
 
             var moduleAssemblyName = BootstrapContext.Module.GetType().Assembly.GetName().Name;
             IModuleContext<TModule> moduleContext = null;
@@ -82,14 +85,14 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             webHostBuilderInitializer.ConfigureWebHost(BootstrapContext.Module as WebModule, builder,
                 new[]
                     {
-                        new DelegateWebHostBuilderConfigurer((_, webHostBuilder) =>
+                        new DelegateWebModuleWebHostBuilderFilter((_, webHostBuilder) =>
                         {
                             webHostBuilder.ConfigureAppConfiguration(
                                 (ctx, b) => { ctx.HostingEnvironment.ApplicationName = moduleAssemblyName; });
                         })
-                    }.Union(hostBuilderConfigurers)
+                    }.Union(webHostBuilderFilters)
                     .Append(
-                        new DelegateWebHostBuilderConfigurer((_, webHostBuilder) =>
+                        new DelegateWebModuleWebHostBuilderFilter((_, webHostBuilder) =>
                         {
                             webHostBuilder.Configure(app =>
                             {
@@ -123,18 +126,14 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             {
                 ctx.HostingEnvironment.ApplicationName = moduleAssemblyName;
 
-                foreach (var configurer in BootstrapContext.Advanced.FrameworkServices.GetServices<IModuleConfigurationConfigurer>())
-                {
-                    configurer.ConfigureModuleConfiguration(
-                        BootstrapContext.ToModuleHostBuilderContext(WebContextToHostBuilderContext(ctx)), config);
-                }
-
+                Filters.BuildFilterPipeline(
+                    BootstrapContext.Advanced.FrameworkServices.GetServices<IModuleConfigurationFilter>(),
+                    (_, __) => { })(BootstrapContext.ToModuleHostBuilderContext(WebContextToHostBuilderContext(ctx)), config);
+                
             });
 
-            foreach (var hostBuilderConfigurer in hostBuilderConfigurers)
-            {
-                hostBuilderConfigurer.ConfigureWebHost(BootstrapContext.Module as WebModule, webHostBuilder);
-            }
+            Filters.BuildFilterPipeline(webHostBuilderFilters, (_, __) => { })(BootstrapContext.Module as WebModule, webHostBuilder);
+
 
             webHostBuilder.ConfigureServices((webContext, services) =>
             {
@@ -157,6 +156,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
                 });
 
+            options.ConfigureWebHostBuilder(webHostBuilder);
             var webHost = options.BuildWebHost(webHostBuilder);
 
             moduleContext = CreateModuleContext(webHost.Services);
@@ -205,6 +205,8 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             });
 
         }
+
+
 #endif
     }
 }

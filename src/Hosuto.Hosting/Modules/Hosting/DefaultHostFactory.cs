@@ -5,6 +5,7 @@ using Dbosoft.Hosuto.Modules.Hosting.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+// ReSharper disable VirtualMemberNeverOverridden.Global
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
@@ -29,13 +30,12 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         protected virtual void ConfigureServices(HostBuilderContext hostBuilderContext, IServiceCollection services, IServiceProvider serviceProvider)
         {
-            foreach (var configurer in BootstrapContext.Advanced.FrameworkServices.GetServices<IModuleServicesConfigurer>())
-            {
-                configurer.ConfigureServices(BootstrapContext.ToModuleHostBuilderContext(hostBuilderContext), services);
-            }
-            
-            ModuleMethodInvoker.CallOptionalMethod(BootstrapContext, "ConfigureServices", serviceProvider, services);
-
+            Filters.BuildFilterPipeline(
+                BootstrapContext.Advanced.FrameworkServices.GetServices<IModuleServicesFilter>(), (ctx, s) =>
+                {
+                    ModuleMethodInvoker.CallOptionalMethod(BootstrapContext, "ConfigureServices", serviceProvider, s);
+                })
+                (BootstrapContext.ToModuleHostBuilderContext(hostBuilderContext), services);
         }
 
 
@@ -58,10 +58,10 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             {
                 ctx.HostingEnvironment.ApplicationName = moduleAssemblyName;
 
-                foreach (var configurer in BootstrapContext.Advanced.FrameworkServices.GetServices<IModuleConfigurationConfigurer>())
-                {
-                    configurer.ConfigureModuleConfiguration(BootstrapContext.ToModuleHostBuilderContext(ctx), config);
-                }
+                Filters.BuildFilterPipeline(
+                    BootstrapContext.Advanced.FrameworkServices.GetServices<IModuleConfigurationFilter>(),
+                    (_, __) => { })(BootstrapContext.ToModuleHostBuilderContext(ctx), config);
+
             });
 
             
