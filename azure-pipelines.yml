@@ -44,7 +44,8 @@ steps:
   inputs:
     command: pack
     arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-
+    restoreArguments: '--disable-parallel'
+    
 - task: PublishBuildArtifacts@1
   displayName: publish artifacts
   inputs:
