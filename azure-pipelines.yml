@@ -28,23 +28,20 @@ steps:
   inputs:
     command: build
     projects: '**/*.csproj'
-    arguments: '--configuration $(buildConfiguration)'
-    restoreArguments: '--disable-parallel'
-
+    arguments: '--configuration $(buildConfiguration) --no-restore'
+  
 - task: DotNetCoreCLI@2
   displayName: dotnet test
   inputs:
     command: test
     projects: '**/*Tests/*.csproj'
-    arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
-    restoreArguments: '--disable-parallel'
-
+    arguments: '--configuration $(buildConfiguration) --collect "Code coverage" --no-build'
+  
 - task: DotNetCoreCLI@2
   displayName: dotnet pack
   inputs:
     command: pack
-    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-    restoreArguments: '--disable-parallel'
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory) --no-build'
     
 - task: PublishBuildArtifacts@1
   displayName: publish artifacts
