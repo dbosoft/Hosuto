@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Dbosoft.Hosuto.Modules.Hosting.Internal
@@ -9,7 +10,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting.Internal
             this IModuleContext<TModule> moduleContext) where TModule : IModule
         {
             return moduleContext.Advanced.FrameworkServices.GetRequiredService<IModuleContextFactory<TModule>>()
-                .CreateModuleBootstrapContext(moduleContext.Module, moduleContext.ModuleHostServices,
+                .CreateModuleBootstrapContext(moduleContext.Module, moduleContext.ModulesHostServices,
                     moduleContext.Advanced.FrameworkServices);
 
         }
@@ -25,6 +26,18 @@ namespace Dbosoft.Hosuto.Modules.Hosting.Internal
             this IModuleBootstrapContext<TModule> bootstrapContext, HostBuilderContext hostBuilderContext = null) where TModule : IModule
         {
             return new ModulesHostBuilderContext<TModule>(hostBuilderContext, bootstrapContext);
+
+        }
+
+        public static IModuleContext ToModuleContext<TModule>(
+            this IModuleBootstrapContext<TModule> bootstrapContext, IServiceProvider moduleServices) where TModule : IModule
+        {
+            return new ModuleContext<TModule>(
+                bootstrapContext.Module, 
+                moduleServices, 
+                bootstrapContext.ModulesHostServices, 
+                bootstrapContext.Advanced.FrameworkServices,
+                bootstrapContext);
 
         }
     }

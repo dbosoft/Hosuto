@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Dbosoft.Hosuto.Modules.Hosting.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,19 +17,30 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             _decoratedHostFactory = decoratedHostFactory;
         }
 
-        private void UseSimpleInjector<TModule>(IModuleContext<TModule> moduleContext, SimpleInjectorUseOptions options) where TModule: IModule
+        private static void UseSimpleInjector(IModuleContext moduleContext, SimpleInjectorUseOptions options)
         {
-            ModuleMethodInvoker.CallOptionalMethod(moduleContext.ToBootstrapContext(), "UseSimpleInjector", moduleContext.Advanced.HostServices, options);
+            Filters.BuildFilterPipeline(
+                moduleContext.Advanced.FrameworkServices.GetServices<IUseSimpleInjectorFilter>()
+                    .Append(GenericModuleContextFilterAdapter<SimpleInjectorUseOptions>.Create(typeof(IUseSimpleInjectorFilter<>))),
+                (ctx, o) =>
+                {
+                    ModuleMethodInvoker.CallOptionalMethod(ctx, "UseSimpleInjector", o);
+
+                })(moduleContext, options);
+            
         }
 
-        private void ConfigureContainer<TModule>(IModuleContext<TModule> moduleContext, Container container) where TModule : IModule
+        private static void ConfigureContainer(IModuleContext moduleContext, Container container)
         {
-            foreach(var configurer in moduleContext.Advanced.FrameworkServices.GetServices<IContainerConfigurer<TModule>>())
-            {
-                configurer.ConfigureContainer(moduleContext, container);
-            }
+            Filters.BuildFilterPipeline(
+                moduleContext.Advanced.FrameworkServices.GetServices<IConfigureContainerFilter>()
+                    .Append(GenericModuleContextFilterAdapter<Container>.Create(typeof(IConfigureContainerFilter<>))),
+                (ctx, c) =>
+                {
+                    ModuleMethodInvoker.CallOptionalMethod(ctx, "ConfigureContainer", container);
 
-            ModuleMethodInvoker.CallOptionalMethod(moduleContext.ToBootstrapContext(), "ConfigureContainer", moduleContext.Advanced.HostServices, container);
+                })(moduleContext, container);
+
         }
 
         public (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost<TModule>(IModuleBootstrapContext<TModule> bootstrapContext, ModuleHostingOptions options) where TModule : IModule

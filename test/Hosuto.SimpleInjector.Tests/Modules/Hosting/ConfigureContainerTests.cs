@@ -69,9 +69,9 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
         [Fact]
         public void ConfigureContainer_extensions_are_called()
         {
-            var configureMock = new Mock<IContainerConfigurer<ModuleWithConfigureContainer>>();
+            var configureMock = new Mock<IConfigureContainerFilter<ModuleWithConfigureContainer>>();
             configureMock.Setup(x =>
-                x.ConfigureContainer(It.IsAny<IModuleContext<ModuleWithConfigureContainer>>(), It.IsAny<Container>())
+                x.Invoke(It.IsAny<Action<IModuleContext<ModuleWithConfigureContainer>, Container>>())
             ).Verifiable();
 
             var builder = ModulesHost.CreateDefaultBuilder();

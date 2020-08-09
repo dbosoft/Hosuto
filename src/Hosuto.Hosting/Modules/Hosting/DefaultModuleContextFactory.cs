@@ -10,7 +10,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         {
             return CreateModuleContextInternal(bootstrapContext.Module, 
                 moduleServices, 
-                bootstrapContext.ModuleHostServices, 
+                bootstrapContext.ModulesHostServices, 
                 bootstrapContext.Advanced.FrameworkServices);
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Dbosoft.Hosuto
 {
@@ -11,4 +12,5 @@ namespace Dbosoft.Hosuto
     {
         Action<T1, T2> Invoke(Action<T1, T2> next);
     }
+
 }

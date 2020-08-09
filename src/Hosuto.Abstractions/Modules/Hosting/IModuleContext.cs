@@ -13,7 +13,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
     public interface IModuleContext : IDisposable
     {
         object Module { get; }
-        IServiceProvider ModuleHostServices { get; }
+        IServiceProvider ModulesHostServices { get; }
 
         IServiceProvider Services { get; }
 

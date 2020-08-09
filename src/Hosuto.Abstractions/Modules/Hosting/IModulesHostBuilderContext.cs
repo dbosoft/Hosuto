@@ -13,4 +13,9 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         IAdvancedModuleContext Advanced { get; }
 
     }
+
+    public interface IModulesHostBuilderContext<TModule> : IModulesHostBuilderContext where TModule : IModule
+    {
+        new TModule Module { get; }
+    }
 }

@@ -39,8 +39,7 @@ namespace Dbosoft.Hosuto
                 }
 
                 var pipeline = enumerable.Aggregate(filteredDelegate, (current, filter) => filter.Invoke(current));
-
-                pipeline(p1,p2);
+                pipeline?.Invoke(p1,p2);
 
             });
         }
