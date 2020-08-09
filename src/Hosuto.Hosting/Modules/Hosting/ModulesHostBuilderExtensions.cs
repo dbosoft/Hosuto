@@ -42,13 +42,13 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         /// <param name="configureDelegate">The delegate for configuring the <see cref="IConfigurationBuilder"/> that will be used
         /// to construct the <see cref="IConfiguration"/> for the application.</param>
         /// <returns>The same instance of the <see cref="IHostBuilder"/> for chaining.</returns>
-        static IModulesHostBuilder ConfigureModuleConfiguration(
+        public static IModulesHostBuilder ConfigureModuleConfiguration(
             this IModulesHostBuilder hostBuilder,
             Action<IModulesHostBuilderContext, IConfigurationBuilder> configureDelegate)
         {
             hostBuilder.ConfigureFrameworkServices((ctx, services) =>
             {
-                services.AddTransient<IModuleConfigurationConfigurer>(sp =>
+                services.AddTransient<IModuleConfigurationFilter>(sp =>
                     new DelegateModuleHostBuilderConfigurationConfigurer(configureDelegate));
             });
 
@@ -68,8 +68,8 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         {
             hostBuilder.ConfigureFrameworkServices((ctx, services) =>
             {
-                services.AddTransient<IModuleServicesConfigurer>(sp =>
-                    new DelegateModuleServicesConfigurer(configureDelegate));
+                services.AddTransient<IModuleServicesFilter>(sp =>
+                    new DelegateModuleServicesFilter(configureDelegate));
             });
 
             return hostBuilder;

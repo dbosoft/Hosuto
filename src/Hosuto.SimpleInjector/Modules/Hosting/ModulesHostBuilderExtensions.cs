@@ -32,8 +32,8 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             hostBuilder.ConfigureFrameworkServices((ctx, services) =>
             {
                 services.AddTransient(typeof(IModuleContextFactory<>), typeof(ModuleContextFactory<>));
-                services.AddTransient(typeof(IModuleServicesConfigurer), typeof(ServicesStartupConfigurer));
-                services.Decorate<IHostFactory, HostFactoryDecorator>();
+                services.AddTransient(typeof(IModuleServicesFilter), typeof(AddSimpleInjectorModuleServicesFilter));
+                services.AddTransient(typeof(IBootstrapHostFilter<>), typeof(BootstrapHostFilter<>));
 
             });
 

@@ -53,7 +53,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         {
             ConfigureFrameworkServices((ctx, services) =>
             {
-                services.AddTransient<IModuleConfigurationConfigurer>(sp =>
+                services.AddTransient<IModuleConfigurationFilter>(sp =>
                     new DelegateModuleHostBuilderConfigurationConfigurer(configureDelegate));
             });
 
@@ -69,8 +69,8 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         {
             ConfigureFrameworkServices((ctx, services) =>
             {
-                services.AddTransient<IModuleServicesConfigurer>(sp =>
-                    new DelegateModuleServicesConfigurer(configureDelegate));
+                services.AddTransient<IModuleServicesFilter>(sp =>
+                    new DelegateModuleServicesFilter(configureDelegate));
             });
 
             return this;
@@ -197,7 +197,6 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             var frameworkServices = new ServiceCollection();
 
             frameworkServices.AddSingleton(ctx.HostingEnvironment);
-            frameworkServices.AddTransient<IHostFactory,DefaultHostFactory>();
             frameworkServices.AddSingleton(ctx);
 
             _configureFrameworkActions.ForEach(c => c(ctx, frameworkServices));

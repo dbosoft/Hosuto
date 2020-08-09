@@ -1,15 +1,17 @@
 ﻿using System;
 using Dbosoft.Hosuto.Modules;
 using Dbosoft.Hosuto.Modules.Hosting;
+using Microsoft.AspNetCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging.EventLog;
 using Moq;
 using SimpleInjector;
 using Xunit;
 
 namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
 {
-    public class ConfigureContainerTests
+    public class WebModuleConfigureContainerTests
     {
 
         [Fact]
@@ -58,6 +60,12 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
             else
                 builder.UseSimpleInjector(container);
 
+#if NETCOREAPP2_1
+            builder.UseAspNetCore(WebHost.CreateDefaultBuilder,(module, webHostBuilder) => { });
+#else
+            builder.UseAspNetCore((module, webHostBuilder) => { });
+#endif
+
             builder.HostModule<TModule>(
                 options => options.ModuleFactoryCallback(_ => moduleMock.Object));
 
@@ -76,6 +84,11 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
 
             var builder = ModulesHost.CreateDefaultBuilder();
             builder.UseSimpleInjector();
+#if NETCOREAPP2_1
+            builder.UseAspNetCore(WebHost.CreateDefaultBuilder,(module, webHostBuilder) => { });
+#else
+            builder.UseAspNetCore((module, webHostBuilder) => { });
+#endif
             builder.HostModule<ModuleWithConfigureContainer>();
             builder.ConfigureFrameworkServices((ctx, services) => services.AddTransient(sp => configureMock.Object));
             builder.Build().Dispose();
@@ -85,9 +98,10 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
 
         }
 
-        public class ModuleWithConfigureContainer : IModule
+        public class ModuleWithConfigureContainer : WebModule
         {
-            public string Name  => nameof(ModuleWithConfigureContainer);
+            public override string Name  => nameof(ModuleWithConfigureContainer);
+            public override string Path { get; } = "";
 
 
             public virtual void ConfigureContainer(Container container)
@@ -95,9 +109,10 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
 
         }
 
-        public  class ModuleWithConfigureContainerAndInjection : IModule
+        public  class ModuleWithConfigureContainerAndInjection : WebModule
         {
-            public string Name => nameof(ModuleWithConfigureContainerAndInjection);
+            public override string Name => nameof(ModuleWithConfigureContainerAndInjection);
+            public override string Path { get; } = "";
 
 
             public virtual void ConfigureContainer(Container container, IHostingEnvironment env)
@@ -106,9 +121,10 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
         }
 
 
-        public class ModuleWithConfigureContainerAndServiceProvider : IModule
+        public class ModuleWithConfigureContainerAndServiceProvider : WebModule
         {
-            public string Name => nameof(ModuleWithConfigureContainerAndServiceProvider);
+            public override string Path { get; } = "";
+            public override string Name => nameof(ModuleWithConfigureContainerAndServiceProvider);
 
             public virtual void ConfigureContainer(IServiceProvider sp, Container container){}
         }

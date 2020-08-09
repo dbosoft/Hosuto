@@ -5,7 +5,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting.Internal
 {
     public static class ModuleMethodInvoker
     {
-        public static void CallOptionalMethod<TModule>(IModuleBootstrapContext<TModule> moduleContext, string methodName, IServiceProvider moduleServices, params object[] arguments) where TModule : IModule
+        public static void CallOptionalMethod(IModuleContext moduleContext, string methodName, params object[] arguments)
         {
             var moduleType = moduleContext.Module.GetType();
             var methodInfo = moduleType.GetMethod(methodName);
@@ -21,7 +21,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting.Internal
                 //by convention: when the first argument is a IServiceProvider it is the service provider of ModuleHost
                 if (index == 0 && parameter.ParameterType == typeof(IServiceProvider))
                 {
-                    parameters.Add(moduleContext.ModuleHostServices);
+                    parameters.Add(moduleContext.ModulesHostServices);
                     continue;
                 }
 
@@ -40,7 +40,11 @@ namespace Dbosoft.Hosuto.Modules.Hosting.Internal
                     continue;
 
                 //resolve all other services from module service provider
-                var resolvedArgument = moduleServices.GetService(parameter.ParameterType);
+
+                if(moduleContext.Advanced.HostServices==null)
+                    throw new InvalidOperationException($"Argument {parameter.Name} with type {parameter.ParameterType} is not support for method {moduleContext.Module.GetType()}::{methodInfo.Name}. For this method no additional arguments can be injected.");
+
+                var resolvedArgument = moduleContext.Advanced.HostServices.GetService(parameter.ParameterType);
                 if (resolvedArgument == null)
                     throw new InvalidOperationException(
                         $"Failed to resolve type {parameter.ParameterType} of argument {parameter.Name} for method {moduleContext.Module.GetType()}::{methodInfo.Name}.");

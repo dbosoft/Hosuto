@@ -42,11 +42,11 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         {
             builder.ConfigureFrameworkServices((ctx, services) =>
             {
-                services.Decorate<IHostFactory, WebModuleHostFactory>();
+                services.AddTransient(typeof(IBootstrapHostFilter<>), typeof(WebModuleBootstrapHostFilter<>));
                 services.TryAddTransient<IWebModuleWebHostBuilderInitializer, WebModuleWebHostBuilderInitializer>();
 
                 if(configure!=null)
-                    services.AddTransient<IWebModuleWebHostBuilderConfigurer>(sp=>new DelegateWebHostBuilderConfigurer(configure));
+                    services.AddTransient<IWebModuleWebHostBuilderFilter>(sp=>new DelegateWebModuleWebHostBuilderFilter(configure));
 
             });
 
@@ -60,7 +60,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
             builder.ConfigureFrameworkServices((ctx, services) =>
             {
-                services.Decorate<IHostFactory, WebModuleHostFactory>();
+                services.AddTransient(typeof(IBootstrapHostFilter<>), typeof(WebModuleBootstrapHostFilter<>));
                 services.TryAddTransient<IWebModuleWebHostBuilderFactory>(sp => new DelegateWebHostBuilderFactory(webHostBuilder));
                 
             });
@@ -74,7 +74,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
             builder.ConfigureFrameworkServices((ctx, services) =>
             {
-                services.TryAddTransient<IWebModuleWebHostBuilderConfigurer>(sp => new DelegateWebHostBuilderConfigurer(configure));
+                services.TryAddTransient<IWebModuleWebHostBuilderFilter>(sp => new DelegateWebModuleWebHostBuilderFilter(configure));
             });
 
             return builder;

@@ -27,10 +27,24 @@ namespace Dbosoft.Hosuto.Modules.Hosting.Internal
 
             var module = moduleHostServices.GetRequiredService<TModule>();
             var contextFactory = _frameworkServices.GetRequiredService<IModuleContextFactory<TModule>>();
-            var context = contextFactory.CreateModuleBootstrapContext(module, moduleHostServices, _frameworkServices);
-            
-            var hostFactory = _frameworkServices.GetRequiredService<IHostFactory>();
-            (_host, ModuleContext) = hostFactory.CreateHost(context, options);
+
+            var command = new BootstrapModuleHostCommand<TModule>
+            {
+                BootstrapContext =
+                    contextFactory.CreateModuleBootstrapContext(module, moduleHostServices, _frameworkServices),
+                Options = options
+            };
+
+            Filters.BuildFilterPipeline(
+                _frameworkServices.GetServices<IBootstrapHostFilter<TModule>>(),
+                (c) =>
+                {
+                    var handler = new DefaultBootstrapHostHandler<TModule>();
+                    handler.BootstrapHost(c);
+                })(command);
+
+            ModuleContext = command.ModuleContext;
+            _host = command.Host;
 
             if (ModuleContext.Advanced.HostServices.GetService<IModuleContextAccessor>() is ModuleContextAccessor contextAccessor) 
                 contextAccessor.Context = ModuleContext;

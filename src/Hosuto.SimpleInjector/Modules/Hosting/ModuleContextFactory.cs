@@ -17,7 +17,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             return new ModuleContextWithContainer<TModule>(containerContext.Container,
                 bootstrapContext.Module,
                 moduleServices,
-                bootstrapContext.ModuleHostServices,
+                bootstrapContext.ModulesHostServices,
                 bootstrapContext.Advanced.FrameworkServices);
         }
 
