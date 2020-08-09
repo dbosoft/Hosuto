@@ -33,7 +33,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             {
                 services.AddTransient(typeof(IModuleContextFactory<>), typeof(ModuleContextFactory<>));
                 services.AddTransient(typeof(IModuleServicesFilter), typeof(AddSimpleInjectorModuleServicesFilter));
-                services.Decorate<IHostFactory, HostFactoryDecorator>();
+                services.AddTransient(typeof(IBootstrapHostFilter<>), typeof(BootstrapHostFilter<>));
 
             });
 

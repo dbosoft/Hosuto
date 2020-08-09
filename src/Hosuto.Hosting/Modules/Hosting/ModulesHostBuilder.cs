@@ -197,7 +197,6 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             var frameworkServices = new ServiceCollection();
 
             frameworkServices.AddSingleton(ctx.HostingEnvironment);
-            frameworkServices.AddTransient<IHostFactory,DefaultHostFactory>();
             frameworkServices.AddSingleton(ctx);
 
             _configureFrameworkActions.ForEach(c => c(ctx, frameworkServices));

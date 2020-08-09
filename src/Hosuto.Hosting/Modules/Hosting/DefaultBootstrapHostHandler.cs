@@ -9,24 +9,10 @@ using Microsoft.Extensions.Hosting;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public class DefaultHostFactory : IHostFactory
+    public class DefaultBootstrapHostHandler<TModule> where TModule : IModule
     {
-        public (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost<TModule>(IModuleBootstrapContext<TModule> bootstrapContext, ModuleHostingOptions options) where TModule : IModule
-        {
-            var factory = new DefaultHostFactory<TModule>(bootstrapContext);
-            return factory.CreateHost(options);
-        }
-        
-    }
 
-    public class DefaultHostFactory<TModule> where TModule : IModule
-    {
-        public DefaultHostFactory(IModuleBootstrapContext<TModule> bootstrapContext)
-        {
-            BootstrapContext = bootstrapContext;
-        }
-
-        public IModuleBootstrapContext<TModule> BootstrapContext { get; }
+        public IModuleBootstrapContext<TModule> BootstrapContext { get; set; }
 
         protected virtual void ConfigureServices(HostBuilderContext hostBuilderContext, IServiceCollection services, IServiceProvider serviceProvider)
         {
@@ -102,16 +88,20 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             var factory = BootstrapContext.Advanced.FrameworkServices.GetRequiredService<IModuleContextFactory<TModule>>();
             return factory.CreateModuleContext(BootstrapContext, services);
         }
-
-        public virtual (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost(ModuleHostingOptions options)
+        
+        public virtual void BootstrapHost(BootstrapModuleHostCommand<TModule> command)
         {
+            if (command.Host != null)
+                return;
+
+            BootstrapContext = command.BootstrapContext;
+
             var builder = CreateHostBuilder();
 
-            options.ConfigureBuilderAction?.Invoke(builder);
-            var host = builder.Build();
+            command.Options.ConfigureBuilderAction?.Invoke(builder);
+            command.Host = builder.Build();
+            command.ModuleContext = CreateModuleContext(command.Host.Services);
 
-            var context = CreateModuleContext(host.Services);
-            return (host, context);
         }
     }
 }

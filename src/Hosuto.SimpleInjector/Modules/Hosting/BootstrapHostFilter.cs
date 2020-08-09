@@ -8,14 +8,8 @@ using SimpleInjector;
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class HostFactoryDecorator : IHostFactory
+    public class BootstrapHostFilter<TModule> : IBootstrapHostFilter<TModule> where TModule : IModule
     {
-        private readonly IHostFactory _decoratedHostFactory;
-
-        public HostFactoryDecorator(IHostFactory decoratedHostFactory)
-        {
-            _decoratedHostFactory = decoratedHostFactory;
-        }
 
         private static void UseSimpleInjector(IModuleContext moduleContext, SimpleInjectorUseOptions options)
         {
@@ -43,22 +37,25 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         }
 
-        public (IHost Host, IModuleContext<TModule> ModuleContext) CreateHost<TModule>(IModuleBootstrapContext<TModule> bootstrapContext, ModuleHostingOptions options) where TModule : IModule
-        {
-            var (host,moduleContext) = _decoratedHostFactory.CreateHost(bootstrapContext, options);
-            if (!(moduleContext is ModuleContextWithContainer<TModule> context)) return (host, moduleContext);
 
-            var container = context.Container;
-            host.UseSimpleInjector(container, o => UseSimpleInjector(moduleContext, o));
-            ConfigureContainer(moduleContext, container);
-            container.RegisterInstance((IServiceProvider) container);
 
-            options.ConfigureContextCalled = true;
-            options.ConfigureContextAction?.Invoke(moduleContext);
+        public Action<BootstrapModuleHostCommand<TModule>> Invoke(Action<BootstrapModuleHostCommand<TModule>> next) =>
+            (command) =>
+            {
+                next(command);
 
-            container.Verify();
+                if (!(command.ModuleContext is ModuleContextWithContainer<TModule> context)) return;
 
-            return (host, moduleContext);
-        }
+                var container = context.Container;
+                command.Host.UseSimpleInjector(container, o => UseSimpleInjector(command.ModuleContext, o));
+                ConfigureContainer(command.ModuleContext, container);
+                container.RegisterInstance((IServiceProvider) container);
+
+                command.Options.ConfigureContextCalled = true;
+                command.Options.ConfigureContextAction?.Invoke(command.ModuleContext);
+
+                container.Verify();
+
+            };
     }
 }
