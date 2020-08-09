@@ -83,6 +83,9 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         {
             var hostBuilderContext = BootstrapContext.Advanced.FrameworkServices.GetRequiredService<HostBuilderContext>();
 
+            if (BootstrapContext.Module.Name == null)
+                return hostBuilderContext.HostingEnvironment.ContentRootPath;
+
             var pathCandidate = Path.Combine(hostBuilderContext.HostingEnvironment
                     .ContentRootPath, "..", BootstrapContext.Module.Name);
 

@@ -6,6 +6,14 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
     <PackageReference Include="Moq" Version="4.14.5" />
@@ -15,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Hosuto.Hosting.AspNetCore\Hosuto.Hosting.AspNetCore.csproj" />
     <ProjectReference Include="..\..\src\Hosuto.Hosting\Hosuto.Hosting.csproj" />
     <ProjectReference Include="..\..\src\Hosuto.SimpleInjector\Hosuto.SimpleInjector.csproj" />
   </ItemGroup>
