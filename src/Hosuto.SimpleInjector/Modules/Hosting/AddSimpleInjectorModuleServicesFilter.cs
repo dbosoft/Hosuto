@@ -12,6 +12,8 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         public Action<IModulesHostBuilderContext, IServiceCollection> Invoke(Action<IModulesHostBuilderContext, IServiceCollection> next) =>
             (context, services) =>
             {
+                next(context, services);
+
                 if (context.Advanced.RootContext is ISimpleInjectorModuleContext containerContext)
                 {
                     services.AddSimpleInjector(containerContext.Container, options =>
@@ -23,12 +25,11 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                             {
                                 ModuleMethodInvoker.CallOptionalMethod(containerContext, "AddSimpleInjector", o);
 
-                            });
+                            })(context, options);
 
                     });
                 }
 
-                next(context, services);
             };
     }
 }
