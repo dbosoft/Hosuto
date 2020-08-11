@@ -23,7 +23,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                             {
                                 ModuleMethodInvoker.CallOptionalMethod(containerContext, "AddSimpleInjector", o);
 
-                            });
+                            })(context, options);
 
                     });
                 }
