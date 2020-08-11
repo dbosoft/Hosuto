@@ -1,12 +1,18 @@
 ## Hosuto
 Advanced application hosting with .NET Generic Host and Asp.Net Core
 
+Stable                     |  Latest                   |  Build Status
+---------------------------|---------------------------|---------------------------
+[![NuGet stable](https://img.shields.io/nuget/v/Dbosoft.Hosuto.svg?style=flat-square)](https://www.nuget.org/packages/Dbosoft.Hosuto) | [![NuGet pre](https://img.shields.io/nuget/vpre/Dbosoft.Hosuto.svg?style=flat-square)](https://www.nuget.org/packages/Dbosoft.Hosuto) | [![Build Status](https://dev.azure.com/dbosoft/public/_apis/build/status/dbosoft.Hosuto?branchName=master)](https://dev.azure.com/dbosoft/public/_build/latest?definitionId=32&branchName=master)
+
+
 ### Description
 
 Hosuto contains currently the following features to extend .NET Generic Host: 
 
 - **Modules**: The Hosuto module system allows you to setup multiple independed hosts within a single application. Modules can share configuration and a DI container for global settings and interaction. The module system supports both .NET Generic host and Asp.Net Core 2.1 and higher. 
 - **Hosted Services extensions**: Hosuto contains extensions methods to simplify the use of hosted services in Generic Hosts and Asp.Net Core Hosts. 
+
 
 ### Platforms & Prerequisites
 
