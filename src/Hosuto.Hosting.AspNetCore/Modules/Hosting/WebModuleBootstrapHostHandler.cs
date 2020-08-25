@@ -1,18 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Dbosoft.Hosuto.Modules.Hosting.Internal;
+using HostingEnvironment = Microsoft.Extensions.Hosting.Internal.HostingEnvironment;
 #if !NETCOREAPP
 using Microsoft.AspNetCore.Hosting.Internal;
-using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
-using HostingEnvironment = Microsoft.Extensions.Hosting.Internal.HostingEnvironment;
 #endif
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
@@ -41,7 +40,6 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                 .GetServices<IWebModuleWebHostBuilderFilter>();
 
             var moduleAssemblyName = BootstrapContext.Module.GetType().Assembly.GetName().Name;
-            IModuleContext<TModule> moduleContext = null;
 
 
 #if NETCOREAPP
@@ -61,7 +59,19 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                         new DelegateWebModuleWebHostBuilderFilter((_, webHostBuilder) =>
                         {
                             webHostBuilder.ConfigureAppConfiguration(
-                                (ctx, b) => { ctx.HostingEnvironment.ApplicationName = moduleAssemblyName; });
+                                (ctx, b) =>
+                                {
+                                    ctx.HostingEnvironment.ApplicationName = moduleAssemblyName;
+                                });
+
+                            webHostBuilder.ConfigureServices((ctx, services) =>
+                            {
+                                // ReSharper disable once ConvertToUsingDeclaration
+                                using(var tempServiceProvider = services.BuildServiceProvider())
+                                {
+                                    ConfigureServices(WebContextToHostBuilderContext(ctx), services, tempServiceProvider);
+                                }
+                            });
                         })
                     }.Union(webHostBuilderFilters)
                     .Append(
@@ -70,9 +80,9 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                             webHostBuilder.Configure(app =>
                             {
                                 // ReSharper disable once AccessToModifiedClosure
-                                Configure(moduleContext, app);
+                                Configure(command.ModuleContext, app);
                             });
-                        })));
+                        })).Reverse());
 
             command.Options.ConfigureBuilderAction?.Invoke(builder);
 
@@ -124,7 +134,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             webHostBuilder.Configure(app =>
                 {
                     // ReSharper disable once AccessToModifiedClosure
-                    Configure(moduleContext, app);
+                    Configure(command.ModuleContext, app);
 
                 });
 
@@ -138,7 +148,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         }
 
-#if NETSTANDARD
+
         private static HostBuilderContext WebContextToHostBuilderContext(WebHostBuilderContext webContext)
         {
             return new HostBuilderContext(new Dictionary<object, object> { { "WebHostBuilderContext", webContext } })
@@ -153,7 +163,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                 }
             };
         }
-        
+#if NETSTANDARD
         private static Action<IServiceCollection> BuildConfigureServicesFilterPipeline(IServiceProvider serviceProvider,  Action<IServiceCollection> configureServices)
         {
             return (services =>

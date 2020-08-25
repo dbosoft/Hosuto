@@ -52,16 +52,6 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
             });
 
-            
-            builder.ConfigureServices((ctx, services) =>
-            {
-                // ReSharper disable once ConvertToUsingDeclaration
-                using(var tempServiceProvider = services.BuildServiceProvider())
-                {
-                    ConfigureServices(ctx, services, tempServiceProvider);
-                }
-            });
-
             return builder;
         }
 
@@ -97,6 +87,16 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             BootstrapContext = command.BootstrapContext;
 
             var builder = CreateHostBuilder();
+
+            builder.ConfigureServices((ctx, services) =>
+            {
+                // ReSharper disable once ConvertToUsingDeclaration
+                using (var tempServiceProvider = services.BuildServiceProvider())
+                {
+                    ConfigureServices(ctx, services, tempServiceProvider);
+                }
+            });
+
 
             command.Options.ConfigureBuilderAction?.Invoke(builder);
             command.Host = builder.Build();
