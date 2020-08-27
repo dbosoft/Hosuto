@@ -24,7 +24,7 @@ Hosuto supports .NET Standard 2.0 or higher and Asp.Net Core >= 2.1 and <= 3.1.
 The easiest way to get started is by installing [the available NuGet package](https://www.nuget.org/packages/Dbosoft.Hosuto). 
 Take a look at the [Wiki](https://github.com/dbosoft/Hosuto/wiki) learning how to configure and use Hosuto.
 
-To see a full example see the [sample](https://github.com/dbosoft/Hosuto/tree/master/samples) folder of the repository. 
+To see a full example see the [samples](https://github.com/dbosoft/Hosuto/tree/master/samples) folder of the repository. 
 
 
 ### Versioning
