@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <RootNamespace>Dbosoft.Hosuto.Sample</RootNamespace>
+    <AssemblyName>Dbosoft.Hosuto.Samples.WebModule</AssemblyName>
+    <OutputType>Library</OutputType>
+    <IsPackable>false</IsPackable>
+
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Hosuto\Hosuto.csproj" />
+    <ProjectReference Include="..\..\shared\Hosuto.Samples.Common\Hosuto.Samples.Common.csproj" />
+  </ItemGroup>
+
+</Project>

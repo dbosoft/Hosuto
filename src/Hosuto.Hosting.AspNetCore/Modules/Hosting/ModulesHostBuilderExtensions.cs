@@ -6,7 +6,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 {
     public static class ModulesHostBuilderExtensions
     {
-#if NETCOREAPP
+#if NETCOREAPP || NET50
 
         public static IModulesHostBuilder ConfigureWebHostDefaults(this IModulesHostBuilder builder, Action<Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure)
         {
