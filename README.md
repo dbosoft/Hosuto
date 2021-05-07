@@ -8,11 +8,14 @@ Stable                     |  Latest                   |  Build Status
 
 ### Description
 
+Hosuto is targeting microservice architectures, where services can be easily distributed as a single (micro) service or bundled into larger applications. 
+
+To support service bundling it extends the default .NET host framework by to capability to run multiple host in parallal. In addition the hosts can share common objects like configuration, hosting environment or a shared DI container. 
+
 Hosuto contains currently the following features to extend .NET Generic Host: 
 
 - **Modules**: The Hosuto module system allows you to setup multiple independed hosts within a single application. Modules can share configuration and a DI container for global settings and interaction. The module system supports both .NET Generic host and Asp.Net Core 2.1 and higher. 
 - **Hosted Services extensions**: Hosuto contains extensions methods to simplify the use of hosted services in Generic Hosts and Asp.Net Core Hosts. 
-
 
 ### Platforms & Prerequisites
 
