@@ -51,10 +51,13 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         public IModulesHostBuilder ConfigureAppConfiguration(Action<HostBuilderContext, IConfigurationBuilder> configureDelegate)
         {
-            //only configure the innerBuilder. Generated config will be shared with modules and for module configuration 
-            //there is the method ConfigureModuleConfiguration
-
             _innerBuilder.ConfigureAppConfiguration(configureDelegate);
+
+            ConfigureFrameworkServices((ctx, services) =>
+            {
+                services.AddTransient<IModuleConfigurationFilter>(sp =>
+                    new DelegateModuleHostBuilderConfigurationConfigurer(configureDelegate));
+            });
 
             return this;
         }
@@ -66,7 +69,6 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         public IModulesHostBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configureDelegate)
         {
-            // services applied here will be added to inner builder and to all modules
             _innerBuilder.ConfigureServices(configureDelegate);
 
             ConfigureFrameworkServices((ctx, services) =>

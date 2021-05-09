@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "App": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "right",
+        "ASPNETCORE_ENVIRONMENT": "wrong"
+      }
+    }
+  }
+}
