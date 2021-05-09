@@ -11,7 +11,6 @@ jobs:
       - name: Create Release Notes
         uses: docker://decathlon/release-notes-generator-action:2.0.1
         env:
-          GH_PAT: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
           OUTPUT_FOLDER: temp_release_notes
           USE_MILESTONE_TITLE: "true"
-          SKIP_MD: README.md
