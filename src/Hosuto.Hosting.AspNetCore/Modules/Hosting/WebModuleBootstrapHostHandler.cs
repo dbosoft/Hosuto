@@ -83,6 +83,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                                 Configure(command.ModuleContext, app);
                             });
                         })).Reverse());
+            ApplyConfiguration(builder);
 
             command.Options.ConfigureBuilderAction?.Invoke(builder);
 
