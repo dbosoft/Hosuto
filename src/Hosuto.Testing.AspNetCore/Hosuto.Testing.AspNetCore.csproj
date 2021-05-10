@@ -4,6 +4,7 @@
     <TargetFrameworks>netcoreapp3.0;netstandard2.0;net5.0</TargetFrameworks>
     <AssemblyName>Dbosoft.Hosuto.Testing.AspNetCore</AssemblyName>
     <RootNamespace>Dbosoft.Hosuto</RootNamespace>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
 
   <Import Project="..\..\build\pack.props" />
