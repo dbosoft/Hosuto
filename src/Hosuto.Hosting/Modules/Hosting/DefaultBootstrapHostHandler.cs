@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Dbosoft.Hosuto.Modules.Hosting.Internal;
@@ -27,39 +26,31 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                 (BootstrapContext.ToModuleHostBuilderContext(hostBuilderContext), services);
         }
 
-        protected virtual void ApplyConfiguration(IHostBuilder builder)
+
+        protected virtual IHostBuilder CreateHostBuilder()
         {
-            
+            var builder = new HostBuilder();
             var hostBuilderContext = BootstrapContext.Advanced.FrameworkServices.GetRequiredService<HostBuilderContext>();
-            var moduleAssemblyName = BootstrapContext.Module.GetType().Assembly.GetName().Name;
 
             builder.ConfigureHostConfiguration((configure) =>
             {
+                configure.Sources.Clear();
                 configure.AddConfiguration(hostBuilderContext.Configuration);
-                configure.AddInMemoryCollection(new[]
-                {
-                    new KeyValuePair<string, string>(HostDefaults.ApplicationKey,moduleAssemblyName)
-                });
-
             });
 
             builder.UseContentRoot(GetContentRoot());
 
+            var moduleAssemblyName = BootstrapContext.Module.GetType().Assembly.GetName().Name;
 
             builder.ConfigureAppConfiguration((ctx, config) =>
             {
+                ctx.HostingEnvironment.ApplicationName = moduleAssemblyName;
+
                 Filters.BuildFilterPipeline(
                     BootstrapContext.Advanced.FrameworkServices.GetServices<IModuleConfigurationFilter>(),
                     (_, __) => { })(BootstrapContext.ToModuleHostBuilderContext(ctx), config);
 
             });
-
-        }
-
-
-        protected virtual IHostBuilder CreateHostBuilder()
-        {
-            var builder = new HostBuilder();
 
             return builder;
         }
@@ -96,7 +87,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             BootstrapContext = command.BootstrapContext;
 
             var builder = CreateHostBuilder();
-            ApplyConfiguration(builder);
+
             builder.ConfigureServices((ctx, services) =>
             {
                 // ReSharper disable once ConvertToUsingDeclaration
