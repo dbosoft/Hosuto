@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Dbosoft.Hosuto.Modules.Hosting.Internal;
 using HostingEnvironment = Microsoft.Extensions.Hosting.Internal.HostingEnvironment;
 #if !NETCOREAPP
 using Microsoft.AspNetCore.Hosting.Internal;
-using Microsoft.Extensions.Configuration;
+using System.IO;
 #endif
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
