@@ -53,6 +53,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleWebModule", "samples\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "App", "samples\dotnet50\App\App.csproj", "{1BFA0E1B-556C-49DA-81F0-1067FAD97458}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RazorLibrary", "samples\dotnet50\RazorLibrary\RazorLibrary.csproj", "{71E30ED2-53D6-4A9D-B541-4255D88E97AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -127,6 +129,10 @@ Global
 		{1BFA0E1B-556C-49DA-81F0-1067FAD97458}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1BFA0E1B-556C-49DA-81F0-1067FAD97458}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1BFA0E1B-556C-49DA-81F0-1067FAD97458}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71E30ED2-53D6-4A9D-B541-4255D88E97AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71E30ED2-53D6-4A9D-B541-4255D88E97AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71E30ED2-53D6-4A9D-B541-4255D88E97AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71E30ED2-53D6-4A9D-B541-4255D88E97AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -144,6 +150,7 @@ Global
 		{F03A55C6-AB61-4A07-8E06-A742A1E9F625} = {0C4A607E-2CBA-4333-83AF-A509FDB38FDB}
 		{1C6AD780-6DC3-4AF1-AB4E-51ABC1FC3A75} = {F03A55C6-AB61-4A07-8E06-A742A1E9F625}
 		{1BFA0E1B-556C-49DA-81F0-1067FAD97458} = {F03A55C6-AB61-4A07-8E06-A742A1E9F625}
+		{71E30ED2-53D6-4A9D-B541-4255D88E97AD} = {F03A55C6-AB61-4A07-8E06-A742A1E9F625}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C7C4A16F-35F6-40CB-9F59-B48D0757FA7C}
