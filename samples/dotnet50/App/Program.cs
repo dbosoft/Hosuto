@@ -14,7 +14,7 @@ namespace Dbosoft.Hosuto.Sample
 
             // you can configure a module host builder like a host builder.
             // All configurations set with ConfigureHostConfiguration will be shared between all modules.
-            builder.UseEnvironment(Environments.Development);
+            //builder.UseEnvironment(Environments.Development);
 
             //here we add a ServiceCollection to build a DI container that is available for all modules. 
             var sc = new ServiceCollection();
@@ -25,6 +25,9 @@ namespace Dbosoft.Hosuto.Sample
             builder.UseAspNetCoreWithDefaults((module, webBuilder) =>
             {
             });
+
+            
+
             var host = builder.Build();
             var test = host.Services.GetService<IMessageDispatcher>();
             var module = host.Services.GetService<SampleWebModule>();

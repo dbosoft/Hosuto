@@ -26,7 +26,7 @@ namespace Dbosoft.Hosuto.Sample
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceProvider serviceProvider, IServiceCollection services)
+        public void ConfigureServices(IServiceProvider serviceProvider, IServiceCollection services, IConfiguration configuration)
         {
 
             services.AddSingleton(serviceProvider.GetRequiredService<IMessageDispatcher>());

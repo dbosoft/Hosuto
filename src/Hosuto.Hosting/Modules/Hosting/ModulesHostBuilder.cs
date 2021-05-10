@@ -51,6 +51,8 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         public IModulesHostBuilder ConfigureAppConfiguration(Action<HostBuilderContext, IConfigurationBuilder> configureDelegate)
         {
+            _innerBuilder.ConfigureAppConfiguration(configureDelegate);
+
             ConfigureFrameworkServices((ctx, services) =>
             {
                 services.AddTransient<IModuleConfigurationFilter>(sp =>
@@ -67,6 +69,8 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         public IModulesHostBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configureDelegate)
         {
+            _innerBuilder.ConfigureServices(configureDelegate);
+
             ConfigureFrameworkServices((ctx, services) =>
             {
                 services.AddTransient<IModuleServicesFilter>(sp =>
@@ -211,7 +215,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         private void AddModuleContextAccessor()
         {
-            ConfigureServices((ctx, services) =>
+            ((IHostBuilder)this).ConfigureServices((ctx, services) =>
             {
                 services.AddSingleton<IModuleContextAccessor, ModuleContextAccessor>();
             });
