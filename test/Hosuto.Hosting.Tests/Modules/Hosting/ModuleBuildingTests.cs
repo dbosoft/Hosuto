@@ -94,6 +94,10 @@ namespace Hosuto.Hosting.Tests.Modules.Hosting
             public string Environment { get; private set; }
             public IConfiguration Configuration { get; private set; }
 
+            public SomeModule(IConfiguration appConfiguration)
+            {
+                
+            }
 
 #pragma warning disable 618
             public void ConfigureServices(IServiceCollection services, IHostingEnvironment environment, IConfiguration configuration)

@@ -1,11 +1,34 @@
 {
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:51225/",
+      "sslPort": 44353
+    }
+  },
   "profiles": {
-    "App": {
+    "SAPHub.ApiEndpoint": {
       "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "http://localhost:8000",
       "environmentVariables": {
-        "DOTNET_ENVIRONMENT": "right",
-        "ASPNETCORE_ENVIRONMENT": "wrong"
-      }
+        "DOTNET_ENVIRONMENT": "Development",
+        "SAPHUB_ENDPOINTS__api": "http://localhost:8000",
+        "SAPHUB_BUS__type": "inmemory"
+      },
+      "applicationUrl": ""
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://localhost:80"
+      },
+      "publishAllPorts": true,
+      "useSSL": true
     }
   }
 }
