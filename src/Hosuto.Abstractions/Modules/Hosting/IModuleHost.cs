@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
 
-    public interface IModuleHost<TModule> : IHost where TModule : IModule
+    public interface IModuleHost<TModule> : IHost where TModule : class
     {
         IModuleContext<TModule> ModuleContext { get;  }
     } 

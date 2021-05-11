@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public class ModulesHostService<TModule> : IHostedService where TModule : IModule
+    public class ModulesHostService<TModule> : IHostedService where TModule : class
     {
         private readonly IModuleHost<TModule> _moduleHost;
 

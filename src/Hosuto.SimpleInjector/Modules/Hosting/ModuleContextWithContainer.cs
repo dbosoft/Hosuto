@@ -4,7 +4,7 @@ using SimpleInjector.Lifestyles;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    internal class ModuleContextWithContainer<TModule> : ModuleContext<TModule>, ISimpleInjectorModuleContext where TModule : IModule
+    internal class ModuleContextWithContainer<TModule> : ModuleContext<TModule>, ISimpleInjectorModuleContext where TModule : class
     {
         public Container Container { get; }
         

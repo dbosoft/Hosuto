@@ -5,7 +5,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 {
     public interface IModulesHostBuilderContext
     {
-        IModule Module { get; }
+        object Module { get; }
         IServiceProvider ModulesHostServices { get; }
 
         HostBuilderContext HostBuilderContext { get; }
@@ -14,7 +14,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
     }
 
-    public interface IModulesHostBuilderContext<TModule> : IModulesHostBuilderContext where TModule : IModule
+    public interface IModulesHostBuilderContext<TModule> : IModulesHostBuilderContext where TModule : class
     {
         new TModule Module { get; }
     }

@@ -2,6 +2,6 @@
 {
     public interface IWebModuleWebHostBuilderFactory
     {
-        Microsoft.AspNetCore.Hosting.IWebHostBuilder CreateWebHost(WebModule module);
+        Microsoft.AspNetCore.Hosting.IWebHostBuilder CreateWebHost(IWebModule module);
     }
 }

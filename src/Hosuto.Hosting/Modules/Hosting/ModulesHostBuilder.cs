@@ -18,7 +18,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         private bool _hostBuilt;
         private readonly IHostBuilder _innerBuilder = new HostBuilder();
         
-        public IModulesHostBuilder HostModule<TModule>(Action<IModuleHostingOptions> options = null) where TModule : class, IModule
+        public IModulesHostBuilder HostModule<TModule>(Action<IModuleHostingOptions> options = null) where TModule : class
         {
             HostModule(typeof(TModule), options);
             return this;

@@ -2,7 +2,7 @@
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public interface IWebModuleWebHostBuilderFilter : IFilter<WebModule, IWebHostBuilder>
+    public interface IWebModuleWebHostBuilderFilter : IFilter<IWebModule, IWebHostBuilder>
     {
     }
 }

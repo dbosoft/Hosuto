@@ -6,7 +6,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
     {
     }
 
-    public interface IConfigureContainerFilter<TModule> : IFilter<IModuleContext<TModule>, Container> where TModule : IModule
+    public interface IConfigureContainerFilter<TModule> : IFilter<IModuleContext<TModule>, Container> where TModule : class
     {
     }
 }

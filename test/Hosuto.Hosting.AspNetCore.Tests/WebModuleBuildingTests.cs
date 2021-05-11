@@ -160,9 +160,8 @@ namespace Hosuto.Hosting.AspNetCore.Tests
         }
 
 
-        private class OtherModule : IModule
+        private class OtherModule
         {
-            public string Name => "I'm a module, too";
             public SomeWebModule SomeModule { get; private set;  }
 
             public void ConfigureServices(IServiceProvider sp, IServiceCollection services)

@@ -2,13 +2,12 @@
 using System.Linq;
 using Dbosoft.Hosuto.Modules.Hosting.Internal;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using SimpleInjector;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class BootstrapHostFilter<TModule> : IBootstrapHostFilter<TModule> where TModule : IModule
+    public class BootstrapHostFilter<TModule> : IBootstrapHostFilter<TModule> where TModule : class
     {
 
         private static void UseSimpleInjector(IModuleContext moduleContext, SimpleInjectorUseOptions options)

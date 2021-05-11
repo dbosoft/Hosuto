@@ -8,7 +8,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
 
     public class GenericModuleContextFilterAdapter<TFilter, TModule, T1> : IFilter<IModuleContext, T1> 
-        where TModule : IModule 
+        where TModule : class
         where TFilter : IFilter<IModuleContext<TModule>, T1>
     {
         public Action<IModuleContext, T1> Invoke(Action<IModuleContext, T1> next) =>

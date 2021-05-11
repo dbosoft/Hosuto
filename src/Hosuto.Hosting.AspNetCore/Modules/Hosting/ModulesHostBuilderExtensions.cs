@@ -25,7 +25,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         }
 
 
-        public static IModulesHostBuilder UseAspNetCoreWithDefaults(this IModulesHostBuilder builder, Action<WebModule, Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure = null)
+        public static IModulesHostBuilder UseAspNetCoreWithDefaults(this IModulesHostBuilder builder, Action<IWebModule, Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure = null)
         {
             builder.ConfigureFrameworkServices((ctx, services) =>
             {
@@ -38,7 +38,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         }
 
         public static IModulesHostBuilder UseAspNetCore(this IModulesHostBuilder builder,
-            Action<WebModule, Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure = null)
+            Action<IWebModule, Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure = null)
         {
             builder.ConfigureFrameworkServices((ctx, services) =>
             {
@@ -54,7 +54,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         }
 
 #else
-        public static IModulesHostBuilder UseAspNetCore(this IModulesHostBuilder builder, Func<Microsoft.AspNetCore.Hosting.IWebHostBuilder> webHostBuilder, Action<WebModule, Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure = null)
+        public static IModulesHostBuilder UseAspNetCore(this IModulesHostBuilder builder, Func<Microsoft.AspNetCore.Hosting.IWebHostBuilder> webHostBuilder, Action<IWebModule, Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure = null)
         {
             if (webHostBuilder == null) throw new ArgumentNullException(nameof(webHostBuilder));
 
@@ -68,7 +68,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             return ConfigureAspNetCore(builder,configure);
         }
 
-        public static IModulesHostBuilder ConfigureAspNetCore(this IModulesHostBuilder builder, Action<WebModule, Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure)
+        public static IModulesHostBuilder ConfigureAspNetCore(this IModulesHostBuilder builder, Action<IWebModule, Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure)
         {
             if (configure == null) throw new ArgumentNullException(nameof(configure));
 

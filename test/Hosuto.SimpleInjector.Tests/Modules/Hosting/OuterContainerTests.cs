@@ -1,5 +1,4 @@
 ﻿using System;
-using Dbosoft.Hosuto.Modules;
 using Dbosoft.Hosuto.Modules.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -36,7 +35,7 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
             void CallMe();
         }
 
-        private class SomeModule : IModule
+        private class SomeModule
         {
             public string Name => "I'm a module";
 

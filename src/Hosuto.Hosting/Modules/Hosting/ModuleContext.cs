@@ -2,7 +2,7 @@
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public class ModuleContext<TModule> : IModuleContext<TModule>, IModuleBootstrapContext<TModule> where TModule : IModule
+    public class ModuleContext<TModule> : IModuleContext<TModule>, IModuleBootstrapContext<TModule> where TModule : class
     {
         public ModuleContext(TModule module, IServiceProvider moduleServices, IServiceProvider modulesHostServices, IServiceProvider frameworkServices, object rootContext = null)
         {

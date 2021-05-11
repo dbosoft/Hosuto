@@ -25,10 +25,8 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
 
 
 
-        public class SomeModule : IModule
+        public class SomeModule
         {
-            public string Name => "I'm a module";
-
 
 #pragma warning disable 618
             public virtual void ConfigureContainer(Container container, IHostingEnvironment env)

@@ -9,7 +9,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting.Internal
 
     }
 
-    public interface IModuleHost<TModule> : Hosting.IModuleHost<TModule>,  IModuleHost where TModule : IModule
+    public interface IModuleHost<TModule> : Hosting.IModuleHost<TModule>,  IModuleHost where TModule : class
     {
 
     }
