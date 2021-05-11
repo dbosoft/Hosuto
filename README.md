@@ -32,7 +32,10 @@ To see a full example see the [samples](https://github.com/dbosoft/Hosuto/tree/m
 
 ### Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/dbosoft/Hosuto/tags). 
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/dbosoft/Hosuto/tags).  
+
+**Warning:**
+Version 1.0 is still not released, that means that new minor versions can include breaking changes!
 
 ### Authors
 
