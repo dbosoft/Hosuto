@@ -2,7 +2,7 @@
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public class DefaultModuleContextFactory<TModule> : IModuleContextFactory<TModule> where TModule : IModule
+    public class DefaultModuleContextFactory<TModule> : IModuleContextFactory<TModule> where TModule : class
     {
 
 

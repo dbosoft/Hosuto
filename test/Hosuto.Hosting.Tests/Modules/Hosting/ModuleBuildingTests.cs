@@ -88,9 +88,8 @@ namespace Hosuto.Hosting.Tests.Modules.Hosting
             Assert.NotNull(module.SomeModule);
         }
 
-        private class SomeModule : IModule
+        private class SomeModule
         {
-            public string Name => "I'm a module";
             public string Environment { get; private set; }
             public IConfiguration Configuration { get; private set; }
 
@@ -109,9 +108,8 @@ namespace Hosuto.Hosting.Tests.Modules.Hosting
 
         }
 
-        private class OtherModule : IModule
+        private class OtherModule
         {
-            public string Name => "I'm a module, too";
             public SomeModule SomeModule { get; private set;  }
 
             public void ConfigureServices(IServiceProvider sp, IServiceCollection services)

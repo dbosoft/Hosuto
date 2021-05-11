@@ -10,7 +10,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public class DefaultBootstrapHostHandler<TModule> where TModule : IModule
+    public class DefaultBootstrapHostHandler<TModule> where TModule : class
     {
 
         public IModuleBootstrapContext<TModule> BootstrapContext { get; set; }

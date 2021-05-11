@@ -6,7 +6,7 @@ using SimpleInjector.Lifestyles;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    internal class ModuleContextFactory<TModule> : IModuleContextFactory<TModule> where TModule: IModule
+    internal class ModuleContextFactory<TModule> : IModuleContextFactory<TModule> where TModule: class
     {
 
         public IModuleContext<TModule> CreateModuleContext(IModuleBootstrapContext<TModule> bootstrapContext, IServiceProvider moduleServices)

@@ -2,7 +2,7 @@
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public interface IModuleBootstrapContext<TModule> where TModule : IModule
+    public interface IModuleBootstrapContext<TModule> where TModule : class
     {
         TModule Module { get; }
         IServiceProvider ModulesHostServices { get; }

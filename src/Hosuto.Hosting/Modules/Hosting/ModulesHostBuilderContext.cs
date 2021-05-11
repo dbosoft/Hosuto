@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public class ModulesHostBuilderContext<TModule> : IModulesHostBuilderContext<TModule> where TModule : IModule
+    public class ModulesHostBuilderContext<TModule> : IModulesHostBuilderContext<TModule> where TModule : class
     {
         private readonly IModuleBootstrapContext<TModule> _bootstrapContext;
 
@@ -25,6 +25,6 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         public IAdvancedModuleContext Advanced { get; }
 
 
-        IModule IModulesHostBuilderContext.Module => Module;
+        object IModulesHostBuilderContext.Module => Module;
     }
 }

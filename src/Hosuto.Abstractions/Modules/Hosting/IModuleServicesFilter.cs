@@ -8,7 +8,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
     {
     }
 
-    public interface IModuleServicesFilter<TModule> : IFilter<IModulesHostBuilderContext<TModule>, IServiceCollection> where TModule : IModule
+    public interface IModuleServicesFilter<TModule> : IFilter<IModulesHostBuilderContext<TModule>, IServiceCollection> where TModule : class
     {
     }
 }

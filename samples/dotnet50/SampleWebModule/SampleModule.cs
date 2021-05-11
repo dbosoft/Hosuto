@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Dbosoft.Hosuto.Sample
 {
-    public class SampleWebModule : WebModule
+    public class SampleWebModule : IWebModule
     {
         public SampleWebModule(IConfiguration configuration)
         {
@@ -64,8 +64,7 @@ namespace Dbosoft.Hosuto.Sample
             });
         }
 
-        public override string Name => "SampleWebModule";
-        public override string Path => "/sample";
+        public string Path => "/sample";
 
         private static T GetServiceFromCollection<T>(IServiceCollection services)
 

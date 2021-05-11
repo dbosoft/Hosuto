@@ -11,7 +11,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting.Internal
 
         public Action<IModuleContext> ConfigureContextAction { get; private set; }
 
-        public Func<IServiceProvider, IModule> ModuleFactory { get; private set; }
+        public Func<IServiceProvider, object> ModuleFactory { get; private set; }
 
         public bool ConfigureContextCalled { get; set; }
 
@@ -41,7 +41,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting.Internal
             return this;
         }
 
-        public IModuleHostingOptions ModuleFactoryCallback(Func<IServiceProvider, IModule> moduleFactory)
+        public IModuleHostingOptions ModuleFactoryCallback(Func<IServiceProvider, object> moduleFactory)
         {
             ModuleFactory = moduleFactory;
             return this;

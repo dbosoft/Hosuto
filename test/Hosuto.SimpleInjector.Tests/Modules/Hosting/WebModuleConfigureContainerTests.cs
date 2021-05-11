@@ -53,7 +53,7 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
 
         }
 
-        private void BuildAndVerifyModuleMock<TModule>(Mock<TModule> moduleMock, Container container = null) where TModule : class, IModule
+        private void BuildAndVerifyModuleMock<TModule>(Mock<TModule> moduleMock, Container container = null) where TModule : class
         {
             var builder = ModulesHost.CreateDefaultBuilder();
 
@@ -102,7 +102,6 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
 
         public class ModuleWithConfigureContainer : WebModule
         {
-            public override string Name  => nameof(ModuleWithConfigureContainer);
             public override string Path { get; } = "";
 
 
@@ -113,7 +112,6 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
 
         public  class ModuleWithConfigureContainerAndInjection : WebModule
         {
-            public override string Name => nameof(ModuleWithConfigureContainerAndInjection);
             public override string Path { get; } = "";
 
 
@@ -128,8 +126,6 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
         public class ModuleWithConfigureContainerAndServiceProvider : WebModule
         {
             public override string Path { get; } = "";
-            public override string Name => nameof(ModuleWithConfigureContainerAndServiceProvider);
-
             public virtual void ConfigureContainer(IServiceProvider sp, Container container){}
         }
 
