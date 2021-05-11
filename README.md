@@ -14,7 +14,7 @@ To support service bundling it extends the [.NET generic host](https://docs.micr
 
 Hosuto contains currently the following features to extend .NET Generic Host: 
 
-- **Modules**: The Hosuto module system allows you to setup multiple independed hosts within a single application. Modules can share configuration and a DI container for global settings and interaction. The module system supports both .NET Generic host and Asp.Net Core 2.1 and higher. 
+- **Modules**: The Hosuto module system allows you to setup multiple independed hosts within a single application. Modules can share configuration and a DI container for global settings and interaction. The module system supports both .NET Generic host and Asp.Net Core 2.1 and higher. See [wiki](https://github.com/dbosoft/Hosuto/wiki/Modules) how to configure and use modules. 
 - **Hosted Services extensions**: Hosuto contains extensions methods to simplify the use of hosted services in Generic Hosts and Asp.Net Core Hosts. 
 
 ### Platforms & Prerequisites
