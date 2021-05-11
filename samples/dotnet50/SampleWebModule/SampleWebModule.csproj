@@ -7,6 +7,7 @@
     <AssemblyName>Dbosoft.Hosuto.Samples.WebModule</AssemblyName>
     <OutputType>Library</OutputType>
     <IsPackable>false</IsPackable>
+    <StaticWebAssetBasePath>.modules/$(AssemblyName)</StaticWebAssetBasePath>
 
   </PropertyGroup>
 
@@ -18,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Hosuto\Hosuto.csproj" />
     <ProjectReference Include="..\..\shared\Hosuto.Samples.Common\Hosuto.Samples.Common.csproj" />
+    <ProjectReference Include="..\RazorLibrary\RazorLibrary.csproj" />
   </ItemGroup>
 
 </Project>

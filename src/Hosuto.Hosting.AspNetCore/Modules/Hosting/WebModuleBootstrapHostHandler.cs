@@ -5,7 +5,7 @@ using Dbosoft.Hosuto.Modules.Hosting.Internal;
 using HostingEnvironment = Microsoft.Extensions.Hosting.Internal.HostingEnvironment;
 #if !NETCOREAPP
 using Microsoft.AspNetCore.Hosting.Internal;
-using Microsoft.Extensions.Configuration;
+using System.IO;
 #endif
 
 using Microsoft.AspNetCore.Builder;
@@ -72,16 +72,23 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                                     ConfigureServices(WebContextToHostBuilderContext(ctx), services, tempServiceProvider);
                                 }
                             });
+
+                            
                         })
                     }.Union(webHostBuilderFilters)
                     .Append(
                         new DelegateWebModuleWebHostBuilderFilter((_, webHostBuilder) =>
                         {
+                            AddModuleContent(webHostBuilder);
+
                             webHostBuilder.Configure(app =>
                             {
                                 // ReSharper disable once AccessToModifiedClosure
                                 Configure(command.ModuleContext, app);
+
                             });
+                            
+
                         })).Reverse());
             ApplyConfiguration(builder);
 
@@ -104,7 +111,10 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             var webHostBuilder = webHostBuilderFactory.CreateWebHost(BootstrapContext.Module as WebModule);
             var hostBuilderContext = BootstrapContext.Advanced.FrameworkServices.GetRequiredService<HostBuilderContext>();
             webHostBuilder.UseConfiguration(hostBuilderContext.Configuration);
-            webHostBuilder.UseContentRoot(GetContentRoot());
+            
+            if(hostBuilderContext.HostingEnvironment.IsDevelopment())
+                webHostBuilder.UseContentRoot(GetRelativeModulePath());
+
             webHostBuilder.ConfigureAppConfiguration((ctx, config) =>
             {
                 ctx.HostingEnvironment.ApplicationName = moduleAssemblyName;
@@ -149,6 +159,44 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         }
 
+#if NETCOREAPP
+        private void AddModuleContent(IWebHostBuilder webHostBuilder)
+        {
+            webHostBuilder.ConfigureAppConfiguration((ctx,config) =>
+            {
+
+                ModuleWebAssets.ModuleWebAssetsLoader
+                    .UseModuleAssets(ctx.HostingEnvironment, ctx.Configuration);
+                
+                if (!ctx.HostingEnvironment.IsDevelopment()) return;
+
+                var realHostEnv = BootstrapContext.ModulesHostServices.GetRequiredService<IHostEnvironment>();
+
+                ModuleWebAssets.ModuleWebAssetsLoader
+                    .UseStaticWebAssets(ctx.HostingEnvironment, ctx.Configuration, realHostEnv.ApplicationName);
+            });
+        }
+#endif
+
+#if NETSTANDARD
+        protected virtual string GetRelativeModulePath()
+        {
+            var hostBuilderContext = BootstrapContext.Advanced.FrameworkServices.GetRequiredService<HostBuilderContext>();
+
+            if (BootstrapContext.Module.Name == null)
+                return hostBuilderContext.HostingEnvironment.ContentRootPath;
+
+            var pathCandidate = Path.Combine(hostBuilderContext.HostingEnvironment
+                .ContentRootPath, "..", BootstrapContext.Module.Name);
+
+            if (!Directory.Exists(pathCandidate))
+                return hostBuilderContext.HostingEnvironment.ContentRootPath;
+
+
+            return Path.GetFullPath(pathCandidate);
+
+        }
+#endif
 
         private static HostBuilderContext WebContextToHostBuilderContext(WebHostBuilderContext webContext)
         {

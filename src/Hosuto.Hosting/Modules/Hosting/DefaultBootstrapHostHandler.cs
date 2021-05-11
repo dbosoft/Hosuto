@@ -43,9 +43,6 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
             });
 
-            builder.UseContentRoot(GetContentRoot());
-
-
             builder.ConfigureAppConfiguration((ctx, config) =>
             {
                 Filters.BuildFilterPipeline(
@@ -62,24 +59,6 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             var builder = new HostBuilder();
 
             return builder;
-        }
-
-        protected virtual string GetContentRoot()
-        {
-            var hostBuilderContext = BootstrapContext.Advanced.FrameworkServices.GetRequiredService<HostBuilderContext>();
-
-            if (BootstrapContext.Module.Name == null)
-                return hostBuilderContext.HostingEnvironment.ContentRootPath;
-
-            var pathCandidate = Path.Combine(hostBuilderContext.HostingEnvironment
-                    .ContentRootPath, "..", BootstrapContext.Module.Name);
-
-            if (!Directory.Exists(pathCandidate))
-                return hostBuilderContext.HostingEnvironment.ContentRootPath;
-
-
-            return Path.GetFullPath(pathCandidate);
-
         }
 
         protected virtual IModuleContext<TModule> CreateModuleContext(IServiceProvider services)
