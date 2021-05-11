@@ -43,7 +43,9 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
         {
             var moduleMock = new Mock<ModuleWithConfigureContainerAndInjection>();
             moduleMock.Setup(x => x.ConfigureContainer(
+#pragma warning disable 618
                 It.IsAny<Container>(), It.IsAny<IHostingEnvironment>())).Verifiable();
+#pragma warning restore 618
 
             BuildAndVerifyModuleMock(moduleMock);
 
@@ -100,7 +102,9 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
             public string Name => nameof(ModuleWithConfigureContainerAndInjection);
 
 
+#pragma warning disable 618
             public virtual void ConfigureContainer(Container container, IHostingEnvironment env)
+#pragma warning restore 618
             {}
 
         }
