@@ -22,7 +22,7 @@ namespace Dbosoft.Hosuto.Modules.Testing
     /// </summary>
     /// <typeparam name="TModule">A type in the entry point assembly of the application.
     /// Typically the Startup or Program classes can be used.</typeparam>
-    public class WebModuleFactory<TModule> : IDisposable where TModule : WebModule
+    public class WebModuleFactory<TModule> : IDisposable where TModule : class, IWebModule
     {
         private bool _disposed;
         private TestServer _server;

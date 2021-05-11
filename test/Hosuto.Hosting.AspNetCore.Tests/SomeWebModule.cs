@@ -24,8 +24,7 @@ namespace Hosuto.Hosting.AspNetCore.Tests
     {
         public IConfiguration HostConfiguration { get; }
         public IConfiguration Configuration { get; private set; }
-
-        public override string Name => "I'm a module";
+        
         public override string Path => "path";
 
 #if NETCOREAPP2_1

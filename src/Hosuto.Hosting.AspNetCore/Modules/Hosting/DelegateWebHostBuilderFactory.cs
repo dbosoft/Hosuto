@@ -13,7 +13,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             _creatorFunc = creatorFunc;
         }
 
-        public IWebHostBuilder CreateWebHost(WebModule module) => _creatorFunc();
+        public IWebHostBuilder CreateWebHost(IWebModule module) => _creatorFunc();
 
     }
 }

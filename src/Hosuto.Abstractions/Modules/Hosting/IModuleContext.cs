@@ -3,7 +3,7 @@
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
     // ReSharper disable once TypeParameterCanBeVariant
-    public interface IModuleContext<TModule> : IModuleContext where TModule : IModule
+    public interface IModuleContext<TModule> : IModuleContext where TModule : class
     {
         new TModule Module { get; }
 

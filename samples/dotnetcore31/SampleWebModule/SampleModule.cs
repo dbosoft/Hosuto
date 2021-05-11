@@ -64,7 +64,6 @@ namespace Dbosoft.Hosuto.Sample
             });
         }
 
-        public override string Name => "SampleWebModule";
         public override string Path => "/sample";
 
         private static T GetServiceFromCollection<T>(IServiceCollection services)

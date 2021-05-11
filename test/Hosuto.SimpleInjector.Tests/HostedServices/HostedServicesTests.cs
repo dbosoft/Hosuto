@@ -59,7 +59,7 @@ namespace Hosuto.SimpleInjector.Tests.HostedServices
             void CallMe();
         }
 
-        public class SomeModule : IModule
+        public class SomeModule
         {
             public string Name => "I'm a module";
 

@@ -2,7 +2,7 @@
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public class WebModuleBootstrapHostFilter<TModule> : IBootstrapHostFilter<TModule> where TModule : IModule
+    public class WebModuleBootstrapHostFilter<TModule> : IBootstrapHostFilter<TModule> where TModule : class
     {
         public Action<BootstrapModuleHostCommand<TModule>> Invoke(Action<BootstrapModuleHostCommand<TModule>> next)
         {

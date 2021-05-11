@@ -15,7 +15,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Dbosoft.Hosuto.Modules.Hosting
 {
-    public class WebModuleBootstrapHostHandler<TModule> : DefaultBootstrapHostHandler<TModule> where TModule : IModule
+    public class WebModuleBootstrapHostHandler<TModule> : DefaultBootstrapHostHandler<TModule> where TModule : class
     {
         protected virtual void Configure(IModuleContext<TModule> moduleContext, IApplicationBuilder app)
         {
@@ -31,7 +31,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         public override void BootstrapHost(BootstrapModuleHostCommand<TModule> command)
         {
-            if (command.Host != null  || !(command.BootstrapContext.Module is WebModule))
+            if (command.Host != null  || !(command.BootstrapContext.Module is IWebModule))
                 return;
 
             BootstrapContext = command.BootstrapContext;
@@ -53,7 +53,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
             var builder = CreateHostBuilder();
 
-            webHostBuilderInitializer.ConfigureWebHost(BootstrapContext.Module as WebModule, builder,
+            webHostBuilderInitializer.ConfigureWebHost(BootstrapContext.Module as IWebModule, builder,
                 new[]
                     {
                         new DelegateWebModuleWebHostBuilderFilter((_, webHostBuilder) =>
@@ -108,7 +108,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                 throw new InvalidOperationException("AspNetCore runtime not configured.");
 
 
-            var webHostBuilder = webHostBuilderFactory.CreateWebHost(BootstrapContext.Module as WebModule);
+            var webHostBuilder = webHostBuilderFactory.CreateWebHost(BootstrapContext.Module as IWebModule);
             var hostBuilderContext = BootstrapContext.Advanced.FrameworkServices.GetRequiredService<HostBuilderContext>();
             webHostBuilder.UseConfiguration(hostBuilderContext.Configuration);
             
@@ -125,7 +125,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                 
             });
 
-            Filters.BuildFilterPipeline(webHostBuilderFilters, (_, __) => { })(BootstrapContext.Module as WebModule, webHostBuilder);
+            Filters.BuildFilterPipeline(webHostBuilderFilters, (_, __) => { })(BootstrapContext.Module as IWebModule, webHostBuilder);
 
 
             webHostBuilder.ConfigureServices((webContext, services) =>
@@ -183,11 +183,14 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         {
             var hostBuilderContext = BootstrapContext.Advanced.FrameworkServices.GetRequiredService<HostBuilderContext>();
 
-            if (BootstrapContext.Module.Name == null)
-                return hostBuilderContext.HostingEnvironment.ContentRootPath;
+            var name = "";
+            if (BootstrapContext.Module is INamedModule namedModule)
+                name = namedModule.Name;
+
+            name = name ?? BootstrapContext.Module.GetType().Assembly.GetName().Name;
 
             var pathCandidate = Path.Combine(hostBuilderContext.HostingEnvironment
-                .ContentRootPath, "..", BootstrapContext.Module.Name);
+                .ContentRootPath, "..", name);
 
             if (!Directory.Exists(pathCandidate))
                 return hostBuilderContext.HostingEnvironment.ContentRootPath;

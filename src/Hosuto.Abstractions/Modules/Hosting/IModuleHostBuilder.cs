@@ -8,7 +8,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
     public interface IModulesHostBuilder: IHostBuilder
     {
 
-        IModulesHostBuilder HostModule<TModule>(Action<IModuleHostingOptions> options = null) where TModule : class, IModule;
+        IModulesHostBuilder HostModule<TModule>(Action<IModuleHostingOptions> options = null) where TModule : class;
         IModulesHostBuilder HostModule(Type moduleType, Action<IModuleHostingOptions> options = null);
 
         /// <summary>

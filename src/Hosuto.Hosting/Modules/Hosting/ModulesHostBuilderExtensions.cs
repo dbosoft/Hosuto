@@ -18,7 +18,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
 
         public static Task RunModule<TModule>(this IModulesHostBuilder hostBuilder,
-            Action<IModuleHostingOptions> options = null ) where TModule : class, IModule
+            Action<IModuleHostingOptions> options = null ) where TModule : class
         {
             return RunModule(hostBuilder, typeof(TModule), options);
         }

@@ -9,7 +9,7 @@ using SimpleInjector;
 
 namespace Dbosoft.Hosuto.Samples
 {
-    public class SimpleModule : IModule, IMessageRecipient
+    public class SimpleModule : IMessageRecipient
     {
         public void ConfigureServices(IServiceProvider serviceProvider, IServiceCollection services)
         {

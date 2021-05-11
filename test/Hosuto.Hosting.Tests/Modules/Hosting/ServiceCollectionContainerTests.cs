@@ -35,10 +35,8 @@ namespace Hosuto.Hosting.Tests.Modules.Hosting
             void CallMe();
         }
 
-        private class SomeModule : IModule
+        private class SomeModule
         {
-            public string Name => "I'm a module";
-
             public void ConfigureServices(IServiceProvider sp, IServiceCollection services)
             {
                 var service = sp.GetService<IService>();

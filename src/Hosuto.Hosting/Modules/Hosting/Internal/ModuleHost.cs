@@ -8,7 +8,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting.Internal
 {
     // ReSharper disable once UnusedMember.Global
     // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
-    public class ModuleHost<TModule> : IModuleHost<TModule> where TModule : IModule
+    public class ModuleHost<TModule> : IModuleHost<TModule> where TModule : class
     {
         private readonly IServiceProvider _frameworkServices;
         private IHost _host;

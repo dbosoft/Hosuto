@@ -7,7 +7,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
     }
 
-    public interface IAddSimpleInjectorFilter<TModule> : IFilter<IModulesHostBuilderContext<TModule>, SimpleInjectorAddOptions> where TModule : IModule
+    public interface IAddSimpleInjectorFilter<TModule> : IFilter<IModulesHostBuilderContext<TModule>, SimpleInjectorAddOptions> where TModule : class
     {
 
     }

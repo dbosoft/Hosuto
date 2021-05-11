@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Dbosoft.Hosuto.Samples
 {
-    public class SampleWebModule : WebModule
+    public class SampleWebModule : WebModule, INamedModule
     {
         public SampleWebModule(IConfiguration configuration)
         {
@@ -59,7 +59,7 @@ namespace Dbosoft.Hosuto.Samples
             });
         }
 
-        public override string Name => "SampleWebModule";
         public override string Path => "/sample";
+        public string Name => "SampleWebModule";
     }
 }

@@ -6,7 +6,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 {
     internal class WebModuleWebHostBuilderInitializer : IWebModuleWebHostBuilderInitializer
     {
-        public void ConfigureWebHost(WebModule module, IHostBuilder builder, IEnumerable<IWebModuleWebHostBuilderFilter> filters)
+        public void ConfigureWebHost(IWebModule module, IHostBuilder builder, IEnumerable<IWebModuleWebHostBuilderFilter> filters)
         {
             builder.ConfigureWebHost(webHostBuilder =>
             {

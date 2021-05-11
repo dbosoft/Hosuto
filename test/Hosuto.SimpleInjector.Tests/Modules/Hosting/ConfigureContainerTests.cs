@@ -51,7 +51,7 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
 
         }
 
-        private void BuildAndVerifyModuleMock<TModule>(Mock<TModule> moduleMock, Container container = null) where TModule : class, IModule
+        private void BuildAndVerifyModuleMock<TModule>(Mock<TModule> moduleMock, Container container = null) where TModule : class
         {
             var builder = ModulesHost.CreateDefaultBuilder();
 
@@ -87,20 +87,16 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
 
         }
 
-        public class ModuleWithConfigureContainer : IModule
+        public class ModuleWithConfigureContainer
         {
-            public string Name  => nameof(ModuleWithConfigureContainer);
-
 
             public virtual void ConfigureContainer(Container container)
             {}
 
         }
 
-        public  class ModuleWithConfigureContainerAndInjection : IModule
+        public  class ModuleWithConfigureContainerAndInjection
         {
-            public string Name => nameof(ModuleWithConfigureContainerAndInjection);
-
 
 #pragma warning disable 618
             public virtual void ConfigureContainer(Container container, IHostingEnvironment env)
@@ -110,7 +106,7 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
         }
 
 
-        public class ModuleWithConfigureContainerAndServiceProvider : IModule
+        public class ModuleWithConfigureContainerAndServiceProvider
         {
             public string Name => nameof(ModuleWithConfigureContainerAndServiceProvider);
 
