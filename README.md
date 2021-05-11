@@ -17,6 +17,8 @@ Hosuto contains currently the following features to extend .NET Generic Host:
 - **Modules**: The Hosuto module system allows you to setup multiple independed hosts within a single application. Modules can share configuration and a DI container for global settings and interaction. The module system supports both .NET Generic host and Asp.Net Core 2.1 and higher. See [wiki](https://github.com/dbosoft/Hosuto/wiki/Modules) how to configure and use modules. 
 - **Hosted Services extensions**: Hosuto contains extensions methods to simplify the use of hosted services in Generic Hosts and Asp.Net Core Hosts. 
 
+
+
 ### Platforms & Prerequisites
 
 Hosuto supports .NET Standard 2.0 or higher, Asp.Net Core >= 2.1 and <= 3.1 and .NET 5.0
@@ -27,7 +29,10 @@ Hosuto supports .NET Standard 2.0 or higher, Asp.Net Core >= 2.1 and <= 3.1 and 
 The easiest way to get started is by installing [the available NuGet package](https://www.nuget.org/packages/Dbosoft.Hosuto). 
 Take a look at the [Wiki](https://github.com/dbosoft/Hosuto/wiki) learning how to configure and use Hosuto.
 
-To see a full example see the [samples](https://github.com/dbosoft/Hosuto/tree/master/samples) folder of the repository. 
+**Samples:**
+
+* For basic examples see the [samples](https://github.com/dbosoft/Hosuto/tree/master/samples) folder of the repository. 
+* For a real world application example see our [SAPHub sample project](https://github.com/dbosoft/SAPHub).
 
 
 ### Versioning
@@ -37,11 +42,14 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 **Warning:**
 Version 1.0 is still not released, that means that new minor versions can include breaking changes!
 
+
+
 ### Authors
 
 * **Frank Wagner** - *Initial work* - [fw2568](https://github.com/fw2568)
 
 See also the list of [contributors](https://github.com/Dbosoft/Hosuto/contributors) who participated in this project.
+
 
 
 ### License
