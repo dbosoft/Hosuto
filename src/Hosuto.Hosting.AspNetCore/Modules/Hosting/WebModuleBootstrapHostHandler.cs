@@ -89,7 +89,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                             });
                             
 
-                        })).Reverse());
+                        })));
             ApplyConfiguration(builder);
 
             command.Options.ConfigureBuilderAction?.Invoke(builder);
@@ -221,7 +221,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             return (services =>
             {
 #pragma warning disable CS0612 // Type or member is obsolete
-            var filters = serviceProvider.GetRequiredService<IEnumerable<IStartupConfigureServicesFilter>>().Reverse().ToArray();
+            var filters = serviceProvider.GetRequiredService<IEnumerable<IStartupConfigureServicesFilter>>().ToArray();
 #pragma warning restore CS0612 // Type or member is obsolete
 
             if (filters.Length == 0)
