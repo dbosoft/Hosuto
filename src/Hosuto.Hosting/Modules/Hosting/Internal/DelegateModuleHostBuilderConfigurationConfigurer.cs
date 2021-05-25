@@ -22,11 +22,8 @@ namespace Dbosoft.Hosuto.Modules.Hosting.Internal
         {
             return (ctx, config) =>
             {
-                //configuration has to be applied in reversed order, so first all 
-                //other filters than override
-                next(ctx, config);
                 _configureDelegate(ctx, config);
-
+                next(ctx, config);
             };
         }
     }

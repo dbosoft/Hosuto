@@ -13,7 +13,7 @@ namespace Dbosoft.Hosuto
 
             return (p1 =>
             {
-                var enumerable = filters.ToList();
+                var enumerable = filters.Reverse().ToList();
                 if (enumerable.Count == 0)
                 {
                     filteredDelegate(p1);
@@ -31,7 +31,7 @@ namespace Dbosoft.Hosuto
             if (filteredDelegate == null) throw new ArgumentNullException(nameof(filteredDelegate));
             return ((p1, p2) =>
             {
-                var enumerable = filters.ToList();
+                var enumerable = filters.Reverse().ToList();
                 if (enumerable.Count == 0)
                 {
                     filteredDelegate(p1,p2);
