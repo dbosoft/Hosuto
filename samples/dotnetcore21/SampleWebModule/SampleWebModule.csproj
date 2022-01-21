@@ -6,7 +6,7 @@
     <AssemblyName>Dbosoft.Hosuto.Samples.WebModule</AssemblyName>
     <RootNamespace>Dbosoft.Hosuto.Samples</RootNamespace>
     <IsPackable>false</IsPackable>
-
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
 
   <ItemGroup>

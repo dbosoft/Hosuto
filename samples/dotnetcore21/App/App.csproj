@@ -6,6 +6,8 @@
     <AssemblyName>Dbosoft.Hosuto.Samples.App</AssemblyName>
     <RootNamespace>Dbosoft.Hosuto.Samples</RootNamespace>
     <IsPackable>false</IsPackable>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+
   </PropertyGroup>
 
   <ItemGroup>

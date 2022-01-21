@@ -1,13 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.0;netstandard2.0;net5.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;netstandard2.0;net5.0;net6.0</TargetFrameworks>
     <AssemblyName>Dbosoft.Hosuto.Testing.AspNetCore</AssemblyName>
     <RootNamespace>Dbosoft.Hosuto</RootNamespace>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
 
   <Import Project="..\..\build\pack.props" />
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.0" />
+  </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
@@ -20,13 +26,7 @@
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.0" />
   </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="2.1" />
-  </ItemGroup>
-
+  
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.1" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.1" />
