@@ -17,7 +17,7 @@ steps:
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
-    version: '2.1'
+    version: '2.x'
 
 - task: UseGitVersion@5
   inputs:
