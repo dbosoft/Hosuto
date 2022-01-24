@@ -17,6 +17,7 @@ steps:
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
+    performMultiLevelLookup: 'true'
     version: '2.x'
 
 - task: UseGitVersion@5
