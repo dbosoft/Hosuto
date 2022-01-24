@@ -3,8 +3,7 @@ Advanced application hosting with .NET Generic Host and Asp.Net Core
 
 Stable                     |  Latest                   |  Build Status
 ---------------------------|---------------------------|---------------------------
-[![NuGet stable](https://img.shields.io/nuget/v/Dbosoft.Hosuto.svg?style=flat-square)](https://www.nuget.org/packages/Dbosoft.Hosuto) | [![NuGet pre](https://img.shields.io/nuget/vpre/Dbosoft.Hosuto.svg?style=flat-square)](https://www.nuget.org/packages/Dbosoft.Hosuto) | [![Build Status](https://dev.azure.com/dbosoft/public/_apis/build/status/dbosoft.Hosuto?branchName=master)](https://dev.azure.com/dbosoft/public/_build/latest?definitionId=32&branchName=master)
-
+[![NuGet stable](https://img.shields.io/nuget/v/Dbosoft.Hosuto.svg?style=flat-square)](https://www.nuget.org/packages/Dbosoft.Hosuto) | [![NuGet pre](https://img.shields.io/nuget/vpre/Dbosoft.Hosuto.svg?style=flat-square)](https://www.nuget.org/packages/Dbosoft.Hosuto) | [![Build Status](https://dev.azure.com/dbosoft/public/_apis/build/status/dbosoft.Hosuto?branchName=main)](https://dev.azure.com/dbosoft/public/_build/latest?definitionId=32&branchName=main)
 
 ### Description
 
