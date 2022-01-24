@@ -38,10 +38,6 @@ Take a look at the [Wiki](https://github.com/dbosoft/Hosuto/wiki) learning how t
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/dbosoft/Hosuto/tags).  
 
-**Warning:**
-Version 1.0 is still not released, that means that new minor versions can include breaking changes!
-
-
 
 ### Authors
 
