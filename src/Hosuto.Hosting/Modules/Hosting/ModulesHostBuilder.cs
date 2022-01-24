@@ -123,12 +123,13 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
                 foreach (var module in _registeredModules)
                 {
-                    
-                    if(module.Value.ModuleFactory==null)
+                    moduleHostServicesFactory?.ConfigureModule(module.Key, module.Value.ModuleFactory);
+                    if (moduleHostServicesFactory != null) continue;
+
+                    if (module.Value.ModuleFactory == null)
                         services.AddSingleton(module.Key);
                     else
                         services.AddSingleton(module.Key, module.Value.ModuleFactory);
-
                 }
 
                 RegisterModulesAndHosts(services, frameworkServices);

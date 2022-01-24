@@ -7,5 +7,8 @@ namespace Dbosoft.Hosuto.Modules.Hosting
     {
         object ConfigureServices(IServiceCollection services);
         IServiceProvider ReplaceServiceProvider(object state, IServiceProvider services);
+
+        void ConfigureModule(Type moduleType, Func<IServiceProvider,object> moduleFactory);
+
     }
 }

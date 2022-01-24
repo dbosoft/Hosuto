@@ -88,6 +88,25 @@ namespace Hosuto.Hosting.Tests.Modules.Hosting
             Assert.NotNull(module.SomeModule);
         }
 
+
+        [Fact]
+        public void Module_dependencies_can_be_injected_from_host_container()
+        {
+            var builder = ModulesHost.CreateDefaultBuilder();
+            builder.HostModule<ModuleWithConstructorInjection>();
+
+            var depMock = Mock.Of<IDep>();
+            var sc = new ServiceCollection();
+            sc.AddTransient(sp => depMock);
+
+            builder.UseServiceCollection(sc);
+
+            var host = builder.Build();
+            var module = host.Services.GetRequiredService<ModuleWithConstructorInjection>();
+
+            Assert.Equal(depMock,module.Dependency);
+        }
+
         private class SomeModule
         {
             public string Environment { get; private set; }
@@ -104,6 +123,21 @@ namespace Hosuto.Hosting.Tests.Modules.Hosting
             {
                 Environment = environment.EnvironmentName;
                 Configuration = configuration;
+            }
+
+        }
+
+        public interface IDep
+        {
+            
+        }
+
+        private class ModuleWithConstructorInjection
+        {
+            public IDep Dependency { get;  }
+            public ModuleWithConstructorInjection(IDep dep)
+            {
+                Dependency = dep;
             }
 
         }

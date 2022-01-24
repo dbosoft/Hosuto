@@ -22,11 +22,29 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
 
 
             builder.HostModule<SomeModule>();
-            var host = builder.Build();
-            var moduleHost = host.Services.GetRequiredService<IModuleHost<SomeModule>>();
+            builder.Build();
+            var moduleHost = container.GetRequiredService<IModuleHost<SomeModule>>();
 
             serviceMock.Verify(x=>x.CallMe());
 
+        }
+
+        [Fact]
+        public void Module_dependencies_can_be_injected_from_outer_container()
+        {
+            var container = new Container();
+
+            var builder = ModulesHost.CreateDefaultBuilder();
+            builder.UseSimpleInjector(container);
+            var serviceMock = Mock.Of<IService>();
+            container.RegisterInstance(serviceMock);
+
+
+            builder.HostModule<ModuleWithConstructorInjection>();
+
+            var host = builder.Build();
+            var module = container.GetRequiredService<ModuleWithConstructorInjection>();
+            Assert.Equal(module.Dependency, serviceMock);
         }
 
         // ReSharper disable once MemberCanBePrivate.Global
@@ -43,6 +61,18 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
             {
                 var service = sp.GetService<IService>();
                 service?.CallMe();
+            }
+
+        }
+
+
+        // ReSharper disable once ClassNeverInstantiated.Local
+        private class ModuleWithConstructorInjection
+        {
+            public IService Dependency { get; }
+            public ModuleWithConstructorInjection(IService dep)
+            {
+                Dependency = dep;
             }
 
         }

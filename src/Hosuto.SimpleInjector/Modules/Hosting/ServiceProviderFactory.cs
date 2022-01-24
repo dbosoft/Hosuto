@@ -30,6 +30,20 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
             return _container;
         }
+
+        public void ConfigureModule(Type moduleType, Func<IServiceProvider, object> moduleFactory)
+        {
+
+            switch (moduleFactory)
+            {
+                case null:
+                    _container.Register(moduleType);
+                    break;
+                default:
+                    _container.Register(moduleType, () => moduleFactory(_container) );
+                    break;
+            }
+        }
     }
     
 }
