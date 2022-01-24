@@ -14,12 +14,6 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- task: UseDotNet@2
-  inputs:
-    packageType: 'sdk'
-    performMultiLevelLookup: 'true'
-    version: '2.x'
-
 - task: UseGitVersion@5
   inputs:
     versionSpec: '5.x'
