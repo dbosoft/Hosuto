@@ -6,6 +6,7 @@
 
 trigger:
 - main
+- refs/tags/v*
 
 pool:
   vmImage: windows-2022 
