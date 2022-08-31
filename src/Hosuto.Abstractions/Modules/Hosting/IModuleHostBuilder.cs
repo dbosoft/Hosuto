@@ -12,12 +12,21 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         IModulesHostBuilder HostModule(Type moduleType, Action<IModuleHostingOptions> options = null);
 
         /// <summary>
+        /// Direct access to the host builder used to build the internal host. This could be used
+        /// in special cases when you would like to apply configuration only to the internal host and not to the modules.
+        /// </summary>
+        /// <param name="configureDelegate">The delegate for configuring the <see cref="IHostBuilder"/> that will be used
+        /// to construct the internal host.</param>
+        /// <returns>The same instance of the <see cref="IModulesHostBuilder"/> for chaining.</returns>
+        IModulesHostBuilder ConfigureInternalHost(Action<IHostBuilder> configureDelegate);
+
+        /// <summary>
         /// Set up the configuration for the builder itself. This will be used to initialize the <see cref="IHostEnvironment"/>
         /// for use later in the build process. This can be called multiple times and the results will be additive.
         /// </summary>
         /// <param name="configureDelegate">The delegate for configuring the <see cref="IConfigurationBuilder"/> that will be used
         /// to construct the <see cref="IConfiguration"/> for the host.</param>
-        /// <returns>The same instance of the <see cref="IHostBuilder"/> for chaining.</returns>
+        /// <returns>The same instance of the <see cref="IModulesHostBuilder"/> for chaining.</returns>
         new IModulesHostBuilder ConfigureHostConfiguration(Action<IConfigurationBuilder> configureDelegate);
 
         /// <summary>
@@ -27,7 +36,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         /// </summary>
         /// <param name="configureDelegate">The delegate for configuring the <see cref="IConfigurationBuilder"/> that will be used
         /// to construct the <see cref="IConfiguration"/> for the application.</param>
-        /// <returns>The same instance of the <see cref="IHostBuilder"/> for chaining.</returns>
+        /// <returns>The same instance of the <see cref="IModulesHostBuilder"/> for chaining.</returns>
         new IModulesHostBuilder ConfigureAppConfiguration(Action<HostBuilderContext, IConfigurationBuilder> configureDelegate);
 
         /// <summary>
@@ -35,7 +44,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         /// </summary>
         /// <param name="configureDelegate">The delegate for configuring the <see cref="IServiceCollection"/> that will be used
         /// to construct the <see cref="IServiceProvider"/>.</param>
-        /// <returns>The same instance of the <see cref="IHostBuilder"/> for chaining.</returns>
+        /// <returns>The same instance of the <see cref="IModulesHostBuilder"/> for chaining.</returns>
         new IModulesHostBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configureDelegate);
 
 
@@ -44,7 +53,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         /// </summary>
         /// <param name="configureDelegate">The delegate for configuring the <see cref="IServiceCollection"/> that will be used
         /// to construct the internal <see cref="IServiceProvider"/> used to configure the module builder.</param>
-        /// <returns>The same instance of the <see cref="IHostBuilder"/> for chaining.</returns>
+        /// <returns>The same instance of the <see cref="IModulesHostBuilder"/> for chaining.</returns>
         IModulesHostBuilder ConfigureFrameworkServices(Action<HostBuilderContext, IServiceCollection> configureDelegate);
 
 
@@ -54,7 +63,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         /// </summary>
         /// <typeparam name="TContainerBuilder">The type of builder.</typeparam>
         /// <param name="factory">The factory to register.</param>
-        /// <returns>The same instance of the <see cref="IHostBuilder"/> for chaining.</returns>
+        /// <returns>The same instance of the <see cref="IModulesHostBuilder"/> for chaining.</returns>
         new IModulesHostBuilder UseServiceProviderFactory<TContainerBuilder>(IServiceProviderFactory<TContainerBuilder> factory);
 
 #if NETSTANDARD2_1
@@ -71,7 +80,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         /// </summary>
         /// <typeparam name="TContainerBuilder">The type of builder.</typeparam>
         /// <param name="configureDelegate">The delegate which configures the builder.</param>
-        /// <returns>The same instance of the <see cref="IHostBuilder"/> for chaining.</returns>
+        /// <returns>The same instance of the <see cref="IModulesHostBuilder"/> for chaining.</returns>
         new IModulesHostBuilder ConfigureContainer<TContainerBuilder>(Action<HostBuilderContext, TContainerBuilder> configureDelegate);
 
 
