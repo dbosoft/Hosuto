@@ -43,6 +43,12 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             return this;
         }
 
+        public IModulesHostBuilder ConfigureInternalHost(Action<IHostBuilder> configureDelegate)
+        {
+            configureDelegate(_innerBuilder);
+            return this;
+        }
+
         public IModulesHostBuilder ConfigureFrameworkServices(Action<HostBuilderContext, IServiceCollection> configureDelegate)
         {
             _configureFrameworkActions.Add(configureDelegate ?? throw new ArgumentNullException(nameof(configureDelegate)));
