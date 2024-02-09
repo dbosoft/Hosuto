@@ -28,8 +28,8 @@ namespace Dbosoft.Hosuto.Modules.Testing
         private TestServer _server;
         private IHost _host;
         private Action<IWebHostBuilder> _configuration;
-        private IList<HttpClient> _clients = new List<HttpClient>();
-        private List<WebModuleFactory<TModule>> _derivedFactories =
+        private readonly IList<HttpClient> _clients = new List<HttpClient>();
+        private readonly List<WebModuleFactory<TModule>> _derivedFactories =
             new List<WebModuleFactory<TModule>>();
 
         /// <summary>
@@ -129,6 +129,28 @@ namespace Dbosoft.Hosuto.Modules.Testing
                     _configuration(builder);
                     configuration(builder);
                 },
+                ConfigureModule);
+
+            _derivedFactories.Add(factory);
+
+            return factory;
+        }
+
+        public WebModuleFactory<TModule> WithModuleHostBuilder(Action<IModulesHostBuilder> configure)
+        {
+            var factory = new DelegatedWebApplicationFactory(
+                ClientOptions,
+                CreateServer,
+                CreateHost,
+                () =>
+                {
+                    var builder = CreateModuleHostBuilder();
+                    configure(builder);
+                    return builder;
+                },
+                GetTestAssemblies,
+                ConfigureClient,
+                ConfigureWebHost,
                 ConfigureModule);
 
             _derivedFactories.Add(factory);
