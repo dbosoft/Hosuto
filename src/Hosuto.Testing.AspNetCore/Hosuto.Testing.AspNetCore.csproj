@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.0;netstandard2.0;net5.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;netstandard2.0;net6.0;net8.0</TargetFrameworks>
     <AssemblyName>Dbosoft.Hosuto.Testing.AspNetCore</AssemblyName>
     <RootNamespace>Dbosoft.Hosuto</RootNamespace>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
@@ -15,10 +15,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="5.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
