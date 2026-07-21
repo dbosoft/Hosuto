@@ -21,7 +21,7 @@ Hosuto contains currently the following features to extend .NET Generic Host:
 
 ### Platforms & Prerequisites
 
-Hosuto supports .NET Standard 2.0 or higher, Asp.Net Core 3.0, 3.1, .NET 5.0 and .NET 6.0.
+Hosuto supports .NET Standard 2.0 or higher, Asp.Net Core 3.0, 3.1, .NET 5.0+ (up to .NET 10 currently).
 
 ### Getting started
 
