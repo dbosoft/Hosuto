@@ -1,13 +1,18 @@
 using System;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Dbosoft.Hosuto.Modules;
 
 namespace Dbosoft.Hosuto.Samples.Minimal.RazorModule
 {
-    // A Razor web module hosted on the minimal-API WebApplication inner host. Exercises Razor Pages
-    // and module static assets (wwwroot/css/site.css, namespaced via StaticWebAssetBasePath).
-    public sealed class RazorGreetModule : WebModule, IServiceConfiguringModule, IApplicationConfiguringModule
+    // A Razor web module on the minimal-API WebApplication inner host, authored with the three
+    // module contracts - services, middleware, and (minimal-API-style) endpoints:
+    //   IServiceConfiguringModule    -> AddRazorPages
+    //   IApplicationConfiguringModule -> UseStaticFiles (middleware)
+    //   IEndpointConfiguringModule    -> MapRazorPages (idiomatic endpoint mapping)
+    public sealed class RazorGreetModule
+        : WebModule, IServiceConfiguringModule, IApplicationConfiguringModule, IEndpointConfiguringModule
     {
         public override string Path { get; } = "";
 
@@ -19,8 +24,11 @@ namespace Dbosoft.Hosuto.Samples.Minimal.RazorModule
         public void Configure(IServiceProvider serviceProvider, IApplicationBuilder app)
         {
             app.UseStaticFiles();
-            app.UseRouting();
-            app.UseEndpoints(endpoints => endpoints.MapRazorPages());
+        }
+
+        public void MapEndpoints(IServiceProvider serviceProvider, IEndpointRouteBuilder endpoints)
+        {
+            endpoints.MapRazorPages();
         }
     }
 }
