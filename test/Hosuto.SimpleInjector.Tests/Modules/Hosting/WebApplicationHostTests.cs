@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -81,6 +82,38 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
             builder.Build().Dispose();
         }
 #endif
+
+        // A module's own static web assets (the published ".modules/{module}" physical layout) are
+        // served by the minimal-API module host via UseStaticFiles.
+        [Fact]
+        public async Task WebModule_serves_its_static_web_assets()
+        {
+            var moduleAssembly = typeof(StaticAssetModule).Assembly.GetName().Name;
+            var contentRoot = Path.Combine(Path.GetTempPath(), "hosuto-swa-" + Guid.NewGuid().ToString("N"));
+            var assetDir = Path.Combine(contentRoot, "wwwroot", ".modules", moduleAssembly);
+            Directory.CreateDirectory(assetDir);
+            File.WriteAllText(Path.Combine(assetDir, "hello.txt"), "static-asset-ok");
+
+            try
+            {
+                var builder = ModulesHost.CreateDefaultBuilder();
+                builder.UseContentRoot(contentRoot);
+                builder.UseSimpleInjector(new Container());
+                builder.UseAspNetCoreMinimal(app => app.WebHost.UseUrls("http://127.0.0.1:0"));
+                builder.HostModule<StaticAssetModule>();
+
+                using var host = builder.Build();
+                await host.StartAsync();
+                var body = await Get(host, BaseUrl<StaticAssetModule>(host) + "/hello.txt");
+                await host.StopAsync();
+
+                Assert.Equal("static-asset-ok", body);
+            }
+            finally
+            {
+                try { Directory.Delete(contentRoot, recursive: true); } catch { /* best effort */ }
+            }
+        }
 
         private static async Task<IHost> StartMinimalHost<TModule>() where TModule : class
         {
@@ -170,6 +203,16 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
             void IEndpointConfiguringModule.MapEndpoints(IServiceProvider serviceProvider, IEndpointRouteBuilder endpoints)
             {
                 endpoints.MapGet("/hello", () => "mapped via IEndpointConfiguringModule");
+            }
+        }
+
+        public sealed class StaticAssetModule : WebModule, IApplicationConfiguringModule
+        {
+            public override string Path { get; } = "";
+
+            void IApplicationConfiguringModule.Configure(IServiceProvider serviceProvider, IApplicationBuilder app)
+            {
+                app.UseStaticFiles();
             }
         }
 

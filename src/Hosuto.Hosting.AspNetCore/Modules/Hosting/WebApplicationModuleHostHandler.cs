@@ -1,8 +1,10 @@
 #if NET6_0_OR_GREATER
+using System;
 using System.Collections.Generic;
 using Dbosoft.Hosuto.Modules.Hosting.Internal;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -94,7 +96,32 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             command.Options.ConfigureBuilderAction?.Invoke(builder.Host);
 
             command.Host = builder.Build();
+            MapModuleStaticWebAssets(command.Host.Services);
             command.ModuleContext = CreateModuleContext(command.Host.Services);
+        }
+
+        // Makes the module's own static web assets available at the module host's web root. Each
+        // module's inner WebApplication has ApplicationName = the module assembly, so the module's
+        // OWN static web assets manifest is already root-mapped - no ".modules/{module}" stripping is
+        // needed and each module host serves only its own assets. Served via the WebRootFileProvider
+        // (classic UseStaticFiles), resolved lazily by the middleware after Build().
+        private static void MapModuleStaticWebAssets(IServiceProvider hostServices)
+        {
+            // both are always registered on a WebApplication host - fail fast if not.
+            var environment = hostServices.GetRequiredService<IWebHostEnvironment>();
+            var configuration = hostServices.GetRequiredService<IConfiguration>();
+
+            // Deliberately NOT gated on IsDevelopment (unlike WebApplicationBuilder's own automatic
+            // UseStaticWebAssets): a modules host defaults to the Production environment under
+            // `dotnet run`, so an env gate would never load the dev manifest and module assets would
+            // 404. Both loaders below are no-ops when their input is absent, so calling both
+            // unconditionally is safe:
+            //  - dev / build output: {module}.staticwebassets.runtime.json exists -> assets mapped at
+            //    the web root (no-op in published output, where that manifest is not present);
+            //  - published output: composes {contentRoot}/wwwroot/.modules/{module} physically
+            //    (no-op in dev, where that folder does not exist).
+            StaticWebAssetsLoader.UseStaticWebAssets(environment, configuration);
+            ModuleWebAssets.ModuleWebAssetsLoader.UseModuleAssets(environment, configuration);
         }
 
         private void ConfigureApp(BootstrapModuleHostCommand<TModule> command, IApplicationBuilder app)
