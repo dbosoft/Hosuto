@@ -9,15 +9,18 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using SimpleInjector;
+using SimpleInjector.Integration.ServiceCollection;
 using Xunit;
 
 namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
 {
+    // The module methods are implemented EXPLICITLY on purpose: an explicit interface implementation
+    // is not discoverable via Type.GetMethod("<name>"), so the reflection convention in
+    // ModuleMethodInvoker cannot find them. If the interface-dispatch branch at any call site were
+    // removed or broken, these tests would fail (the reflection fallback would find nothing) - which
+    // is what proves the interface path, not the fallback, is exercised.
     public class ModuleInterfaceContractsTests
     {
-        // A module authored purely against the opt-in interfaces (no convention methods, no
-        // reflection) is configured end-to-end: ConfigureServices + ConfigureContainer run, and the
-        // hosted handler resolves the container-registered service.
         [Fact]
         public async Task Interface_based_module_is_configured_and_runs()
         {
@@ -38,7 +41,22 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
             host.Dispose();
         }
 
-        // The IApplicationConfiguringModule.Configure contract is invoked for a web module.
+        [Fact]
+        public void SimpleInjector_hook_interfaces_are_invoked()
+        {
+            SimpleInjectorHooksModule.Reset();
+
+            var builder = ModulesHost.CreateDefaultBuilder();
+            builder.UseSimpleInjector(new Container());
+            builder.HostModule<SimpleInjectorHooksModule>();
+
+            builder.Build().Dispose();
+
+            Assert.True(SimpleInjectorHooksModule.AddCalled, "IAddSimpleInjectorModule.AddSimpleInjector was not invoked");
+            Assert.True(SimpleInjectorHooksModule.UseCalled, "IUseSimpleInjectorModule.UseSimpleInjector was not invoked");
+            Assert.True(SimpleInjectorHooksModule.ContainerConfigured, "IContainerConfiguringModule.ConfigureContainer was not invoked");
+        }
+
         [Fact]
         public async Task Interface_based_web_module_Configure_is_invoked()
         {
@@ -79,19 +97,38 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
             }
         }
 
+        // Explicit implementations -> invisible to Type.GetMethod, so only interface dispatch works.
         public class InterfaceModule : IServiceConfiguringModule, IContainerConfiguringModule
         {
-            public void ConfigureServices(IServiceProvider serviceProvider, IServiceCollection services)
+            void IServiceConfiguringModule.ConfigureServices(IServiceProvider serviceProvider, IServiceCollection services)
             {
                 services.AddHostedHandler<HostedServiceHandler>();
             }
 
-            public void ConfigureContainer(IServiceProvider serviceProvider, Container container)
+            void IContainerConfiguringModule.ConfigureContainer(IServiceProvider serviceProvider, Container container)
             {
                 var service = serviceProvider.GetRequiredService<IService>();
                 container.RegisterInstance(service);
                 container.Register<HostedServiceHandler>();
             }
+        }
+
+        public class SimpleInjectorHooksModule : IContainerConfiguringModule, IUseSimpleInjectorModule, IAddSimpleInjectorModule
+        {
+            public static bool ContainerConfigured;
+            public static bool UseCalled;
+            public static bool AddCalled;
+
+            public static void Reset() => ContainerConfigured = UseCalled = AddCalled = false;
+
+            void IContainerConfiguringModule.ConfigureContainer(IServiceProvider serviceProvider, Container container)
+                => ContainerConfigured = true;
+
+            void IUseSimpleInjectorModule.UseSimpleInjector(SimpleInjectorUseOptions options)
+                => UseCalled = true;
+
+            void IAddSimpleInjectorModule.AddSimpleInjector(SimpleInjectorAddOptions options)
+                => AddCalled = true;
         }
 
         public class InterfaceWebModule : WebModule, IApplicationConfiguringModule
@@ -100,7 +137,7 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
 
             public override string Path { get; } = "";
 
-            public void Configure(IServiceProvider serviceProvider, IApplicationBuilder app)
+            void IApplicationConfiguringModule.Configure(IServiceProvider serviceProvider, IApplicationBuilder app)
             {
                 Configured = true;
             }

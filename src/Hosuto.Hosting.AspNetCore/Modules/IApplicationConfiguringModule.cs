@@ -9,10 +9,16 @@ namespace Dbosoft.Hosuto.Modules
     /// the method via reflection. Modules that do not implement it keep working through the
     /// reflection convention.
     /// </summary>
+    /// <remarks>
+    /// If a module implements this interface, the framework calls it and ignores any conventional
+    /// <c>Configure</c> method. The <paramref name="serviceProvider"/> matches what the convention
+    /// injects as a method's <em>first</em> <see cref="IServiceProvider"/> parameter (the modules
+    /// host's service provider); a conventional method that placed <see cref="IServiceProvider"/> in
+    /// a later position could receive a different provider.
+    /// </remarks>
     public interface IApplicationConfiguringModule
     {
-        /// <param name="serviceProvider">The modules host service provider (same instance the
-        /// conventional method receives as its first <see cref="IServiceProvider"/> parameter).</param>
+        /// <param name="serviceProvider">The modules host's service provider.</param>
         /// <param name="app">The module's application pipeline builder.</param>
         void Configure(IServiceProvider serviceProvider, IApplicationBuilder app);
     }
