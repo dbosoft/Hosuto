@@ -37,6 +37,29 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             return UseAspNetCore(builder, configure);
         }
 
+#if NET6_0_OR_GREATER
+        /// <summary>
+        /// Opt-in: host web modules on a minimal-API <see cref="Microsoft.AspNetCore.Builder.WebApplication"/>
+        /// inner host instead of the classic <c>ConfigureWebHostDefaults</c> host. Additive - the
+        /// module authoring model (ConfigureServices/Configure/ConfigureContainer, convention or the
+        /// module interfaces) is unchanged.
+        /// </summary>
+        public static IModulesHostBuilder UseAspNetCoreMinimal(this IModulesHostBuilder builder,
+            Action<Microsoft.AspNetCore.Builder.WebApplicationBuilder> configure = null)
+        {
+            builder.ConfigureFrameworkServices((ctx, services) =>
+            {
+                services.AddTransient(typeof(IBootstrapHostFilter<>), typeof(WebApplicationBootstrapHostFilter<>));
+
+                if (configure != null)
+                    services.AddTransient<IWebApplicationBuilderConfigurer>(sp =>
+                        new DelegateWebApplicationBuilderConfigurer(configure));
+            });
+
+            return builder;
+        }
+#endif
+
         public static IModulesHostBuilder UseAspNetCore(this IModulesHostBuilder builder,
             Action<IWebModule, Microsoft.AspNetCore.Hosting.IWebHostBuilder> configure = null)
         {

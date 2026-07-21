@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <IsPackable>false</IsPackable>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <RootNamespace>Dbosoft.Hosuto.Samples.Minimal.RazorModule</RootNamespace>
+    <AssemblyName>Dbosoft.Hosuto.Samples.Minimal.RazorModule</AssemblyName>
+    <!-- module static web assets are namespaced so the host can map them per module -->
+    <StaticWebAssetBasePath>.modules/$(AssemblyName)</StaticWebAssetBasePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Hosuto.Hosting.AspNetCore\Hosuto.Hosting.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Hosuto.SimpleInjector\Hosuto.SimpleInjector.csproj" />
+  </ItemGroup>
+
+</Project>
