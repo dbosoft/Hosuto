@@ -66,6 +66,29 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             var factory = BootstrapContext.Advanced.FrameworkServices.GetRequiredService<IModuleContextFactory<TModule>>();
             return factory.CreateModuleContext(BootstrapContext, services);
         }
+
+        protected static void ConfigureServiceProviderValidation(IHostBuilder builder, ModuleHostingOptions options)
+        {
+            if (!options.HasServiceProviderValidationOverride())
+                return;
+
+#if !NETSTANDARD2_0
+            builder.UseDefaultServiceProvider((_, serviceProviderOptions) =>
+                ApplyServiceProviderValidation(serviceProviderOptions, options));
+#endif
+        }
+
+        protected static void ApplyServiceProviderValidation(ServiceProviderOptions serviceProviderOptions, ModuleHostingOptions options)
+        {
+            var validateScopes = options.GetValidateScopesOverride();
+            if (validateScopes != null)
+                serviceProviderOptions.ValidateScopes = validateScopes.Value;
+#if !NETSTANDARD2_0
+            var validateOnBuild = options.GetValidateOnBuildOverride();
+            if (validateOnBuild != null)
+                serviceProviderOptions.ValidateOnBuild = validateOnBuild.Value;
+#endif
+        }
         
         public virtual void BootstrapHost(BootstrapModuleHostCommand<TModule> command)
         {
@@ -85,6 +108,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                 }
             });
 
+            ConfigureServiceProviderValidation(builder, command.Options);
 
             command.Options.ConfigureBuilderAction?.Invoke(builder);
             command.Host = builder.Build();

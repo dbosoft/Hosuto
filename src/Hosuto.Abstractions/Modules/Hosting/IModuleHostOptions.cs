@@ -16,7 +16,5 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             where TContext : class, IModuleContext;
 
         IModuleHostingOptions ModuleFactoryCallback(Func<IServiceProvider, object> moduleFactory);
-
-
     }
 }
