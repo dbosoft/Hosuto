@@ -103,18 +103,24 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         // Makes the module's own static web assets available at the module host's web root. Each
         // module's inner WebApplication has ApplicationName = the module assembly, so the module's
         // OWN static web assets manifest is already root-mapped - no ".modules/{module}" stripping is
-        // needed and each module host serves only its own assets. Serves via the WebRootFileProvider
+        // needed and each module host serves only its own assets. Served via the WebRootFileProvider
         // (classic UseStaticFiles), resolved lazily by the middleware after Build().
         private static void MapModuleStaticWebAssets(IServiceProvider hostServices)
         {
-            var environment = hostServices.GetService<IWebHostEnvironment>();
-            var configuration = hostServices.GetService<IConfiguration>();
-            if (environment == null || configuration == null)
-                return;
+            // both are always registered on a WebApplication host - fail fast if not.
+            var environment = hostServices.GetRequiredService<IWebHostEnvironment>();
+            var configuration = hostServices.GetRequiredService<IConfiguration>();
 
-            // dev: reads {module}.staticwebassets.runtime.json (assets mapped at the web root).
+            // Deliberately NOT gated on IsDevelopment (unlike WebApplicationBuilder's own automatic
+            // UseStaticWebAssets): a modules host defaults to the Production environment under
+            // `dotnet run`, so an env gate would never load the dev manifest and module assets would
+            // 404. Both loaders below are no-ops when their input is absent, so calling both
+            // unconditionally is safe:
+            //  - dev / build output: {module}.staticwebassets.runtime.json exists -> assets mapped at
+            //    the web root (no-op in published output, where that manifest is not present);
+            //  - published output: composes {contentRoot}/wwwroot/.modules/{module} physically
+            //    (no-op in dev, where that folder does not exist).
             StaticWebAssetsLoader.UseStaticWebAssets(environment, configuration);
-            // published: composes {contentRoot}/wwwroot/.modules/{module} physically.
             ModuleWebAssets.ModuleWebAssetsLoader.UseModuleAssets(environment, configuration);
         }
 
