@@ -13,27 +13,46 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         public IDictionary<object, object> Properties => _innerBuilder.Properties;
 
-        private readonly Dictionary<Type, ModuleHostingOptions> _registeredModules = new Dictionary<Type, ModuleHostingOptions>();
+        private readonly Dictionary<Type, IModuleRegistration> _registeredModules = new Dictionary<Type, IModuleRegistration>();
         private readonly List<Action<HostBuilderContext, IServiceCollection>> _configureFrameworkActions = new List<Action<HostBuilderContext, IServiceCollection>>();
         private bool _hostBuilt;
         private readonly IHostBuilder _innerBuilder = new HostBuilder();
         
         public IModulesHostBuilder HostModule<TModule>(Action<IModuleHostingOptions> options = null) where TModule : class
         {
-            HostModule(typeof(TModule), options);
+            // Generic overload: the closed ModuleRegistration<TModule> keeps the module type as a
+            // static generic parameter, so no reflection/MakeGenericType is needed to host it.
+            AddModuleRegistration(new ModuleRegistration<TModule>(CreateHostingOptions(options)));
             return this;
         }
 
         public IModulesHostBuilder HostModule(Type moduleType, Action<IModuleHostingOptions> options = null)
         {
-            if (_registeredModules.ContainsKey(moduleType))
-                throw new InvalidOperationException($"Module of type {moduleType} is already used.");
+            if (moduleType == null) throw new ArgumentNullException(nameof(moduleType));
 
+            // Type-based overload: the module type is only known at runtime, so the closed
+            // registration has to be created reflectively here. Prefer the generic HostModule<TModule>
+            // overload, which is trimming/AOT friendly.
+            var registration = (IModuleRegistration)Activator.CreateInstance(
+                typeof(ModuleRegistration<>).MakeGenericType(moduleType), CreateHostingOptions(options));
+
+            AddModuleRegistration(registration);
+            return this;
+        }
+
+        private void AddModuleRegistration(IModuleRegistration registration)
+        {
+            if (_registeredModules.ContainsKey(registration.ModuleType))
+                throw new InvalidOperationException($"Module of type {registration.ModuleType} is already used.");
+
+            _registeredModules.Add(registration.ModuleType, registration);
+        }
+
+        private static ModuleHostingOptions CreateHostingOptions(Action<IModuleHostingOptions> options)
+        {
             var hostingOptions = new ModuleHostingOptions();
             options?.Invoke(hostingOptions);
-
-            _registeredModules.Add(moduleType, hostingOptions);
-            return this;
+            return hostingOptions;
         }
 
         public IModulesHostBuilder ConfigureHostConfiguration(
@@ -127,19 +146,12 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                 var moduleHostServicesFactory = frameworkServices.GetService<IModuleHostServiceProviderFactory>();
                 moduleHostServicesFactoryState = moduleHostServicesFactory?.ConfigureServices(services);
 
-                foreach (var module in _registeredModules)
+                foreach (var registration in _registeredModules.Values)
                 {
-                    moduleHostServicesFactory?.ConfigureModule(module.Key, module.Value.ModuleFactory);
-                    if (moduleHostServicesFactory != null) continue;
-
-                    if (module.Value.ModuleFactory == null)
-                        services.AddSingleton(module.Key);
-                    else
-                        services.AddSingleton(module.Key, module.Value.ModuleFactory);
+                    registration.RegisterModule(services, moduleHostServicesFactory);
+                    registration.RegisterHost(services, frameworkServices);
                 }
 
-                RegisterModulesAndHosts(services, frameworkServices);
-                
             }).Build();
 
             var moduleHostServiceProvider = host.Services;
@@ -157,20 +169,6 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             BootstrapModuleHosts(moduleHostServiceProvider, frameworkServices);
 
             return host;
-        }
-
-        private void RegisterModulesAndHosts(IServiceCollection services, IServiceProvider frameworkServices)
-        {
-            foreach (var module in _registeredModules)
-            {
-                var internalHostType = typeof(Internal.IModuleHost<>).MakeGenericType(module.Key);
-                var serviceType = typeof(IModuleHost<>).MakeGenericType(module.Key);
-                var hostedServiceType = typeof(ModulesHostService<>).MakeGenericType(module.Key);
-                
-                var internalHost = frameworkServices.GetRequiredService(internalHostType);
-                services.AddSingleton(serviceType, sp => internalHost);
-                services.AddTransient(typeof(IHostedService), hostedServiceType);
-            }
         }
 
         IHostBuilder IHostBuilder.ConfigureHostConfiguration(Action<IConfigurationBuilder> configureDelegate)
@@ -235,18 +233,11 @@ namespace Dbosoft.Hosuto.Modules.Hosting
         }
 
 
-        private static IModuleHost GetModuleHost(Type moduleType, IServiceProvider frameworkServices)
-        {
-            var hostType = typeof(Internal.IModuleHost<>).MakeGenericType(moduleType);
-            var internalHost = frameworkServices.GetRequiredService(hostType) as IModuleHost;
-            return internalHost;
-        }
-
         private void BootstrapModuleHosts(IServiceProvider moduleHostServices, IServiceProvider frameworkServices)
         {
-            foreach (var module in _registeredModules)
+            foreach (var registration in _registeredModules.Values)
             {
-                GetModuleHost(module.Key, frameworkServices)?.Bootstrap(moduleHostServices, module.Value);
+                registration.Bootstrap(moduleHostServices, frameworkServices);
             }
         }
 
