@@ -23,7 +23,11 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                 BootstrapContext.Advanced.FrameworkServices.GetServices<IWebModuleConfigureFilter>(),
                 (ctx, appBuilder) =>
                 {
-                    ModuleMethodInvoker.CallOptionalMethod(BootstrapContext.ToModuleContext(app.ApplicationServices), "Configure", appBuilder);
+                    var innerContext = BootstrapContext.ToModuleContext(app.ApplicationServices);
+                    if (innerContext.Module is IApplicationConfiguringModule configuringModule)
+                        configuringModule.Configure(innerContext.ModulesHostServices, appBuilder);
+                    else
+                        ModuleMethodInvoker.CallOptionalMethod(innerContext, "Configure", appBuilder);
 
                 })(moduleContext, app);
 

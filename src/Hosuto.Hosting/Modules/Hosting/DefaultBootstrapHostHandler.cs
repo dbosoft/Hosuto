@@ -25,7 +25,11 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                     .Append(moduleServicesFilterAdapter)
                 , (ctx, s) =>
                 {
-                    ModuleMethodInvoker.CallOptionalMethod(BootstrapContext.ToModuleContext(serviceProvider), "ConfigureServices", serviceProvider, s);
+                    var moduleContext = BootstrapContext.ToModuleContext(serviceProvider);
+                    if (moduleContext.Module is IServiceConfiguringModule configuringModule)
+                        configuringModule.ConfigureServices(moduleContext.ModulesHostServices, s);
+                    else
+                        ModuleMethodInvoker.CallOptionalMethod(moduleContext, "ConfigureServices", serviceProvider, s);
                 })
                 (BootstrapContext.ToModuleHostBuilderContext(hostBuilderContext), services);
         }

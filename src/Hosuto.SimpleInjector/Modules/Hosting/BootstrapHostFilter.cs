@@ -20,7 +20,10 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                     .Append(useSimpleInjectorAdapter),
                 (ctx, o) =>
                 {
-                    ModuleMethodInvoker.CallOptionalMethod(ctx, "UseSimpleInjector", o);
+                    if (ctx.Module is IUseSimpleInjectorModule module)
+                        module.UseSimpleInjector(o);
+                    else
+                        ModuleMethodInvoker.CallOptionalMethod(ctx, "UseSimpleInjector", o);
 
                 })(moduleContext, options);
             
@@ -36,7 +39,10 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                     .Append(configureContainerAdapter),
                 (ctx, c) =>
                 {
-                    ModuleMethodInvoker.CallOptionalMethod(ctx, "ConfigureContainer", container);
+                    if (ctx.Module is IContainerConfiguringModule module)
+                        module.ConfigureContainer(ctx.ModulesHostServices, container);
+                    else
+                        ModuleMethodInvoker.CallOptionalMethod(ctx, "ConfigureContainer", container);
 
                 })(moduleContext, container);
 
