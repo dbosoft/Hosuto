@@ -15,21 +15,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting.Internal
 
         public bool ConfigureContextCalled { get; set; }
 
-        public bool? ValidateScopesOverride { get; private set; }
-
-        public bool? ValidateOnBuildOverride { get; private set; }
-
-        public bool HasServiceProviderValidationOverride =>
-            ValidateScopesOverride != null || ValidateOnBuildOverride != null;
-
         public IDictionary<string, object> Properties { get; } = new Dictionary<string, object>();
-
-        public IModuleHostingOptions ValidateServiceProvider(bool validateScopes, bool validateOnBuild)
-        {
-            ValidateScopesOverride = validateScopes;
-            ValidateOnBuildOverride = validateOnBuild;
-            return this;
-        }
 
         public IModuleHostingOptions Configure(Action<IServiceProvider> configureAction)
         {

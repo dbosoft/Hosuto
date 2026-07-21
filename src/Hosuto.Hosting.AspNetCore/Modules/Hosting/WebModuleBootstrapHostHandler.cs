@@ -75,7 +75,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
                             // Applied on the web host builder (after ConfigureWebHostDefaults has set
                             // its environment-based defaults) so the override wins deterministically.
-                            if (command.Options.HasServiceProviderValidationOverride)
+                            if (command.Options.HasServiceProviderValidationOverride())
                                 webHostBuilder.UseDefaultServiceProvider(serviceProviderOptions =>
                                     ApplyServiceProviderValidation(serviceProviderOptions, command.Options));
 

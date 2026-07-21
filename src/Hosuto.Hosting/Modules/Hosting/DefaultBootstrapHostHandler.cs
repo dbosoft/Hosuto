@@ -69,7 +69,7 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         protected static void ConfigureServiceProviderValidation(IHostBuilder builder, ModuleHostingOptions options)
         {
-            if (!options.HasServiceProviderValidationOverride)
+            if (!options.HasServiceProviderValidationOverride())
                 return;
 
 #if !NETSTANDARD2_0
@@ -80,11 +80,13 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         protected static void ApplyServiceProviderValidation(ServiceProviderOptions serviceProviderOptions, ModuleHostingOptions options)
         {
-            if (options.ValidateScopesOverride != null)
-                serviceProviderOptions.ValidateScopes = options.ValidateScopesOverride.Value;
+            var validateScopes = options.GetValidateScopesOverride();
+            if (validateScopes != null)
+                serviceProviderOptions.ValidateScopes = validateScopes.Value;
 #if !NETSTANDARD2_0
-            if (options.ValidateOnBuildOverride != null)
-                serviceProviderOptions.ValidateOnBuild = options.ValidateOnBuildOverride.Value;
+            var validateOnBuild = options.GetValidateOnBuildOverride();
+            if (validateOnBuild != null)
+                serviceProviderOptions.ValidateOnBuild = validateOnBuild.Value;
 #endif
         }
         
