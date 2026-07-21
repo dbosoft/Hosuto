@@ -23,7 +23,10 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                                 .Append(GenericModuleHostBuilderContextAdapter<SimpleInjectorAddOptions>.Create(typeof(IAddSimpleInjectorFilter<>))),
                             (ctx, o) =>
                             {
-                                ModuleMethodInvoker.CallOptionalMethod(containerContext, "AddSimpleInjector", o);
+                                if (containerContext.Module is IAddSimpleInjectorModule module)
+                                    module.AddSimpleInjector(o);
+                                else
+                                    ModuleMethodInvoker.CallOptionalMethod(containerContext, "AddSimpleInjector", o);
 
                             })(context, options);
 
