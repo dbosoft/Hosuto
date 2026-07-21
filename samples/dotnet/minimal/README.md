@@ -14,20 +14,20 @@ dotnet run --project App
 
 The host starts the module on an ephemeral port, then probes two URLs and prints the results.
 
-## What works
+## What it shows
 
 - `GET /` → **200** — Razor Pages are discovered and rendered on the minimal-API module host.
+- `GET /css/site.css` → **200** — the module's **static web assets** are served by the module host,
+  in both `dotnet run` (dev) and `dotnet publish` output.
 - Dependency injection / SimpleInjector module container (`ConfigureContainer`) works post-build.
+- The module is authored with the three module contracts: `IServiceConfiguringModule` (AddRazorPages),
+  `IApplicationConfiguringModule` (UseStaticFiles middleware) and `IEndpointConfiguringModule`
+  (MapRazorPages).
 
-## Known limitation (tracked as a follow-up)
+## How module static web assets are served
 
-- `GET /css/site.css` → **404** — a module's **static web assets are not yet mapped** on the
-  minimal-API host.
-
-  The classic host wires module assets via `ModuleWebAssetsLoader`, which is **file-provider /
-  XML-manifest** based (`{app}.StaticWebAssets.xml`) and manipulates `WebRootFileProvider`. Since
-  .NET 9 static web assets are **endpoint-based** (`MapStaticAssets`,
-  `{app}.staticwebassets.*.json`), that mechanism no longer applies. Mapping a module's static web
-  assets on net9/10 (filtering the host manifest's `.modules/{module}` entries into the module host)
-  is a separate piece of work and is intentionally **not** part of the initial `UseAspNetCoreMinimal`
-  handler.
+Each module's inner `WebApplication` uses `ApplicationName` = the module assembly, so the module's
+own static web assets manifest is already root-mapped. The host composes those assets onto the
+module's `WebRootFileProvider` after build (`StaticWebAssetsLoader.UseStaticWebAssets` for dev +
+`ModuleWebAssetsLoader.UseModuleAssets` for published output) — no `.modules/{module}` prefix
+stripping is needed, and each module host serves only its own assets.

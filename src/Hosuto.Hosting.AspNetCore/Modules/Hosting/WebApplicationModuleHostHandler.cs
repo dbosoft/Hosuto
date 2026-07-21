@@ -1,8 +1,10 @@
 #if NET6_0_OR_GREATER
+using System;
 using System.Collections.Generic;
 using Dbosoft.Hosuto.Modules.Hosting.Internal;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -94,7 +96,26 @@ namespace Dbosoft.Hosuto.Modules.Hosting
             command.Options.ConfigureBuilderAction?.Invoke(builder.Host);
 
             command.Host = builder.Build();
+            MapModuleStaticWebAssets(command.Host.Services);
             command.ModuleContext = CreateModuleContext(command.Host.Services);
+        }
+
+        // Makes the module's own static web assets available at the module host's web root. Each
+        // module's inner WebApplication has ApplicationName = the module assembly, so the module's
+        // OWN static web assets manifest is already root-mapped - no ".modules/{module}" stripping is
+        // needed and each module host serves only its own assets. Serves via the WebRootFileProvider
+        // (classic UseStaticFiles), resolved lazily by the middleware after Build().
+        private static void MapModuleStaticWebAssets(IServiceProvider hostServices)
+        {
+            var environment = hostServices.GetService<IWebHostEnvironment>();
+            var configuration = hostServices.GetService<IConfiguration>();
+            if (environment == null || configuration == null)
+                return;
+
+            // dev: reads {module}.staticwebassets.runtime.json (assets mapped at the web root).
+            StaticWebAssetsLoader.UseStaticWebAssets(environment, configuration);
+            // published: composes {contentRoot}/wwwroot/.modules/{module} physically.
+            ModuleWebAssets.ModuleWebAssetsLoader.UseModuleAssets(environment, configuration);
         }
 
         private void ConfigureApp(BootstrapModuleHostCommand<TModule> command, IApplicationBuilder app)
