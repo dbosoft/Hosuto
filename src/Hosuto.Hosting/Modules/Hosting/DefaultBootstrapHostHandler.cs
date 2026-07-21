@@ -17,9 +17,12 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         protected virtual void ConfigureServices(HostBuilderContext hostBuilderContext, IServiceCollection services, IServiceProvider serviceProvider)
         {
+            IFilter<IModulesHostBuilderContext, IServiceCollection> moduleServicesFilterAdapter =
+                new GenericModuleHostBuilderContextAdapter<IModuleServicesFilter<TModule>, TModule, IServiceCollection>();
+
             Filters.BuildFilterPipeline(
                 BootstrapContext.Advanced.FrameworkServices.GetServices<IModuleServicesFilter>()
-                    .Append(GenericModuleHostBuilderContextAdapter<IServiceCollection>.Create(typeof(IModuleServicesFilter<>)))
+                    .Append(moduleServicesFilterAdapter)
                 , (ctx, s) =>
                 {
                     ModuleMethodInvoker.CallOptionalMethod(BootstrapContext.ToModuleContext(serviceProvider), "ConfigureServices", serviceProvider, s);

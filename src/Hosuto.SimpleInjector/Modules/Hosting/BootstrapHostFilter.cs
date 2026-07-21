@@ -12,9 +12,12 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         private static void UseSimpleInjector(IModuleContext moduleContext, SimpleInjectorUseOptions options)
         {
+            IFilter<IModuleContext, SimpleInjectorUseOptions> useSimpleInjectorAdapter =
+                new GenericModuleContextFilterAdapter<IUseSimpleInjectorFilter<TModule>, TModule, SimpleInjectorUseOptions>();
+
             Filters.BuildFilterPipeline(
                 moduleContext.Advanced.FrameworkServices.GetServices<IUseSimpleInjectorFilter>()
-                    .Append(GenericModuleContextFilterAdapter<SimpleInjectorUseOptions>.Create(typeof(IUseSimpleInjectorFilter<>))),
+                    .Append(useSimpleInjectorAdapter),
                 (ctx, o) =>
                 {
                     ModuleMethodInvoker.CallOptionalMethod(ctx, "UseSimpleInjector", o);
@@ -25,9 +28,12 @@ namespace Dbosoft.Hosuto.Modules.Hosting
 
         private static void ConfigureContainer(IModuleContext moduleContext, Container container)
         {
+            IFilter<IModuleContext, Container> configureContainerAdapter =
+                new GenericModuleContextFilterAdapter<IConfigureContainerFilter<TModule>, TModule, Container>();
+
             Filters.BuildFilterPipeline(
                 moduleContext.Advanced.FrameworkServices.GetServices<IConfigureContainerFilter>()
-                    .Append(GenericModuleContextFilterAdapter<Container>.Create(typeof(IConfigureContainerFilter<>))),
+                    .Append(configureContainerAdapter),
                 (ctx, c) =>
                 {
                     ModuleMethodInvoker.CallOptionalMethod(ctx, "ConfigureContainer", container);
