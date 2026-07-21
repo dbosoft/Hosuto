@@ -15,9 +15,13 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- task: UseGitVersion@5
+- task: gitversion/setup@3.1.11
+  displayName: Install GitVersion
   inputs:
-    versionSpec: '5.x'
+    versionSpec: '5.11.x'
+      
+- task: gitversion/execute@3.1.11
+  displayName: Execute GitVersion
 
 - task: DotNetCoreCLI@2
   inputs:

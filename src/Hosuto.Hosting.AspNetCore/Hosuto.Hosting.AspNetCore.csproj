@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netcoreapp3.0;net5.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netcoreapp3.0;net6.0</TargetFrameworks>
     <AssemblyName>Dbosoft.Hosuto.Hosting.AspNetCore</AssemblyName>
     <RootNamespace>Dbosoft.Hosuto</RootNamespace>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
@@ -9,7 +9,7 @@
 
   <Import Project="..\..\build\pack.props" />
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
@@ -32,7 +32,7 @@
 
 
   <ItemGroup>
-    <PackageReference Include="GitVersion.MsBuild" Version="5.6.9">
+    <PackageReference Include="GitVersion.MsBuild" Version="5.11.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
