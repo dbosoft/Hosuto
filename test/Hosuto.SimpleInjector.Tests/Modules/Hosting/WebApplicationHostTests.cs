@@ -42,6 +42,17 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
             await host.StopAsync();
         }
 
+        // Endpoints are also mappable via a conventional MapEndpoints method (no interface),
+        // consistent with the other module methods' interface-or-convention model.
+        [Fact]
+        public async Task WebModule_maps_endpoints_via_convention_method()
+        {
+            using var host = await StartMinimalHost<ConventionEndpointModule>();
+            var body = await Get(host, BaseUrl<ConventionEndpointModule>(host) + "/conv");
+            Assert.Equal("mapped via convention", body);
+            await host.StopAsync();
+        }
+
 #if NET9_0_OR_GREATER
         // On .NET 9+ the minimal host enables ValidateOnBuild in Development, so a container-only
         // dependency fails validation - unless the module opts out via ValidateServiceProvider.
@@ -127,6 +138,23 @@ namespace Hosuto.SimpleInjector.Tests.Modules.Hosting
                 app.UseEndpoints(endpoints =>
                     endpoints.MapGet("/greet", async context =>
                         await context.Response.WriteAsync(_container.GetInstance<IGreeter>().Greet())));
+            }
+        }
+
+        public sealed class ConventionEndpointModule : WebModule, IServiceConfiguringModule
+        {
+            public override string Path { get; } = "";
+
+            void IServiceConfiguringModule.ConfigureServices(IServiceProvider serviceProvider, IServiceCollection services)
+            {
+                services.AddRouting();
+            }
+
+            // conventional MapEndpoints (no IEndpointConfiguringModule) - discovered by reflection.
+            // ReSharper disable once UnusedMember.Global
+            public void MapEndpoints(IEndpointRouteBuilder endpoints)
+            {
+                endpoints.MapGet("/conv", () => "mapped via convention");
             }
         }
 

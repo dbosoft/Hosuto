@@ -111,13 +111,22 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                         ModuleMethodInvoker.CallOptionalMethod(innerContext, "Configure", appBuilder);
                 })(command.ModuleContext, app);
 
-            // endpoints: minimal-API-style mapping via IEndpointConfiguringModule.
+            // endpoints: minimal-API-style mapping via IEndpointConfiguringModule or a conventional
+            // MapEndpoints(IEndpointRouteBuilder) method (same interface-or-convention model as the
+            // other module methods).
             var endpointContext = BootstrapContext.ToModuleContext(app.ApplicationServices);
-            if (endpointContext.Module is IEndpointConfiguringModule endpointModule)
+            var endpointModuleInstance = endpointContext.Module;
+            if (endpointModuleInstance is IEndpointConfiguringModule
+                || endpointModuleInstance.GetType().GetMethod("MapEndpoints") != null)
             {
                 app.UseRouting();
                 app.UseEndpoints(endpoints =>
-                    endpointModule.MapEndpoints(endpointContext.ModulesHostServices, endpoints));
+                {
+                    if (endpointModuleInstance is IEndpointConfiguringModule endpointModule)
+                        endpointModule.MapEndpoints(endpointContext.ModulesHostServices, endpoints);
+                    else
+                        ModuleMethodInvoker.CallOptionalMethod(endpointContext, "MapEndpoints", endpoints);
+                });
             }
         }
     }

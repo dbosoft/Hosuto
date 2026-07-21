@@ -12,6 +12,9 @@ namespace Dbosoft.Hosuto.Modules
     /// and calls this within the endpoint middleware, so it works the same on the classic and the
     /// minimal-API (<c>UseAspNetCoreMinimal</c>) host. A module may also implement
     /// <see cref="IApplicationConfiguringModule"/> for non-endpoint middleware.
+    /// Equivalently, a module may expose a conventional <c>MapEndpoints(IEndpointRouteBuilder)</c>
+    /// method instead of implementing this interface (interface-or-convention, like the other
+    /// module methods).
     /// </summary>
     public interface IEndpointConfiguringModule
     {

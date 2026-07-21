@@ -32,14 +32,22 @@ namespace Dbosoft.Hosuto.Modules.Hosting
                 })(moduleContext, app);
 
 #if NETCOREAPP
-            // endpoints: minimal-API-style mapping via IEndpointConfiguringModule (same contract as
-            // the minimal-API host). Endpoint routing is only available on ASP.NET Core 3.0+.
+            // endpoints: minimal-API-style mapping via IEndpointConfiguringModule or a conventional
+            // MapEndpoints(IEndpointRouteBuilder) method (same contract as the minimal-API host).
+            // Endpoint routing is only available on ASP.NET Core 3.0+.
             var endpointContext = BootstrapContext.ToModuleContext(app.ApplicationServices);
-            if (endpointContext.Module is IEndpointConfiguringModule endpointModule)
+            var endpointModuleInstance = endpointContext.Module;
+            if (endpointModuleInstance is IEndpointConfiguringModule
+                || endpointModuleInstance.GetType().GetMethod("MapEndpoints") != null)
             {
                 app.UseRouting();
                 app.UseEndpoints(endpoints =>
-                    endpointModule.MapEndpoints(endpointContext.ModulesHostServices, endpoints));
+                {
+                    if (endpointModuleInstance is IEndpointConfiguringModule endpointModule)
+                        endpointModule.MapEndpoints(endpointContext.ModulesHostServices, endpoints);
+                    else
+                        ModuleMethodInvoker.CallOptionalMethod(endpointContext, "MapEndpoints", endpoints);
+                });
             }
 #endif
         }
